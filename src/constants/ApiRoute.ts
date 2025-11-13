@@ -91,7 +91,7 @@ export const API_ROUTES = {
     SUBTYPE: {
       GET_ALL: `${BASE_URL}/mas/sub`,
       GET_BY_ID: (id: string) => `${BASE_URL}/mas/sub/${id}`,
-      GET_ALL_BY_CAMPAIGN_AND_TYPE: (campaignid: string,typeid:string) => `${BASE_URL}/mas/type/filter/campaign/${campaignid}/${typeid}`,
+      GET_ALL_BY_CAMPAIGN_AND_TYPE: (campaignid: string,typeid:string) => `${BASE_URL}/mas/sub/filter/${campaignid}/${typeid}`,
       GET_BY_PARAMS: (params: string) => `${BASE_URL}/mas/sub?${params}`,
       ADD: `${BASE_URL}/mas/sub`,
       UPDATE: (id: string) => `${BASE_URL}/mas/sub/${id}`,

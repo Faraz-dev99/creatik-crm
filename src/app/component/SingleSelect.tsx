@@ -71,7 +71,7 @@ export default function SingleSelect({ options, label, value, onChange, error }:
           transition-all duration-200 transform origin-top z-50
           ${open ? "opacity-100 scale-100 pointer-events-auto" : "opacity-0 scale-95 pointer-events-none"}`}
       >
-        {options.map((opt, idx) => (
+        {options.length > 0 ? (options.map((opt, idx) => (
           <li
             key={idx}
             onClick={() => handleSelect(opt)}
@@ -79,7 +79,11 @@ export default function SingleSelect({ options, label, value, onChange, error }:
           >
             {opt}
           </li>
-        ))}
+        ))
+      ): (
+        <li className="px-3 py-2 text-gray-500 text-sm">No options available</li>
+      )
+        }
       </ul>
 
       {/* Error */}

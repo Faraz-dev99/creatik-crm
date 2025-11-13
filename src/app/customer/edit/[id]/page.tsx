@@ -11,13 +11,15 @@ import { getCustomerById, updateCustomer } from "@/store/customer";
 import { customerAllDataInterface } from "@/store/customer.interface";
 import { handleFieldOptions } from "@/app/utils/handleFieldOptions";
 import { getCampaign } from "@/store/masters/campaign/campaign";
-import { getTypes } from "@/store/masters/types/types";
+import { getTypes, getTypesByCampaign } from "@/store/masters/types/types";
 import { getLocation } from "@/store/masters/location/location";
 import { getCity } from "@/store/masters/city/city";
 import { getFacilities } from "@/store/masters/facilities/facilities";
-import { getSubtype } from "@/store/masters/subtype/subtype";
+import { getSubtype, getSubtypeByCampaignAndType } from "@/store/masters/subtype/subtype";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import { handleFieldOptionsObject } from "@/app/utils/handleFieldOptionsObject";
+import ObjectSelect from "@/app/component/ObjectSelect";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -28,10 +30,10 @@ export default function CustomerEdit() {
   const router = useRouter();
 
   const [customerData, setCustomerData] = useState<customerAllDataInterface>({
-    Campaign: "",
-    CustomerType: "",
+    Campaign: { id: "", name: "" },
+    CustomerType: { id: "", name: "" },
     customerName: "",
-    CustomerSubtype: "",
+    CustomerSubtype: { id: "", name: "" },
     ContactNumber: "",
     City: "",
     Location: "",
@@ -73,11 +75,32 @@ export default function CustomerEdit() {
         }
         console.log("customer ", data);
         // Just set the fetched data
-        setCustomerData({
+        /* setCustomerData({
           ...data,
           CustomerImage: [], // no files yet, only local uploads go here
           SitePlan: {} as File, // same, user can manually upload
+        }); */
+
+        setCustomerData({
+          ...data,
+          Campaign: {
+            id: data?.Campaign?._id || "",
+            name: data?.Campaign?.Name || ""
+          },
+          CustomerType: {
+            id: data?.CustomerType?._id || "",
+            name: data?.CustomerType?.Name || ""
+          },
+          CustomerSubtype: {
+            id: data?.CustomerSubType?._id || "",  // map the backend typo
+            name: data?.CustomerSubType?.Name || ""
+          },
+          CustomerImage: [],
+          SitePlan: {} as File,
         });
+
+        
+
 
         // Preview URLs for already existing images
         setImagePreviews(Array.isArray(data.CustomerImage) ? data.CustomerImage : []);
@@ -94,14 +117,13 @@ export default function CustomerEdit() {
     };
 
     if (id) fetchCustomer();
-    if (id) fetchFields();
 
-    
+
   }, [id]);
 
-  useEffect(()=>{
-console.log("filed optoins ", fieldOptions.Location,dropdownOptions)
-  },[fieldOptions])
+  useEffect(() => {
+    console.log("filed optoins ", fieldOptions.Location, dropdownOptions)
+  }, [fieldOptions])
 
   // Input change handlers
   const handleInputChange = useCallback(
@@ -186,22 +208,7 @@ console.log("filed optoins ", fieldOptions.Location,dropdownOptions)
     return newErrors;
   };
 
-  const fetchFields = async () => {
-    await handleFieldOptions(
-      [
-        { key: "StatusAssign", staticData: ["Assigned", "Unassigned"] },
-        { key: "Campaign", fetchFn: getCampaign },
-        { key: "CustomerType", fetchFn: getTypes },
-        { key: "CustomerSubtype", fetchFn: getSubtype },
-        { key: "City", fetchFn: getCity },
-        { key: "Location", fetchFn: getLocation },
-        { key: "Facilities", fetchFn: getFacilities},
-        { key: "User", staticData: ["Admin", "Agent1", "Agent2"] },
-        { key: "Verified", staticData: ["yes", "no"] },
-      ],
-      setFieldOptions
-    );
-  }
+
 
   // ✅ Submit data correctly as FormData
   const handleSubmit = async () => {
@@ -215,10 +222,10 @@ console.log("filed optoins ", fieldOptions.Location,dropdownOptions)
       const formData = new FormData();
 
       // Append normal fields
-      if (customerData.Campaign) formData.append("Campaign", customerData.Campaign);
-      if (customerData.CustomerType) formData.append("CustomerType", customerData.CustomerType);
+      if (customerData.Campaign) formData.append("Campaign", customerData.Campaign?.name);
+      if (customerData.CustomerType) formData.append("CustomerType", customerData.CustomerType?.name);
       if (customerData.customerName) formData.append("customerName", customerData.customerName);
-      if (customerData.CustomerSubtype) formData.append("CustomerSubType", customerData.CustomerSubtype);
+      if (customerData.CustomerSubtype) formData.append("CustomerSubType", customerData.CustomerSubtype?.name);
       if (customerData.ContactNumber) formData.append("ContactNumber", customerData.ContactNumber);
       if (customerData.City) formData.append("City", customerData.City);
       if (customerData.Location) formData.append("Location", customerData.Location);
@@ -276,6 +283,66 @@ console.log("filed optoins ", fieldOptions.Location,dropdownOptions)
   };
 
   const dropdownOptions = ["Option1", "Option2", "Option3"];
+  // Object-based fields (for ObjectSelect)
+  const objectFields = [
+    { key: "Campaign", fetchFn: getCampaign },
+    { key: "CustomerType", staticData: [] },
+    { key: "CustomerSubtype", staticData: [] } // dependent
+
+  ];
+
+  // Simple array fields (for normal Select)
+  const arrayFields = [
+    { key: "Verified", staticData: ["yes", "no"] },
+    { key: "Gender", staticData: ["male", "female", "other"] },
+    { key: "City", fetchFn: getCity },
+    { key: "Facilities", fetchFn: getFacilities },
+    { key: "Location", fetchFn: getLocation },
+  ];
+
+
+  useEffect(() => {
+    const loadFieldOptions = async () => {
+      await handleFieldOptionsObject(objectFields, setFieldOptions);
+      await handleFieldOptions(arrayFields, setFieldOptions);
+    };
+    loadFieldOptions();
+  }, []);
+
+
+  useEffect(() => {
+    if (customerData.Campaign.id) {
+      fetchCustomerType(customerData.Campaign.id);
+    } else {
+      setFieldOptions((prev) => ({ ...prev, CustomerType: [] }));
+    }
+
+    if (customerData.Campaign.id && customerData.CustomerType.id) {
+      fetchCustomerSubType(customerData.Campaign.id, customerData.CustomerType.id);
+    } else {
+      setFieldOptions((prev) => ({ ...prev, CustomerSubtype: [] }));
+    }
+  }, [customerData.Campaign.id, customerData.CustomerType.id]);
+
+  const fetchCustomerType = async (campaignId: string) => {
+    try {
+      const res = await getTypesByCampaign(campaignId);
+      setFieldOptions((prev) => ({ ...prev, CustomerType: res || [] }));
+    } catch (error) {
+      console.error("Error fetching types:", error);
+      setFieldOptions((prev) => ({ ...prev, CustomerType: [] }));
+    }
+  };
+
+  const fetchCustomerSubType = async (campaignId: string, customertypeId: string) => {
+    try {
+      const res = await getSubtypeByCampaignAndType(campaignId, customertypeId);
+      setFieldOptions((prev) => ({ ...prev, CustomerSubtype: res || [] }));
+    } catch (error) {
+      console.error("Error fetching types:", error);
+      setFieldOptions((prev) => ({ ...prev, CustomerSubtype: [] }));
+    }
+  };
   if (loading) return null;
 
   return (
@@ -284,11 +351,11 @@ console.log("filed optoins ", fieldOptions.Location,dropdownOptions)
       <div className="w-full">
         <div className="flex justify-end mb-4">
           <BackButton
-              url="/customer"
-              text="Back"
-              icon={<ArrowLeft size={18} />}
+            url="/customer"
+            text="Back"
+            icon={<ArrowLeft size={18} />}
           />
-          
+
         </div>
 
         <div className="bg-white/90 backdrop-blur-lg p-10 w-full rounded-3xl shadow-2xl h-auto">
@@ -300,16 +367,72 @@ console.log("filed optoins ", fieldOptions.Location,dropdownOptions)
             </div>
 
             <div className="grid grid-cols-3 gap-6 max-xl:grid-cols-2 max-lg:grid-cols-1">
-              <SingleSelect options={Array.isArray(fieldOptions?.Campaign)?fieldOptions.Campaign:[]} label="Campaign" value={customerData.Campaign} onChange={(v) => handleSelectChange("Campaign", v)} />
-              <SingleSelect options={Array.isArray(fieldOptions?.CustomerType)?fieldOptions.CustomerType:[]} label="Customer Type" value={customerData.CustomerType} onChange={(v) => handleSelectChange("CustomerType", v)} />
+              {/*  <SingleSelect options={Array.isArray(fieldOptions?.Campaign)?fieldOptions.Campaign:[]} label="Campaign" value={customerData.Campaign} onChange={(v) => handleSelectChange("Campaign", v)} />
+              <SingleSelect options={Array.isArray(fieldOptions?.CustomerType)?fieldOptions.CustomerType:[]} label="Customer Type" value={customerData.CustomerType} onChange={(v) => handleSelectChange("CustomerType", v)} /> */}
+              <ObjectSelect
+                options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []}
+                label="Campaign"
+                value={customerData.Campaign.id}
+                getLabel={(item) => item?.Name || ""}
+                getId={(item) => item?._id || ""}
+                onChange={(selectedId) => {
+                  const selectedObj = fieldOptions.Campaign.find((i) => i._id === selectedId);
+                  if (selectedObj) {
+                    setCustomerData((prev) => ({
+                      ...prev,
+                      Campaign: { id: selectedObj._id, name: selectedObj.Name },
+                      CustomerType: { id: "", name: "" }, // reset on change
+                    }));
+                  }
+                }}
+                error={errors.Campaign}
+              />
+
+              <ObjectSelect
+                options={Array.isArray(fieldOptions?.CustomerType) ? fieldOptions.CustomerType : []}
+                label="Customer Type"
+                value={customerData.CustomerType.id}
+                getLabel={(item) => item?.Name || ""}
+                getId={(item) => item?._id || ""}
+                onChange={(selectedId) => {
+                  const selectedObj = fieldOptions.CustomerType.find((i) => i._id === selectedId);
+                  if (selectedObj) {
+                    setCustomerData((prev) => ({
+                      ...prev,
+                      CustomerType: { id: selectedObj._id, name: selectedObj.Name },
+                      CustomerSubtype: { id: "", name: "" } // reset on change
+                    }));
+                  }
+                }}
+                error={errors.CustomerType}
+              />
+
+              <ObjectSelect
+                options={Array.isArray(fieldOptions?.CustomerSubtype) ? fieldOptions.CustomerSubtype : []}
+                label="Customer Subtype"
+                value={customerData.CustomerSubtype?.id}
+                getLabel={(item) => item?.Name || ""}
+                getId={(item) => item?._id || ""}
+                onChange={(selectedId) => {
+                  const selectedObj = fieldOptions.CustomerSubtype.find((i) => i._id === selectedId);
+                  if (selectedObj) {
+                    setCustomerData((prev) => ({
+                      ...prev,
+                      CustomerSubtype: { id: selectedObj._id, name: selectedObj.Name },
+                    }));
+                  }
+                }}
+                error={errors.CustomerSubtype}
+              />
+
               <InputField label="Customer Name" name="customerName" value={customerData.customerName} onChange={handleInputChange} error={errors.CustomerName} />
               <InputField label="Contact No" name="ContactNumber" value={customerData.ContactNumber} onChange={handleInputChange} error={errors.ContactNumber} />
-              <SingleSelect options={Array.isArray(fieldOptions?.City)?fieldOptions.City:[]} label="City" value={customerData.City} onChange={(v) => handleSelectChange("City", v)} />
-              <SingleSelect options={Array.isArray(fieldOptions?.Location)?fieldOptions.Location:[]} label="Location" value={customerData.Location} onChange={(v) => handleSelectChange("Location", v)} />
+              <SingleSelect options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []} label="City" value={customerData.City} onChange={(v) => handleSelectChange("City", v)} />
+              <SingleSelect options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []} label="Location" value={customerData.Location} onChange={(v) => handleSelectChange("Location", v)} />
               <InputField label="Area" name="Area" value={customerData.Area} onChange={handleInputChange} />
               <InputField label="Address" name="Address" value={customerData.Address} onChange={handleInputChange} />
               <InputField label="Email" name="Email" value={customerData.Email} onChange={handleInputChange} error={errors.Email} />
-              <SingleSelect options={Array.isArray(fieldOptions?.Facilities)?fieldOptions.Facilities:[]} label="Facilities" value={customerData.Facilities} onChange={(v) => handleSelectChange("Facilities", v)} />
+              <SingleSelect options={Array.isArray(fieldOptions?.Facilities) ? fieldOptions.Facilities : []} label="Facilities" value={customerData.Facilities} onChange={(v) => handleSelectChange("Facilities", v)} />
               <InputField label="Reference ID" name="ReferenceId" value={customerData.ReferenceId} onChange={handleInputChange} />
               <InputField label="Customer ID" name="CustomerId" value={customerData.CustomerId} onChange={handleInputChange} />
               <DateSelector label="Customer Date" value={customerData.CustomerDate} onChange={(val) => handleSelectChange("CustomerDate", val)} />
@@ -318,13 +441,13 @@ console.log("filed optoins ", fieldOptions.Location,dropdownOptions)
               <InputField label="Description" name="Description" value={customerData.Description} onChange={handleInputChange} />
               <InputField label="Video" name="Video" value={customerData.Video} onChange={handleInputChange} />
               <InputField label="Google Map" name="GoogleMap" value={customerData.GoogleMap} onChange={handleInputChange} />
-              <SingleSelect options={Array.isArray(fieldOptions?.Verified)?fieldOptions.Verified:[]} label="Verified" value={customerData.Verified} onChange={(v) => handleSelectChange("Verified", v)} />
+              <SingleSelect options={Array.isArray(fieldOptions?.Verified) ? fieldOptions.Verified : []} label="Verified" value={customerData.Verified} onChange={(v) => handleSelectChange("Verified", v)} />
               <FileUpload label="Customer Images" multiple onChange={(e) => handleFileChange(e, "CustomerImage")} previews={imagePreviews} onRemove={handleRemoveImage} />
               <FileUpload label="Site Plan" onChange={(e) => handleFileChange(e, "SitePlan")} previews={sitePlanPreview.length > 0 ? [sitePlanPreview] : []} onRemove={() => handleRemoveSitePlan()} />
             </div>
 
             <div className="flex justify-end mt-4">
-              
+
               <SaveButton text="Update" onClick={handleSubmit} />
 
             </div>

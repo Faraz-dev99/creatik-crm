@@ -11,16 +11,18 @@ import { getCampaign } from "@/store/masters/campaign/campaign";   // Range
 import { handleFieldOptions } from "@/app/utils/handleFieldOptions";
 
 import { importContact } from "@/store/contact";   // ✅ Your contact import API
-import { getContactType } from "@/store/masters/contacttype/contacttype";
+import { getContactType, getContactTypeByCampaign } from "@/store/masters/contacttype/contacttype";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import { handleFieldOptionsObject } from "@/app/utils/handleFieldOptionsObject";
+import ObjectSelect from "@/app/component/ObjectSelect";
 
 
 export default function ContactImport() {
 
   const [importData, setImportData] = useState({
-    Campaign: "",
-    ContactType: "",
+    Campaign: { id: "", name: "" },
+    ContactType: { id: "", name: "" },
     Range: "",
     file: null as File | null,
   });
@@ -31,19 +33,47 @@ export default function ContactImport() {
 
 
   // ✅ Fetch dropdown data
+
+  // Object-based fields (for ObjectSelect)
+  const objectFields = [
+    { key: "Campaign", fetchFn: getCampaign },
+    { key: "ContactType", staticData: [] },
+
+  ];
+
+  // Simple array fields (for normal Select)
+  const arrayFields = [
+    { key: "Range", staticData: ["10", "20", "30"] }
+  ];
+  const rangeOptions=["10","20","30"]
+
   useEffect(() => {
-    fetchFields();
+    const loadFieldOptions = async () => {
+      await handleFieldOptionsObject(objectFields, setFieldOptions);
+      // await handleFieldOptions(arrayFields, setFieldOptions);
+    };
+    loadFieldOptions();
   }, []);
 
-  const fetchFields = async () => {
-    await handleFieldOptions(
-      [
-        { key: "Campaign", fetchFn: getCampaign },
-        { key: "ContactType", fetchFn: getContactType }, // ✅ Reuse types for contact types
-        { key: "Range", staticData: ["10", "20", "30"] },     // ✅ Range from subtype API
-      ],
-      setFieldOptions
-    );
+  useEffect(() => {
+    if (importData.Campaign.id) {
+      fetchContactType(importData.Campaign.id);
+    } else {
+      setFieldOptions((prev) => ({ ...prev, ContactType: [] }));
+    }
+
+
+  }, [importData.Campaign.id]);
+
+  const fetchContactType = async (campaignId: string) => {
+    try {
+      const res = await getContactTypeByCampaign(campaignId);
+      setFieldOptions((prev) => ({ ...prev, ContactType: res?.data || [] }));
+
+    } catch (error) {
+      console.error("Error fetching types:", error);
+      setFieldOptions((prev) => ({ ...prev, ContactType: [] }));
+    }
   };
 
 
@@ -84,8 +114,8 @@ export default function ContactImport() {
 
     try {
       const formData = new FormData();
-      formData.append("Campaign", importData.Campaign);
-      formData.append("ContactType", importData.ContactType);
+      formData.append("Campaign", importData.Campaign?.name);
+      formData.append("ContactType", importData.ContactType?.name);
       formData.append("Range", importData.Range);
       if (importData.file) formData.append("file", importData.file);
 
@@ -124,25 +154,45 @@ export default function ContactImport() {
           </h1>
 
           <div className="grid grid-cols-3 gap-6 max-md:grid-cols-1 max-lg:grid-cols-2">
-
-            <SingleSelect
+            <ObjectSelect
               options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []}
               label="Campaign"
-              value={importData.Campaign}
-              onChange={(v) => handleSelectChange("Campaign", v)}
+              value={importData.Campaign.id}
+              getLabel={(item) => item?.Name || ""}
+              getId={(item) => item?._id || ""}
+              onChange={(selectedId) => {
+                const selectedObj = fieldOptions.Campaign.find((i) => i._id === selectedId);
+                if (selectedObj) {
+                  setImportData((prev) => ({
+                    ...prev,
+                    Campaign: { id: selectedObj._id, name: selectedObj.Name },
+                    ContactType: { id: "", name: "" }, // reset on change
+                  }));
+                }
+              }}
               error={errors.Campaign}
             />
 
-            <SingleSelect
+            <ObjectSelect
               options={Array.isArray(fieldOptions?.ContactType) ? fieldOptions.ContactType : []}
               label="Contact Type"
-              value={importData.ContactType}
-              onChange={(v) => handleSelectChange("ContactType", v)}
+              value={importData.ContactType.id}
+              getLabel={(item) => item?.Name || ""}
+              getId={(item) => item?._id || ""}
+              onChange={(selectedId) => {
+                const selectedObj = fieldOptions.ContactType.find((i) => i._id === selectedId);
+                if (selectedObj) {
+                  setImportData((prev) => ({
+                    ...prev,
+                    ContactType: { id: selectedObj._id, name: selectedObj.Name },
+                  }));
+                }
+              }}
               error={errors.ContactType}
             />
 
             <SingleSelect
-              options={Array.isArray(fieldOptions?.Range) ? fieldOptions.Range : []}
+              options={rangeOptions}
               label="Range"
               value={importData.Range}
               onChange={(v) => handleSelectChange("Range", v)}
@@ -157,7 +207,7 @@ export default function ContactImport() {
           </div>
 
           <div className="flex justify-end mt-8">
-            
+
             <SaveButton text="Import" onClick={handleSubmit} />
 
           </div>

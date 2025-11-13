@@ -92,8 +92,8 @@ export default function Customer() {
         data.map((item: any) => ({
           _id: item._id,
           Campaign: item.Campaign,
-          Type: item.Type,
-          SubType: item.SubType,
+          Type: item.CustomerType,
+          SubType: item.CustomerSubType,
           Name: item.customerName,
           Email: item.Email,
           City: item.City,

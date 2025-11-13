@@ -43,7 +43,20 @@ export default function FavouritePage() {
   const getFavouriteData = async () => {
     const data = await getFavoutiteCustomer();
     console.log(data)
-    if (data) setFavouriteData(data.map((item: any) => ({ ...item, Name: item.customerName })));
+    if (data) setFavouriteData(data.map((item: any) => ({
+      _id: item._id,
+      Campaign: item.Campaign,
+      Type: item.CustomerType,
+      SubType: item.CustomerSubType,
+      Name: item.customerName,
+      Email: item.Email,
+      City: item.City,
+      Location: item.Location,
+      ContactNumber: item.ContactNumber,
+      AssignTo: item.AssignTo?.name,
+      isFavourite: item.isFavourite,
+      Date: item.Date,
+    })));
   };
 
   const handleDelete = async (data: DeleteDialogDataInterface | null) => {

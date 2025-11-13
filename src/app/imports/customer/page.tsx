@@ -7,18 +7,20 @@ import toast, { Toaster } from "react-hot-toast";
 import SingleSelect from "@/app/component/SingleSelect";
 import { useRouter } from "next/navigation";
 import { getCampaign } from "@/store/masters/campaign/campaign";
-import { getTypes } from "@/store/masters/types/types";
+import { getTypes, getTypesByCampaign } from "@/store/masters/types/types";
 import { handleFieldOptions } from "@/app/utils/handleFieldOptions";
 import { importCustomer } from "@/store/customer";
-import { getSubtype } from "@/store/masters/subtype/subtype";
+import { getSubtype, getSubtypeByCampaignAndType } from "@/store/masters/subtype/subtype";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import { handleFieldOptionsObject } from "@/app/utils/handleFieldOptionsObject";
+import ObjectSelect from "@/app/component/ObjectSelect";
 
 export default function CustomerImport() {
   const [importData, setImportData] = useState({
-    Campaign: "",
-    CustomerType: "",
-    CustomerSubType: "",
+    Campaign: {id:"",name:""},
+    CustomerType: {id:"",name:""},
+    CustomerSubType: {id:"",name:""},
     file: null as File | null,
   });
 
@@ -27,22 +29,65 @@ export default function CustomerImport() {
   const router = useRouter();
 
   // 🔹 Fetch dropdown data
+  /*   useEffect(() => {
+      fetchFields();
+    }, []);
+   */
+  // Object-based fields (for ObjectSelect)
+  const objectFields = [
+    { key: "Campaign", fetchFn: getCampaign },
+    { key: "CustomerType", staticData: [] },
+    { key: "CustomerSubtype", staticData: [] } // dependent
+
+  ];
+
+  // Simple array fields (for normal Select)
+  const arrayFields = [
+  ];
+
   useEffect(() => {
-    fetchFields();
+    const loadFieldOptions = async () => {
+      await handleFieldOptionsObject(objectFields, setFieldOptions);
+      // await handleFieldOptions(arrayFields, setFieldOptions);
+    };
+    loadFieldOptions();
   }, []);
 
-  const fetchFields = async () => {
-    await handleFieldOptions(
-      [
-        { key: "Campaign", fetchFn: getCampaign },
-        { key: "CustomerType", fetchFn: getTypes },
-        { key: "CustomerSubType", fetchFn: getSubtype },
-      ],
-      setFieldOptions
-    );
-  };
+    useEffect(() => {
+      if (importData.Campaign.id) {
+        fetchCustomerType(importData.Campaign.id);
+      } else {
+        setFieldOptions((prev) => ({ ...prev, CustomerType: [] }));
+      }
+  
+      if (importData.Campaign.id && importData.CustomerType.id) {
+        fetchCustomerSubType(importData.Campaign.id, importData.CustomerType.id);
+      } else {
+        setFieldOptions((prev) => ({ ...prev, CustomerSubtype: [] }));
+      }
+    }, [importData.Campaign.id, importData.CustomerType.id]);
+  
+    const fetchCustomerType = async (campaignId: string) => {
+      try {
+        const res = await getTypesByCampaign(campaignId);
+        setFieldOptions((prev) => ({ ...prev, CustomerType: res || [] }));
+      } catch (error) {
+        console.error("Error fetching types:", error);
+        setFieldOptions((prev) => ({ ...prev, CustomerType: [] }));
+      }
+    };
+  
+    const fetchCustomerSubType = async (campaignId: string, customertypeId: string) => {
+      try {
+        const res = await getSubtypeByCampaignAndType(campaignId, customertypeId);
+        setFieldOptions((prev) => ({ ...prev, CustomerSubtype: res || [] }));
+      } catch (error) {
+        console.error("Error fetching types:", error);
+        setFieldOptions((prev) => ({ ...prev, CustomerSubtype: [] }));
+      }
+    };
 
-  // 🔹 Handle select changes
+  // Handle select changes
   const handleSelectChange = useCallback(
     (label: string, value: string) => {
       setImportData((prev) => ({ ...prev, [label]: value }));
@@ -51,7 +96,7 @@ export default function CustomerImport() {
     []
   );
 
-  // 🔹 Handle input change
+  // Handle input change
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const { name, value } = e.target;
@@ -87,9 +132,9 @@ export default function CustomerImport() {
 
     try {
       const formData = new FormData();
-      formData.append("Campaign", importData.Campaign);
-      formData.append("CustomerType", importData.CustomerType);
-      formData.append("CustomerSubType", importData.CustomerSubType);
+      formData.append("Campaign", importData.Campaign?.name);
+      formData.append("CustomerType", importData.CustomerType?.name);
+      formData.append("CustomerSubType", importData.CustomerSubType?.name);
       if (importData.file) formData.append("file", importData.file);
 
       console.log(importData)
@@ -128,31 +173,63 @@ export default function CustomerImport() {
           </h1>
 
           <div className="grid grid-cols-3 gap-6  max-md:grid-cols-1 max-lg:grid-cols-2">
-            <SingleSelect
-              options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []}
-              label="Campaign"
-              value={importData.Campaign}
-              onChange={(v) => handleSelectChange("Campaign", v)}
-              error={errors.Campaign}
-            />
+           
 
-            <SingleSelect
-              options={Array.isArray(fieldOptions?.CustomerType) ? fieldOptions.CustomerType : []}
-              label="Customer Type"
-              value={importData.CustomerType}
-              onChange={(v) => handleSelectChange("CustomerType", v)}
-              error={errors.CustomerType}
-            />
+ <ObjectSelect
+                options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []}
+                label="Campaign"
+                value={importData.Campaign.id}
+                getLabel={(item) => item?.Name || ""}
+                getId={(item) => item?._id || ""}
+                onChange={(selectedId) => {
+                  const selectedObj = fieldOptions.Campaign.find((i) => i._id === selectedId);
+                  if (selectedObj) {
+                    setImportData((prev) => ({
+                      ...prev,
+                      Campaign: { id: selectedObj._id, name: selectedObj.Name },
+                      CustomerType: { id: "", name: "" }, // reset on change
+                    }));
+                  }
+                }}
+                error={errors.Campaign}
+              />
 
-            <SingleSelect
-              options={Array.isArray(fieldOptions?.CustomerSubType) ? fieldOptions.CustomerSubType : []}
-              label="Customer SubType"
-              value={importData.CustomerSubType}
-              onChange={(v) => handleSelectChange("CustomerSubType", v)}
-              error={errors.CustomerSubType}
-            />
+              <ObjectSelect
+                options={Array.isArray(fieldOptions?.CustomerType) ? fieldOptions.CustomerType : []}
+                label="Customer Type"
+                value={importData.CustomerType.id}
+                getLabel={(item) => item?.Name || ""}
+                getId={(item) => item?._id || ""}
+                onChange={(selectedId) => {
+                  const selectedObj = fieldOptions.CustomerType.find((i) => i._id === selectedId);
+                  if (selectedObj) {
+                    setImportData((prev) => ({
+                      ...prev,
+                      CustomerType: { id: selectedObj._id, name: selectedObj.Name },
+                      CustomerSubtype:{id:"",name:""} // reset on change
+                    }));
+                  }
+                }}
+                error={errors.CustomerType}
+              />
 
-
+              <ObjectSelect
+                options={Array.isArray(fieldOptions?.CustomerSubtype) ? fieldOptions.CustomerSubtype : []}
+                label="Customer Subtype"
+                value={importData.CustomerSubType.id}
+                getLabel={(item) => item?.Name || ""}
+                getId={(item) => item?._id || ""}
+                onChange={(selectedId) => {
+                  const selectedObj = fieldOptions.CustomerSubtype.find((i) => i._id === selectedId);
+                  if (selectedObj) {
+                    setImportData((prev) => ({
+                      ...prev,
+                      CustomerSubType: { id: selectedObj._id, name: selectedObj.Name },
+                    }));
+                  }
+                }}
+                error={errors.CustomerSubtype}
+              />
 
 
 
@@ -164,7 +241,7 @@ export default function CustomerImport() {
           </div>
 
           <div className="flex justify-end mt-8">
-            
+
             <SaveButton text="Import" onClick={handleSubmit} />
 
           </div>

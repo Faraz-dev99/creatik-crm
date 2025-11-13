@@ -52,7 +52,7 @@ export const getFilteredContact = async (params: string) => {
     }
 }
 
-export const addContact = async (data: contactAllDataInterface) => {
+export const addContact = async (data: any) => {
     try {
         let response = await fetch(API_ROUTES.CONTACT.ADD,
             {
@@ -119,7 +119,7 @@ export const assignContact = async (data:contactAssignInterface) => {
   }
 };
 
-export const updateContact = async (id: string, data: contactAllDataInterface) => {
+export const updateContact = async (id: string, data: any) => {
     try {
         let response = await fetch(API_ROUTES.CONTACT.UPDATE(id),
             {

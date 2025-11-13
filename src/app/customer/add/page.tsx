@@ -10,14 +10,17 @@ import { useRouter } from "next/navigation";
 import { addCustomer } from "@/store/customer";
 import { customerAllDataInterface } from "@/store/customer.interface";
 import { getCampaign } from "@/store/masters/campaign/campaign";
-import { getTypes } from "@/store/masters/types/types";
+import { getTypes, getTypesByCampaign } from "@/store/masters/types/types";
 import { getCity } from "@/store/masters/city/city";
 import { getLocation } from "@/store/masters/location/location";
 import { handleFieldOptions } from "@/app/utils/handleFieldOptions";
-import { getSubtype } from "@/store/masters/subtype/subtype";
+import { getSubtype, getSubtypeByCampaignAndType } from "@/store/masters/subtype/subtype";
 import { getFacilities } from "@/store/masters/facilities/facilities";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import { handleFieldOptionsObject } from "@/app/utils/handleFieldOptionsObject";
+import ObjectSelect from "@/app/component/ObjectSelect";
+import CustomerSubtypeAdd from "@/app/masters/customer-subtype/add/page";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -25,10 +28,10 @@ interface ErrorInterface {
 
 export default function CustomerAdd() {
   const [customerData, setCustomerData] = useState<customerAllDataInterface>({
-    Campaign: "",
-    CustomerType: "",
+    Campaign: { id: "", name: "" },
+    CustomerType: { id: "", name: "" },
     customerName: "",
-    CustomerSubtype: "",
+    CustomerSubtype: {id:"",name:""},
     ContactNumber: "",
     City: "",
     Location: "",
@@ -55,9 +58,7 @@ export default function CustomerAdd() {
   const [errors, setErrors] = useState<ErrorInterface>({});
   const router = useRouter();
 
-  useEffect(() => {
-    fetchFields();
-  }, [])
+
 
   // 🟩 Handle Input
   const handleInputChange = useCallback(
@@ -112,7 +113,7 @@ export default function CustomerAdd() {
   // 🟩 Validate Form
   const validateForm = () => {
     const newErrors: ErrorInterface = {};
-    if (!customerData.Campaign.trim())
+    if (!customerData.Campaign?.name.trim())
       newErrors.Campaign = "Campaign is required";
     if (!customerData.customerName.trim())
       newErrors.customerName = "Customer Name is required";
@@ -136,10 +137,10 @@ export default function CustomerAdd() {
 
       // Append fields
 
-      if (customerData.Campaign) formData.append("Campaign", customerData.Campaign);
-      if (customerData.CustomerType) formData.append("CustomerType", customerData.CustomerType);
+      if (customerData.Campaign) formData.append("Campaign", customerData.Campaign.name);
+      if (customerData.CustomerType) formData.append("CustomerType", customerData.CustomerType.name);
       if (customerData.customerName) formData.append("customerName", customerData.customerName);
-      if (customerData.CustomerSubtype) formData.append("CustomerSubType", customerData.CustomerSubtype);
+      if (customerData.CustomerSubtype) formData.append("CustomerSubType", customerData.CustomerSubtype?.name);
       if (customerData.ContactNumber) formData.append("ContactNumber", customerData.ContactNumber);
       if (customerData.City) formData.append("City", customerData.City);
       if (customerData.Location) formData.append("Location", customerData.Location);
@@ -182,22 +183,67 @@ export default function CustomerAdd() {
 
   const dropdownOptions = ["Option1", "Option2", "Option3"];
 
-  const fetchFields = async () => {
-    await handleFieldOptions(
-      [
-        { key: "StatusAssign", staticData: ["Assigned", "Unassigned"] },
-        { key: "Campaign", fetchFn: getCampaign },
-        { key: "CustomerType", fetchFn: getTypes },
-        { key: "CustomerSubtype", fetchFn: getSubtype },
-        { key: "City", fetchFn: getCity },
-        { key: "Facilities", fetchFn: getFacilities },
-        { key: "Location", fetchFn: getLocation },
-        { key: "User", staticData: ["Admin", "Agent1", "Agent2"] },
-        { key: "Verified", staticData: ["yes", "no"] },
-      ],
-      setFieldOptions
-    );
-  }
+  // Object-based fields (for ObjectSelect)
+  const objectFields = [
+    { key: "Campaign", fetchFn: getCampaign },
+    { key: "CustomerType", staticData: [] },
+    { key: "CustomerSubtype", staticData: [] } // dependent
+
+  ];
+
+  // Simple array fields (for normal Select)
+  const arrayFields = [
+    { key: "Verified", staticData: ["yes", "no"] },
+    { key: "Gender", staticData: ["male", "female", "other"] },
+    { key: "City", fetchFn: getCity },
+    { key: "Facilities", fetchFn: getFacilities },
+    { key: "Location", fetchFn: getLocation },
+  ];
+
+
+  useEffect(() => {
+    const loadFieldOptions = async () => {
+      await handleFieldOptionsObject(objectFields, setFieldOptions);
+      await handleFieldOptions(arrayFields, setFieldOptions);
+    };
+    loadFieldOptions();
+  }, []);
+
+
+  useEffect(() => {
+    if (customerData.Campaign.id) {
+      fetchCustomerType(customerData.Campaign.id);
+    } else {
+      setFieldOptions((prev) => ({ ...prev, CustomerType: [] }));
+    }
+
+    if (customerData.Campaign.id && customerData.CustomerType.id) {
+      fetchCustomerSubType(customerData.Campaign.id, customerData.CustomerType.id);
+    } else {
+      setFieldOptions((prev) => ({ ...prev, CustomerSubtype: [] }));
+    }
+  }, [customerData.Campaign.id, customerData.CustomerType.id]);
+
+  const fetchCustomerType = async (campaignId: string) => {
+    try {
+      const res = await getTypesByCampaign(campaignId);
+      setFieldOptions((prev) => ({ ...prev, CustomerType: res || [] }));
+    } catch (error) {
+      console.error("Error fetching types:", error);
+      setFieldOptions((prev) => ({ ...prev, CustomerType: [] }));
+    }
+  };
+
+  const fetchCustomerSubType = async (campaignId: string, customertypeId: string) => {
+    try {
+      const res = await getSubtypeByCampaignAndType(campaignId, customertypeId);
+      setFieldOptions((prev) => ({ ...prev, CustomerSubtype: res || [] }));
+    } catch (error) {
+      console.error("Error fetching types:", error);
+      setFieldOptions((prev) => ({ ...prev, CustomerSubtype: [] }));
+    }
+  };
+
 
 
 
@@ -207,10 +253,10 @@ export default function CustomerAdd() {
       <div className="w-full">
         <div className="flex justify-end mb-4">
           <BackButton
-             url="/customer"
-             text="Back"
-             icon={<ArrowLeft size={18} />}
-           />
+            url="/customer"
+            text="Back"
+            icon={<ArrowLeft size={18} />}
+          />
         </div>
 
         <div className="bg-white/90 backdrop-blur-lg p-10 w-full rounded-3xl shadow-2xl h-auto">
@@ -222,17 +268,73 @@ export default function CustomerAdd() {
             </div>
 
             <div className="grid grid-cols-3 gap-6 max-lg:grid-cols-1">
-              <SingleSelect options={Array.isArray(fieldOptions?.Campaign)?fieldOptions.Campaign:[]} label="Campaign" value={customerData.Campaign} onChange={(v) => handleSelectChange("Campaign", v)} error={errors.Campaign} />
-              <SingleSelect options={Array.isArray(fieldOptions?.CustomerType)?fieldOptions.CustomerType:[]} label="Customer Type" value={customerData.CustomerType} onChange={(v) => handleSelectChange("CustomerType", v)} />
-              <SingleSelect options={Array.isArray(fieldOptions?.CustomerSubtype)?fieldOptions.CustomerSubtype:[]} label="Customer Subtype" value={customerData.CustomerSubtype} onChange={(v) => handleSelectChange("CustomerSubtype", v)} />
+              {/* <SingleSelect options={Array.isArray(fieldOptions?.Campaign)?fieldOptions.Campaign:[]} label="Campaign" value={customerData.Campaign} onChange={(v) => handleSelectChange("Campaign", v)} error={errors.Campaign} />
+              <SingleSelect options={Array.isArray(fieldOptions?.CustomerType)?fieldOptions.CustomerType:[]} label="Customer Type" value={customerData.CustomerType} onChange={(v) => handleSelectChange("CustomerType", v)} /> */}
+              <ObjectSelect
+                options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []}
+                label="Campaign"
+                value={customerData.Campaign.id}
+                getLabel={(item) => item?.Name || ""}
+                getId={(item) => item?._id || ""}
+                onChange={(selectedId) => {
+                  const selectedObj = fieldOptions.Campaign.find((i) => i._id === selectedId);
+                  if (selectedObj) {
+                    setCustomerData((prev) => ({
+                      ...prev,
+                      Campaign: { id: selectedObj._id, name: selectedObj.Name },
+                      CustomerType: { id: "", name: "" }, // reset on change
+                    }));
+                  }
+                }}
+                error={errors.Campaign}
+              />
+
+              <ObjectSelect
+                options={Array.isArray(fieldOptions?.CustomerType) ? fieldOptions.CustomerType : []}
+                label="Customer Type"
+                value={customerData.CustomerType.id}
+                getLabel={(item) => item?.Name || ""}
+                getId={(item) => item?._id || ""}
+                onChange={(selectedId) => {
+                  const selectedObj = fieldOptions.CustomerType.find((i) => i._id === selectedId);
+                  if (selectedObj) {
+                    setCustomerData((prev) => ({
+                      ...prev,
+                      CustomerType: { id: selectedObj._id, name: selectedObj.Name },
+                      CustomerSubtype:{id:"",name:""} // reset on change
+                    }));
+                  }
+                }}
+                error={errors.CustomerType}
+              />
+
+              <ObjectSelect
+                options={Array.isArray(fieldOptions?.CustomerSubtype) ? fieldOptions.CustomerSubtype : []}
+                label="Customer Subtype"
+                value={customerData.CustomerSubtype.id}
+                getLabel={(item) => item?.Name || ""}
+                getId={(item) => item?._id || ""}
+                onChange={(selectedId) => {
+                  const selectedObj = fieldOptions.CustomerSubtype.find((i) => i._id === selectedId);
+                  if (selectedObj) {
+                    setCustomerData((prev) => ({
+                      ...prev,
+                      CustomerSubtype: { id: selectedObj._id, name: selectedObj.Name },
+                    }));
+                  }
+                }}
+                error={errors.CustomerSubtype}
+              />
+
+                           
               <InputField label="Customer Name" name="customerName" value={customerData.customerName} onChange={handleInputChange} error={errors.customerName} />
               <InputField label="Contact No" name="ContactNumber" value={customerData.ContactNumber} onChange={handleInputChange} error={errors.ContactNumber} />
-              <SingleSelect options={Array.isArray(fieldOptions?.City)?fieldOptions.City:[]} label="City" value={customerData.City} onChange={(v) => handleSelectChange("City", v)} />
-              <SingleSelect options={Array.isArray(fieldOptions?.Location)?fieldOptions.Location:[]} label="Location" value={customerData.Location} onChange={(v) => handleSelectChange("Location", v)} />
+              <SingleSelect options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []} label="City" value={customerData.City} onChange={(v) => handleSelectChange("City", v)} />
+              <SingleSelect options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []} label="Location" value={customerData.Location} onChange={(v) => handleSelectChange("Location", v)} />
               <InputField label="Area" name="Area" value={customerData.Area} onChange={handleInputChange} />
               <InputField label="Address" name="Address" value={customerData.Address} onChange={handleInputChange} />
               <InputField label="Email" name="Email" value={customerData.Email} onChange={handleInputChange} error={errors.Email} />
-              <SingleSelect options={Array.isArray(fieldOptions?.Facilities)?fieldOptions.Facilities:[]} label="Facilities" value={customerData.Facilities} onChange={(v) => handleSelectChange("Facilities", v)} />
+              <SingleSelect options={Array.isArray(fieldOptions?.Facilities) ? fieldOptions.Facilities : []} label="Facilities" value={customerData.Facilities} onChange={(v) => handleSelectChange("Facilities", v)} />
               <InputField label="Reference ID" name="ReferenceId" value={customerData.ReferenceId} onChange={handleInputChange} />
               <InputField label="Customer ID" name="CustomerId" value={customerData.CustomerId} onChange={handleInputChange} />
               <DateSelector label="Customer Date" value={customerData.CustomerDate} onChange={(val) => handleSelectChange("CustomerDate", val)} />
@@ -241,14 +343,14 @@ export default function CustomerAdd() {
               <InputField label="Description" name="Description" value={customerData.Description} onChange={handleInputChange} />
               <InputField label="Video" name="Video" value={customerData.Video} onChange={handleInputChange} />
               <InputField label="Google Map" name="GoogleMap" value={customerData.GoogleMap} onChange={handleInputChange} />
-              <SingleSelect options={Array.isArray(fieldOptions?.Verified)?fieldOptions.Verified:[]} label="Verified" value={customerData.Verified} onChange={(v) => handleSelectChange("Verified", v)} />
+              <SingleSelect options={Array.isArray(fieldOptions?.Verified) ? fieldOptions.Verified : []} label="Verified" value={customerData.Verified} onChange={(v) => handleSelectChange("Verified", v)} />
               <FileUpload label="Customer Images" multiple previews={imagePreviews} onChange={(e) => handleFileChange(e, "CustomerImage")} onRemove={handleRemoveImage} />
               <FileUpload label="Site Plan" previews={sitePlanPreview ? [sitePlanPreview] : []} onChange={(e) => handleFileChange(e, "SitePlan")} onRemove={handleRemoveSitePlan} />
 
             </div>
 
             <div className="flex justify-end mt-4">
-              
+
               <SaveButton text="Save" onClick={handleSubmit} />
 
             </div>

@@ -11,7 +11,7 @@ import { addContact } from "@/store/contact";
 import { contactAllDataInterface } from "@/store/contact.interface";
 import { handleFieldOptions } from "@/app/utils/handleFieldOptions";
 import { getCampaign } from "@/store/masters/campaign/campaign";
-import { getContactType } from "@/store/masters/contacttype/contacttype";
+import { getContactType, getContactTypeByCampaign } from "@/store/masters/contacttype/contacttype";
 import { getCity } from "@/store/masters/city/city";
 import { getLocation } from "@/store/masters/location/location";
 import { getIndustries } from "@/store/masters/industries/industries";
@@ -21,6 +21,8 @@ import { InputField } from "@/app/component/InputField";
 import TextareaField from "@/app/component/datafields/TextareaField";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import { handleFieldOptionsObject } from "@/app/utils/handleFieldOptionsObject";
+import ObjectSelect from "@/app/component/ObjectSelect";
 
 interface ErrorInterface {
   [key: string]: string; // dynamic key type for any field
@@ -28,10 +30,10 @@ interface ErrorInterface {
 
 export default function ContactAdd() {
   const [contactData, setContactData] = useState<contactAllDataInterface>({
-    Campaign: "",
+    Campaign: { id: "", name: "" },
     Name: "",
     City: "",
-    ContactType: "",
+    ContactType: { id: "", name: "" },
     ContactNo: "",
     Location: "",
     Email: "",
@@ -50,9 +52,7 @@ export default function ContactAdd() {
   const router = useRouter();
   const [fieldOptions, setFieldOptions] = useState<Record<string, any[]>>({});
 
-  useEffect(() => {
-    fetchFields();
-  }, [])
+
 
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -88,17 +88,21 @@ export default function ContactAdd() {
       return;
     }
 
-    const payload = { ...contactData };
+    const payload = {
+      ...contactData,
+      Campaign: contactData.Campaign?.name,
+      ContactType: contactData.ContactType?.name
+    };
     if (contactData.date === "") delete (payload as any).date;
 
     const data = await addContact(payload);
     if (data) {
       toast.success("Contact added successfully!");
       setContactData({
-        Campaign: "",
+        Campaign: { id: "", name: "" },
         Name: "",
         City: "",
-        ContactType: "",
+        ContactType: { id: "", name: "" },
         ContactNo: "",
         Location: "",
         Email: "",
@@ -119,21 +123,53 @@ export default function ContactAdd() {
     toast.error("Failed to add contact");
   };
 
-  const fetchFields = async () => {
-    await handleFieldOptions(
-      [
-        { key: "Status", staticData: ["Active", "Inactive"] },
-        { key: "Campaign", fetchFn: getCampaign },
-        { key: "ContactType", fetchFn: getContactType },
-        { key: "City", fetchFn: getCity },
-        { key: "Location", fetchFn: getLocation },
-        { key: "ContactIndustry", fetchFn: getIndustries },
-        { key: "ContactFunctionalArea", fetchFn: getFunctionalAreas },
-        { key: "ReferenceId", fetchFn: getReferences },
-      ],
-      setFieldOptions
-    );
-  }
+
+
+  // Object-based fields (for ObjectSelect)
+  const objectFields = [
+    { key: "Campaign", fetchFn: getCampaign },
+    { key: "ContactType", staticData: [] },
+
+  ];
+
+  // Simple array fields (for normal Select)
+  const arrayFields = [
+    { key: "Status", staticData: ["Active", "Inactive"] },
+    { key: "City", fetchFn: getCity },
+    { key: "Location", fetchFn: getLocation },
+    { key: "ContactIndustry", fetchFn: getIndustries },
+    { key: "ContactFunctionalArea", fetchFn: getFunctionalAreas },
+    { key: "ReferenceId", fetchFn: getReferences },
+  ];
+
+  useEffect(() => {
+    const loadFieldOptions = async () => {
+      await handleFieldOptionsObject(objectFields, setFieldOptions);
+      await handleFieldOptions(arrayFields, setFieldOptions);
+    };
+    loadFieldOptions();
+  }, []);
+
+  useEffect(() => {
+    if (contactData.Campaign.id) {
+      fetchContactType(contactData.Campaign.id);
+    } else {
+      setFieldOptions((prev) => ({ ...prev, ContactType: [] }));
+    }
+
+
+  }, [contactData.Campaign.id]);
+
+  const fetchContactType = async (campaignId: string) => {
+    try {
+      const res = await getContactTypeByCampaign(campaignId);
+      setFieldOptions((prev) => ({ ...prev, ContactType: res?.data || [] }));
+      
+    } catch (error) {
+      console.error("Error fetching types:", error);
+      setFieldOptions((prev) => ({ ...prev, ContactType: [] }));
+    }
+  };
 
   // Dropdown data
   const campaign = ['Buyer', 'Seller', 'Rent Out', 'Rent In', 'Hostel/PG', 'Agents', 'Services', 'Others', 'Guest House', 'Happy Stay'];
@@ -150,7 +186,7 @@ export default function ContactAdd() {
       <Toaster position="top-right" />
       <div className="w-full ">
         <div className="flex justify-end mb-4">
-          
+
           <BackButton
             url="/contact"
             text="Back"
@@ -168,11 +204,45 @@ export default function ContactAdd() {
 
             <div className="flex flex-col space-y-6">
               <div className="grid grid-cols-3 gap-6 max-lg:grid-cols-1">
+                <ObjectSelect
+                  options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []}
+                  label="Campaign"
+                  value={contactData.Campaign.id}
+                  getLabel={(item) => item?.Name || ""}
+                  getId={(item) => item?._id || ""}
+                  onChange={(selectedId) => {
+                    const selectedObj = fieldOptions.Campaign.find((i) => i._id === selectedId);
+                    if (selectedObj) {
+                      setContactData((prev) => ({
+                        ...prev,
+                        Campaign: { id: selectedObj._id, name: selectedObj.Name },
+                        ContactType: { id: "", name: "" }, // reset on change
+                      }));
+                    }
+                  }}
+                  error={errors.Campaign}
+                />
 
-                <SingleSelect options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []} label="Campaign" value={contactData.Campaign} onChange={(s) => handleSelectChange("Campaign", s)} />
+                <ObjectSelect
+                  options={Array.isArray(fieldOptions?.ContactType) ? fieldOptions.ContactType : []}
+                  label="Contact Type"
+                  value={contactData.ContactType.id}
+                  getLabel={(item) => item?.Name || ""}
+                  getId={(item) => item?._id || ""}
+                  onChange={(selectedId) => {
+                    const selectedObj = fieldOptions.ContactType.find((i) => i._id === selectedId);
+                    if (selectedObj) {
+                      setContactData((prev) => ({
+                        ...prev,
+                        ContactType: { id: selectedObj._id, name: selectedObj.Name },
+                      }));
+                    }
+                  }}
+                  error={errors.ContactType}
+                />
+
                 <InputField label="Contact Name" name="Name" value={contactData.Name} onChange={handleInputChange} error={errors.Name} />
                 <SingleSelect options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []} label="City" value={contactData.City} onChange={(s) => handleSelectChange("City", s)} />
-                <SingleSelect options={Array.isArray(fieldOptions?.ContactType) ? fieldOptions.ContactType : []} label="Contact Type" value={contactData.ContactType} onChange={(s) => handleSelectChange("ContactType", s)} />
                 <InputField label="Contact No" name="ContactNo" value={contactData.ContactNo} onChange={handleInputChange} />
                 <SingleSelect options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []} label="Location" value={contactData.Location} onChange={(s) => handleSelectChange("Location", s)} />
                 <InputField label="Email" name="Email" value={contactData.Email} onChange={handleInputChange} error={errors.Email} />
@@ -188,14 +258,14 @@ export default function ContactAdd() {
               </div>
 
               <div className="flex justify-end mt-4">
-                
+
                 <SaveButton text="Save" onClick={handleSubmit} />
 
               </div>
             </div>
           </form>
         </div>
-      </div> 
+      </div>
     </div>
   );
 }
