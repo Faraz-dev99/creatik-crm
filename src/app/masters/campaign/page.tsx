@@ -13,6 +13,7 @@ import { deleteCampaign, getCampaign } from "@/store/masters/campaign/campaign";
 import DeleteDialog from "@/app/component/popups/DeleteDialog";
 import AddButton from "@/app/component/buttons/AddButton";
 import PageHeader from "@/app/component/labels/PageHeader";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 /* import { getCampaigns, deleteCampaign } from "@/store/campaigns"; */ // you'll create these API helpers
 
@@ -91,7 +92,7 @@ export default function CampaignPage() {
     };
 
     return (
-        <>
+        <MasterProtectedRoute>
             <Toaster position="top-right" />
             <div className="min-h-[calc(100vh-56px)] overflow-auto max-md:py-10">
                 {/* Header */}
@@ -272,6 +273,6 @@ export default function CampaignPage() {
                     </div>
                 </div>
             </div>
-        </>
+        </MasterProtectedRoute>
     );
 }

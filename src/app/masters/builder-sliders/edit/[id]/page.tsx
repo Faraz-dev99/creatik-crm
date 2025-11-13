@@ -10,6 +10,7 @@ import { builderslidersGetDataInterface } from "@/store/masters/buildersliders/b
 import SingleSelect from "@/app/component/SingleSelect";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -115,6 +116,7 @@ export default function BuilderSliderEdit() {
     );
 
   return (
+    <MasterProtectedRoute>
     <div className=" min-h-screen flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full max-w-2xl">
@@ -184,5 +186,6 @@ export default function BuilderSliderEdit() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }

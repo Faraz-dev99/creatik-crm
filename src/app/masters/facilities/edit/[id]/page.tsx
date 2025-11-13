@@ -10,6 +10,7 @@ import { getFacilitiesById, updateFacilities } from "@/store/masters/facilities/
 import { facilitiesAllDataInterface } from "@/store/masters/facilities/facilities.interface";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -105,6 +106,7 @@ export default function FacilitiesEdit() {
     );
 
   return (
+    <MasterProtectedRoute>
     <div className=" min-h-screen flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
@@ -157,6 +159,7 @@ export default function FacilitiesEdit() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

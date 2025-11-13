@@ -10,6 +10,7 @@ import { getReferencesById, updateReferences } from "@/store/masters/references/
 import { referencesAllDataInterface } from "@/store/masters/references/references.interface";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -94,6 +95,7 @@ export default function ReferenceEdit() {
     );
 
   return (
+    <MasterProtectedRoute>
     <div className=" min-h-screen flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
@@ -146,6 +148,7 @@ export default function ReferenceEdit() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

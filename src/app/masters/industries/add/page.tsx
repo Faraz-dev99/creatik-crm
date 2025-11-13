@@ -10,6 +10,7 @@ import { industriesAllDataInterface } from "@/store/masters/industries/industrie
 import { addIndustries } from "@/store/masters/industries/industries"; // create this API helper
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -67,6 +68,7 @@ export default function IndustriesAdd() {
   const statusOptions = ["Active", "Inactive"];
 
   return (
+    <MasterProtectedRoute>
     <div className=" min-h-screen flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
@@ -119,6 +121,7 @@ export default function IndustriesAdd() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

@@ -10,6 +10,7 @@ import { paymentsAllDataInterface, paymentsGetDataInterface } from "@/store/mast
 import { getPaymentsById, updatePayments } from "@/store/masters/payments/payments";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -95,6 +96,7 @@ export default function PaymentMethodEdit() {
     );
 
   return (
+    <MasterProtectedRoute>
     <div className=" min-h-screen flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
@@ -142,6 +144,7 @@ export default function PaymentMethodEdit() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

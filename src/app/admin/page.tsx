@@ -9,22 +9,38 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Login = () => {
   const router = useRouter();
-  const { admin, login } = useAuth();
+  const { admin, isLoading, login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false)
-    const togglePassword = () => {
-        setShowPassword(!showPassword)
-    };
+  const togglePassword = () => {
+    setShowPassword(!showPassword)
+  };
 
-   //Redirect if already logged in
-   
-   useEffect(() => {
-    console.log(admin)
-     if (admin) router.push("/dashboard")
-     else console.log("adming not found ",admin)
-   }, [admin, router]);
+  //Redirect if already logged in
+  /* useEffect(() => {
+   console.log(admin)
+    if (admin) router.push("/dashboard")
+    else console.log("adming not found ",admin)
+  }, [admin, router]); */
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (admin) {
+      router.push("/dashboard");
+    }
+  }, [admin, router]);
+
+  if (isLoading || loading) {
+    return (
+      <div className="grid place-items-center min-h-screen w-full text-lg text-gray-600">
+        Loading...
+      </div>
+    );
+  }
+
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,9 +51,6 @@ const Login = () => {
     setLoading(false);
   };
 
-  if(loading){
-    return null
-  }
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-[url('/bgimage.webp')] bg-center bg-cover">
@@ -72,11 +85,10 @@ const Login = () => {
               />
               <label
                 htmlFor="email"
-                className={`absolute left-10 text-gray-300 text-sm transition-all duration-200 ${
-                  email
-                    ? "-top-1.5 text-purple-300 text-sm"
-                    : "top-3 text-gray-300 text-base"
-                } peer-focus:-top-1.5 peer-focus:text-purple-300 peer-focus:text-sm`}
+                className={`absolute left-10 text-gray-300 text-sm transition-all duration-200 ${email
+                  ? "-top-1.5 text-purple-300 text-sm"
+                  : "top-3 text-gray-300 text-base"
+                  } peer-focus:-top-1.5 peer-focus:text-purple-300 peer-focus:text-sm`}
               >
                 Email Address
               </label>
@@ -94,11 +106,10 @@ const Login = () => {
               />
               <label
                 htmlFor="password"
-                className={`absolute left-10 text-gray-300 text-sm transition-all duration-200 ${
-                  password
-                    ? "-top-1.5 text-purple-300 text-md"
-                    : "top-3 text-gray-300 text-base"
-                } peer-focus:-top-1.5 peer-focus:text-purple-300 peer-focus:text-sm`}
+                className={`absolute left-10 text-gray-300 text-sm transition-all duration-200 ${password
+                  ? "-top-1.5 text-purple-300 text-md"
+                  : "top-3 text-gray-300 text-base"
+                  } peer-focus:-top-1.5 peer-focus:text-purple-300 peer-focus:text-sm`}
               >
                 Password
               </label>

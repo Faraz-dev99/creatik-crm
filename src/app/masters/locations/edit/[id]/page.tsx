@@ -10,6 +10,7 @@ import { getLocationById, updateLocation } from "@/store/masters/location/locati
 import { locationAllDataInterface } from "@/store/masters/location/location.interface";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -106,6 +107,7 @@ export default function LocationEdit() {
     );
 
   return (
+    <MasterProtectedRoute>
     <div className=" min-h-screen flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
@@ -167,6 +169,7 @@ export default function LocationEdit() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

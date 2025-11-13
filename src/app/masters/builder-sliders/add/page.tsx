@@ -10,6 +10,7 @@ import { builderslidersAllDataInterface } from "@/store/masters/buildersliders/b
 import { addBuildersliders } from "@/store/masters/buildersliders/buildersliders";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -88,6 +89,7 @@ export default function BuilderSliderAdd() {
   const statusOptions = ["Active", "Inactive"];
 
   return (
+    <MasterProtectedRoute>
     <div className=" min-h-screen flex justify-center">
       <Toaster position="top-right" />
 
@@ -164,6 +166,7 @@ export default function BuilderSliderAdd() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

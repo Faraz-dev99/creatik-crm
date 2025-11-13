@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 
 interface AuthContextType {
   admin: Admin | null;
+  isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -59,7 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  return <AuthContext.Provider value={{ admin, login, logout }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ admin,isLoading, login, logout }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {

@@ -16,6 +16,7 @@ import {
 import { getExpenses, deleteExpenses } from "@/store/masters/expenses/expenses";
 import AddButton from "@/app/component/buttons/AddButton";
 import PageHeader from "@/app/component/labels/PageHeader";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 export default function ExpensesPage() {
     const [expenses, setExpenses] = useState<expensesGetDataInterface[]>([]);
@@ -87,7 +88,7 @@ export default function ExpensesPage() {
     };
 
     return (
-        <>
+        <MasterProtectedRoute>
             <Toaster position="top-right" />
             <div className="min-h-[calc(100vh-56px)] overflow-auto max-md:py-10">
                 
@@ -255,6 +256,6 @@ export default function ExpensesPage() {
                     </div>
                 </div>
             </div>
-        </>
+        </MasterProtectedRoute>
     );
 }

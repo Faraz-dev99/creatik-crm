@@ -10,6 +10,7 @@ import { statustypeAllDataInterface } from "@/store/masters/statustype/statustyp
 import { addStatusType } from "@/store/masters/statustype/statustype";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -67,6 +68,7 @@ export default function StatusTypeAdd() {
   const statusOptions = ["Active", "Inactive"];
 
   return (
+    <MasterProtectedRoute>
     <div className=" min-h-screen flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
@@ -119,6 +121,7 @@ export default function StatusTypeAdd() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

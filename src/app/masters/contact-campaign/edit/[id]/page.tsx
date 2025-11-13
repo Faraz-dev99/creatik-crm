@@ -10,6 +10,7 @@ import { contactcampaignAllDataInterface } from "@/store/masters/contactcampaign
 import { getContactCampaignById, updateContactCampaign } from "@/store/masters/contactcampaign/contactcampaign";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -100,6 +101,7 @@ export default function ContactCampaignEdit() {
     );
 
   return (
+    <MasterProtectedRoute>
     <div className=" min-h-screen p-6 flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
@@ -152,6 +154,7 @@ export default function ContactCampaignEdit() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

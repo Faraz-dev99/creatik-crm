@@ -14,6 +14,7 @@ import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
 import ObjectSelect from "@/app/component/ObjectSelect";
 import { handleFieldOptionsObject } from "@/app/utils/handleFieldOptionsObject";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -94,6 +95,7 @@ export default function CustomerTypeAdd() {
   const campaignOptions = ["Campaign A", "Campaign B", "Campaign C"]; // dummy options
 
   return (
+    <MasterProtectedRoute>
     <div className=" min-h-screen flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
@@ -162,6 +164,7 @@ export default function CustomerTypeAdd() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

@@ -13,6 +13,7 @@ import { facilitiesAllDataInterface } from "@/store/masters/facilities/facilitie
 import DeleteDialog from "@/app/component/popups/DeleteDialog";
 import AddButton from "@/app/component/buttons/AddButton";
 import PageHeader from "@/app/component/labels/PageHeader";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 /* import { getFacilities, deleteFacility } from "@/store/facilities"; */ // future API helpers
 
 interface FacilityType {
@@ -101,7 +102,7 @@ export default function FacilitiesPage() {
   };
 
   return (
-    <>
+    <MasterProtectedRoute>
       <Toaster position="top-right" />
       <div className="min-h-[calc(100vh-56px)] overflow-auto max-md:py-10">
         
@@ -289,6 +290,6 @@ export default function FacilitiesPage() {
           </div>
         </div>
       </div>
-    </>
+    </MasterProtectedRoute>
   );
 }

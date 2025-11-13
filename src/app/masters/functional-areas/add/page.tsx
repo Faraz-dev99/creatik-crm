@@ -10,6 +10,7 @@ import { functionalareaAllDataInterface } from "@/store/masters/functionalarea/f
 import { addFunctionalArea } from "@/store/masters/functionalarea/functionalarea";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -67,6 +68,7 @@ export default function FunctionalAreaAdd() {
   const statusOptions = ["Active", "Inactive"];
 
   return (
+    <MasterProtectedRoute>
     <div className=" min-h-screen flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
@@ -119,6 +121,7 @@ export default function FunctionalAreaAdd() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

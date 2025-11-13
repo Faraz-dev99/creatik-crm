@@ -16,6 +16,7 @@ import { deleteTypes, getTypes } from "@/store/masters/types/types";
 import DeleteDialog from "@/app/component/popups/DeleteDialog";
 import AddButton from "@/app/component/buttons/AddButton";
 import PageHeader from "@/app/component/labels/PageHeader";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 export default function CustomerTypePage() {
   const [types, setTypes] = useState<typesGetDataInterface[]>([]);
@@ -82,7 +83,7 @@ export default function CustomerTypePage() {
   const currentRows = filteredTypes.slice(indexOfFirstRow, indexOfLastRow);
 
   return (
-    <>
+    <MasterProtectedRoute>
       <Toaster position="top-right" />
       <div className="min-h-[calc(100vh-56px)] overflow-auto max-md:py-10">
         
@@ -289,6 +290,6 @@ export default function CustomerTypePage() {
           </div>
         </div>
       </div>
-    </>
+    </MasterProtectedRoute>
   );
 }

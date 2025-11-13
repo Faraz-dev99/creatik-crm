@@ -15,6 +15,7 @@ import {
 } from "@/store/masters/amenities/amenities.interface";
 import AddButton from "@/app/component/buttons/AddButton";
 import PageHeader from "@/app/component/labels/PageHeader";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 export default function AmenitiesPage() {
   const [amenities, setAmenities] = useState<amenitiesGetDataInterface[]>([]);
@@ -92,7 +93,7 @@ export default function AmenitiesPage() {
   };
 
   return (
-    <>
+    <MasterProtectedRoute>
       <Toaster position="top-right" />
       <div className="min-h-[calc(100vh-56px)] overflow-auto max-md:py-10">
         {/* Header */}
@@ -177,7 +178,7 @@ export default function AmenitiesPage() {
           {/* Table */}
           <div className="overflow-auto">
             <table className="table-auto w-full border-collapse text-sm border border-gray-200">
-              <thead className="bg-gray-900 text-white">
+              <thead className="bg-[var(--color-primary)] text-white">
                 <tr className="flex justify-between items-center w-full">
                   {/* Left section (S.No + Name) */}
                   <th className="flex items-center border border-[var(--color-secondary-dark)] gap-10 px-8 py-3 text-left w-1/2">
@@ -300,6 +301,6 @@ export default function AmenitiesPage() {
           </div>
         </div>
       </div>
-    </>
+    </MasterProtectedRoute>
   );
 }

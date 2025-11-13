@@ -14,6 +14,7 @@ import { handleFieldOptionsObject } from "@/app/utils/handleFieldOptionsObject";
 import { getCampaign } from "@/store/masters/campaign/campaign";
 import { getTypesByCampaign } from "@/store/masters/types/types";
 import ObjectSelect from "@/app/component/ObjectSelect";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 
 interface ErrorInterface { [key: string]: string; }
@@ -130,6 +131,7 @@ export default function CustomerSubtypeEdit() {
   if (loading) return null;
 
   return (
+    <MasterProtectedRoute>
     <div className=" min-h-screen  flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
@@ -189,6 +191,7 @@ export default function CustomerSubtypeEdit() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

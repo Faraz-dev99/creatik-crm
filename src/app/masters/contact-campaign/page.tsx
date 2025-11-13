@@ -20,6 +20,7 @@ import {
 } from "@/store/masters/contactcampaign/contactcampaign"; // create these API helpers
 import AddButton from "@/app/component/buttons/AddButton";
 import PageHeader from "@/app/component/labels/PageHeader";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 export default function ContactCampaignPage() {
     const [contactCampaigns, setContactCampaigns] = useState<contactcampaignGetDataInterface[]>([]);
@@ -91,7 +92,7 @@ export default function ContactCampaignPage() {
     };
 
     return (
-        <>
+        <MasterProtectedRoute>
             <Toaster position="top-right" />
             <div className="min-h-[calc(100vh-56px)] overflow-auto max-md:py-10">
                
@@ -260,6 +261,6 @@ export default function ContactCampaignPage() {
                     </div>
                 </div>
             </div>
-        </>
+        </MasterProtectedRoute>
     );
 }

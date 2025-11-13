@@ -12,6 +12,7 @@ import { contacttypeGetDataInterface, contacttypeDialogDataInterface } from "@/s
 import { getContactType, deleteContactType } from "@/store/masters/contacttype/contacttype"; // create these API helpers
 import AddButton from "@/app/component/buttons/AddButton";
 import PageHeader from "@/app/component/labels/PageHeader";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 export default function ContactTypePage() {
   const [contactTypes, setContactTypes] = useState<contacttypeGetDataInterface[]>([]);
@@ -83,7 +84,7 @@ export default function ContactTypePage() {
   };
 
   return (
-    <>
+    <MasterProtectedRoute>
       <Toaster position="top-right" />
       <div className="min-h-[calc(100vh-56px)] overflow-auto max-md:py-10">
         {/* Header */}
@@ -261,6 +262,6 @@ export default function ContactTypePage() {
           </div>
         </div>
       </div>
-    </>
+    </MasterProtectedRoute>
   );
 }

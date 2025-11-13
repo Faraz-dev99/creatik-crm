@@ -10,13 +10,14 @@ import { referencesAllDataInterface } from "@/store/masters/references/reference
 import { addReferences } from "@/store/masters/references/references";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
 }
 
 export default function ReferenceAdd() {
-  const [referenceData, setReferenceData] = useState<referencesAllDataInterface>(()=>({
+  const [referenceData, setReferenceData] = useState<referencesAllDataInterface>(() => ({
     Name: "",
     Status: "",
   }));
@@ -67,12 +68,13 @@ export default function ReferenceAdd() {
   const statusOptions = ["Active", "Inactive"];
 
   return (
+    <MasterProtectedRoute>
     <div className=" min-h-screen flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
         {/* Back Button */}
         <div className="flex justify-end mb-4">
-          
+
           <BackButton
             url="/masters/references"
             text="Back"
@@ -111,7 +113,7 @@ export default function ReferenceAdd() {
 
               {/* Save Button */}
               <div className="flex justify-end mt-4">
-                
+
                 <SaveButton text="Save" onClick={handleSubmit} />
               </div>
             </div>
@@ -119,6 +121,7 @@ export default function ReferenceAdd() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

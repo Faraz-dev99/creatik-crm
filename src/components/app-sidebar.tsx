@@ -28,6 +28,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { title } from "process";
+import { useAuth } from "@/context/AuthContext";
 
 // This is sample data.
 const data = {
@@ -259,10 +260,20 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const {state}=useSidebar();
+  const { state } = useSidebar();
+  const { admin, isLoading } = useAuth();
+  if (isLoading) return null;
+
+  const filteredNavItems = data.navMain.filter((item) => {
+    // Hide "Masters" if not admin
+    if (item.title === "Masters" && admin?.role !== "administrator") {
+      return false;
+    }
+    return true;
+  });
   return (
     <Sidebar collapsible="icon" className="" {...props}>
-      <SidebarHeader className={`flex items-center py-1 justify-center ${state==="collapsed"?"bg-white py-4":"bg-gray-100"}`}>
+      <SidebarHeader className={`flex items-center py-1 justify-center ${state === "collapsed" ? "bg-white py-4" : "bg-gray-100"}`}>
         {/* <img src="/logo.webp" alt="App Logo" className="h-10 w-40 " /> */}
         {state === "collapsed" ? (
           <ShieldUser className="w-6 h-6" />
@@ -275,7 +286,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         )}
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={filteredNavItems} />
       </SidebarContent>
 
       <SidebarRail />

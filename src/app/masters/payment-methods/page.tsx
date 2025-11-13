@@ -12,6 +12,7 @@ import { paymentsGetDataInterface, paymentsDialogDataInterface } from "@/store/m
 import { getPayments, deletePayments } from "@/store/masters/payments/payments";
 import AddButton from "@/app/component/buttons/AddButton";
 import PageHeader from "@/app/component/labels/PageHeader";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 export default function PaymentMethodPage() {
   const [payments, setPayments] = useState<paymentsGetDataInterface[]>([]);
@@ -83,7 +84,7 @@ export default function PaymentMethodPage() {
   };
 
   return (
-    <>
+    <MasterProtectedRoute>
       <Toaster position="top-right" />
       <div className="min-h-[calc(100vh-56px)] overflow-auto max-md:py-10">
         
@@ -270,6 +271,6 @@ export default function PaymentMethodPage() {
           </div>
         </div>
       </div>
-    </>
+    </MasterProtectedRoute>
   );
 }

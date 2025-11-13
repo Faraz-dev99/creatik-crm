@@ -12,6 +12,7 @@ import { functionalareaGetDataInterface, functionalareaDialogDataInterface } fro
 import { getFunctionalAreas, deleteFunctionalArea } from "@/store/masters/functionalarea/functionalarea";
 import AddButton from "@/app/component/buttons/AddButton";
 import PageHeader from "@/app/component/labels/PageHeader";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 /* FunctionalArea page */
 export default function FunctionalAreaPage() {
@@ -84,7 +85,7 @@ export default function FunctionalAreaPage() {
   };
 
   return (
-    <>
+    <MasterProtectedRoute>
       <Toaster position="top-right" />
       <div className="min-h-[calc(100vh-56px)] overflow-auto max-md:py-10">
         
@@ -271,6 +272,6 @@ export default function FunctionalAreaPage() {
           </div>
         </div>
       </div>
-    </>
+    </MasterProtectedRoute>
   );
 }

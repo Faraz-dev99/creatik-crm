@@ -10,6 +10,7 @@ import { expensesAllDataInterface } from "@/store/masters/expenses/expenses.inte
 import { getExpensesById, updateExpenses } from "@/store/masters/expenses/expenses";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -97,6 +98,7 @@ export default function ExpensesEdit() {
     );
 
   return (
+    <MasterProtectedRoute>
     <div className="bg-slate-200 min-h-screen p-6 flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
@@ -144,6 +146,7 @@ export default function ExpensesEdit() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

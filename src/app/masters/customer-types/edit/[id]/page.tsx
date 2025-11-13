@@ -14,6 +14,7 @@ import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
 import { handleFieldOptionsObject } from "@/app/utils/handleFieldOptionsObject";
 import ObjectSelect from "@/app/component/ObjectSelect";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -118,6 +119,7 @@ export default function CustomerTypeEdit() {
   ); */
 
   return (
+    <MasterProtectedRoute>
     <div className=" min-h-screen flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
@@ -185,6 +187,7 @@ export default function CustomerTypeEdit() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

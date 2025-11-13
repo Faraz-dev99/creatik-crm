@@ -10,6 +10,7 @@ import { campaignAllDataInterface } from "@/store/masters/campaign/campaign.inte
 import { addCampaign } from "@/store/masters/campaign/campaign";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 
 interface ErrorInterface {
@@ -71,6 +72,7 @@ export default function CampaignAdd() {
   const statusOptions = ["Active", "Inactive"];
 
   return (
+    <MasterProtectedRoute>
     <div className=" min-h-screen flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
@@ -123,6 +125,7 @@ export default function CampaignAdd() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

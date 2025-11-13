@@ -15,6 +15,7 @@ import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
 import { handleFieldOptionsObject } from "@/app/utils/handleFieldOptionsObject";
 import ObjectSelect from "@/app/component/ObjectSelect";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 
 
@@ -132,6 +133,7 @@ export default function CustomerSubtypeAdd() {
     const statusOptions = ["Active", "Inactive"];
 
     return (
+        <MasterProtectedRoute>
         <div className=" min-h-screen flex justify-center">
             <Toaster position="top-right" />
             <div className="w-full">
@@ -190,6 +192,7 @@ export default function CustomerSubtypeAdd() {
                 </div>
             </div>
         </div>
+        </MasterProtectedRoute>
     );
 }
 

@@ -10,6 +10,7 @@ import { getIncomeById, updateIncome } from "@/store/masters/income/income";
 import { incomeAllDataInterface } from "@/store/masters/income/income.interface";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -96,6 +97,7 @@ export default function IncomesEdit() {
     );
 
   return (
+    <MasterProtectedRoute>
     <div className="bg-slate-200 min-h-screen p-6 flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
@@ -145,6 +147,7 @@ export default function IncomesEdit() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

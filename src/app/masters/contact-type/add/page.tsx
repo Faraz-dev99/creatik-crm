@@ -13,6 +13,7 @@ import SaveButton from "@/app/component/buttons/SaveButton";
 import { handleFieldOptionsObject } from "@/app/utils/handleFieldOptionsObject";
 import { getCampaign } from "@/store/masters/campaign/campaign";
 import ObjectSelect from "@/app/component/ObjectSelect";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -87,6 +88,7 @@ export default function ContactTypeAdd() {
   const statusOptions = ["Active", "Inactive"];
 
   return (
+    <MasterProtectedRoute>
     <div className="bg-slate-200 min-h-screen p-6 flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
@@ -152,6 +154,7 @@ export default function ContactTypeAdd() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

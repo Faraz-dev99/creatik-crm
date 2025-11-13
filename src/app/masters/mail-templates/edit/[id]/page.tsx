@@ -10,6 +10,7 @@ import { getMailById, updateMail } from "@/store/masters/mail/mail"; // 🔧 You
 import { mailAllDataInterface } from "@/store/masters/mail/mail.interface";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -108,6 +109,7 @@ export default function MailEdit() {
     );
 
   return (
+    <MasterProtectedRoute>
     <div className=" min-h-screen flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
@@ -178,6 +180,7 @@ export default function MailEdit() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

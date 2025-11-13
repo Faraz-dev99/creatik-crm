@@ -16,6 +16,7 @@ import {
 import { deleteIncome, getIncome } from "@/store/masters/income/income"; // you will create these API helpers
 import AddButton from "@/app/component/buttons/AddButton";
 import PageHeader from "@/app/component/labels/PageHeader";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 export default function IncomesPage() {
     const [incomes, setIncomes] = useState<incomeGetDataInterface[]>([]);
@@ -87,7 +88,7 @@ export default function IncomesPage() {
     };
 
     return (
-        <>
+        <MasterProtectedRoute>
             <Toaster position="top-right" />
             <div className="min-h-[calc(100vh-56px)] overflow-auto max-md:py-10">
                 
@@ -264,6 +265,6 @@ export default function IncomesPage() {
                     </div>
                 </div>
             </div>
-        </>
+        </MasterProtectedRoute>
     );
 }

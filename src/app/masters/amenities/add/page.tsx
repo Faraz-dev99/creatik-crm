@@ -10,6 +10,7 @@ import { amenitiesAllDataInterface } from "@/store/masters/amenities/amenities.i
 import { addAmenities } from "@/store/masters/amenities/amenities";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -71,6 +72,7 @@ export default function AmenitiesAdd() {
   const statusOptions = ["Active", "Inactive"];
 
   return (
+    <MasterProtectedRoute>
     <div className=" min-h-screen flex justify-center">
       <Toaster position="top-right" />
       <div className="w-full">
@@ -123,6 +125,7 @@ export default function AmenitiesAdd() {
         </div>
       </div>
     </div>
+    </MasterProtectedRoute>
   );
 }
 

@@ -10,6 +10,7 @@ import { getIndustriesById, updateIndustries } from "@/store/masters/industries/
 import { industriesAllDataInterface } from "@/store/masters/industries/industries.interface";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
+import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -95,58 +96,60 @@ export default function IndustriesEdit() {
     );
 
   return (
-    <div className=" min-h-screen flex justify-center">
-      <Toaster position="top-right" />
-      <div className="w-full">
-        {/* Back Button */}
-        <div className="flex justify-end mb-4">
-          
-          <BackButton
-            url="/masters/industries"
-            text="Back"
-            icon={<ArrowLeft size={18} />}
-          />
-        </div>
+    <MasterProtectedRoute>
+      <div className=" min-h-screen flex justify-center">
+        <Toaster position="top-right" />
+        <div className="w-full">
+          {/* Back Button */}
+          <div className="flex justify-end mb-4">
 
-        {/* Form Card */}
-        <div className="bg-white/90 backdrop-blur-lg p-10 w-full rounded-3xl shadow-2xl">
-          <form onSubmit={(e) => e.preventDefault()} className="w-full">
-            <div className="mb-8 text-left border-b pb-4 border-gray-200">
-              <h1 className="text-3xl font-extrabold text-[var(--color-secondary-darker)] leading-tight tracking-tight">
-                Edit <span className="text-[var(--color-primary)]">Industry</span>
-              </h1>
-            </div>
+            <BackButton
+              url="/masters/industries"
+              text="Back"
+              icon={<ArrowLeft size={18} />}
+            />
+          </div>
 
-            <div className="flex flex-col space-y-6">
-              <div className="grid grid-cols-2 gap-6 max-lg:grid-cols-1">
-                {/* Industry Name */}
-                <InputField
-                  label="Industry Name"
-                  name="Name"
-                  value={industriesData.Name}
-                  onChange={handleInputChange}
-                  error={errors.Name}
-                />
-
-                {/* Status Dropdown */}
-                <SingleSelect
-                  options={statusOptions}
-                  label="Status"
-                  value={industriesData.Status}
-                  onChange={(v) => handleSelectChange("Status", v)}
-                />
+          {/* Form Card */}
+          <div className="bg-white/90 backdrop-blur-lg p-10 w-full rounded-3xl shadow-2xl">
+            <form onSubmit={(e) => e.preventDefault()} className="w-full">
+              <div className="mb-8 text-left border-b pb-4 border-gray-200">
+                <h1 className="text-3xl font-extrabold text-[var(--color-secondary-darker)] leading-tight tracking-tight">
+                  Edit <span className="text-[var(--color-primary)]">Industry</span>
+                </h1>
               </div>
 
-              {/* Update Button */}
-              <div className="flex justify-end mt-4">
-                
-                <SaveButton text="Update" onClick={handleSubmit} />
+              <div className="flex flex-col space-y-6">
+                <div className="grid grid-cols-2 gap-6 max-lg:grid-cols-1">
+                  {/* Industry Name */}
+                  <InputField
+                    label="Industry Name"
+                    name="Name"
+                    value={industriesData.Name}
+                    onChange={handleInputChange}
+                    error={errors.Name}
+                  />
+
+                  {/* Status Dropdown */}
+                  <SingleSelect
+                    options={statusOptions}
+                    label="Status"
+                    value={industriesData.Status}
+                    onChange={(v) => handleSelectChange("Status", v)}
+                  />
+                </div>
+
+                {/* Update Button */}
+                <div className="flex justify-end mt-4">
+
+                  <SaveButton text="Update" onClick={handleSubmit} />
+                </div>
               </div>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+    </MasterProtectedRoute>
   );
 }
 
@@ -170,11 +173,10 @@ const InputField: React.FC<{
     />
     <p
       className={`absolute left-2 bg-white px-1 text-gray-500 text-sm transition-all duration-300
-      ${
-        value || error
+      ${value || error
           ? "-top-2 text-xs text-blue-500"
           : "peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-blue-500"
-      }`}
+        }`}
     >
       {label}
     </p>
