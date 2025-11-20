@@ -10,12 +10,13 @@ import { useRouter } from "next/navigation";
 import { getCampaign } from "@/store/masters/campaign/campaign";   // Range
 import { handleFieldOptions } from "@/app/utils/handleFieldOptions";
 
-import { importContact } from "@/store/contact";   // ✅ Your contact import API
+import { contactExcelHeaders, importContact } from "@/store/contact";   // ✅ Your contact import API
 import { getContactType, getContactTypeByCampaign } from "@/store/masters/contacttype/contacttype";
 import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
 import { handleFieldOptionsObject } from "@/app/utils/handleFieldOptionsObject";
 import ObjectSelect from "@/app/component/ObjectSelect";
+import { useContactImport } from "@/context/ContactImportContext";
 
 
 export default function ContactImport() {
@@ -30,6 +31,7 @@ export default function ContactImport() {
   const [fieldOptions, setFieldOptions] = useState<Record<string, any[]>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const router = useRouter();
+  const { setExcelHeaders , setFile } = useContactImport();
 
 
   // ✅ Fetch dropdown data
@@ -45,7 +47,7 @@ export default function ContactImport() {
   const arrayFields = [
     { key: "Range", staticData: ["10", "20", "30"] }
   ];
-  const rangeOptions=["10","20","30"]
+  const rangeOptions = ["10", "20", "30"]
 
   useEffect(() => {
     const loadFieldOptions = async () => {
@@ -77,34 +79,31 @@ export default function ContactImport() {
   };
 
 
-  // ✅ Select change
+  // Select change
   const handleSelectChange = useCallback((label: string, value: string) => {
     setImportData((prev) => ({ ...prev, [label]: value }));
     setErrors((prev) => ({ ...prev, [label]: "" }));
   }, []);
 
 
-  // ✅ File upload
+  // File upload
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setImportData((prev) => ({ ...prev, file }));
   };
 
 
-  // ✅ Validation
+  // Validation
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!importData.Campaign) newErrors.Campaign = "Campaign is required";
-    if (!importData.ContactType) newErrors.ContactType = "Contact Type is required";
-    if (!importData.Range) newErrors.Range = "Range is required";
     if (!importData.file) newErrors.file = "Please upload an Excel file";
 
     return newErrors;
   };
 
 
-  // ✅ Submit
+  //  Submit
   const handleSubmit = async () => {
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
@@ -114,16 +113,19 @@ export default function ContactImport() {
 
     try {
       const formData = new FormData();
-      formData.append("Campaign", importData.Campaign?.name);
+     /*  formData.append("Campaign", importData.Campaign?.name);
       formData.append("ContactType", importData.ContactType?.name);
-      formData.append("Range", importData.Range);
+      formData.append("Range", importData.Range); */
       if (importData.file) formData.append("file", importData.file);
 
-      const result = await importContact(formData);
+      const result = await contactExcelHeaders(formData);
+      console.log(" result naruto",result)
 
-      if (result) {
-        toast.success("Contacts imported successfully!");
-        router.push("/contact");
+      if (result?.headers) {
+        //toast.success("Contacts imported successfully!");
+        setExcelHeaders(result.headers);
+        setFile(importData.file)
+        router.push("/imports/contact/select-imports");
       } else {
         toast.error("Failed to import contacts");
       }
@@ -135,7 +137,7 @@ export default function ContactImport() {
 
 
   return (
-    <div className=" min-h-screen max-md:p-0 flex justify-center">
+    <div className=" min-h-screen max-md:p-0 max-w-[700px] mx-auto flex justify-center">
       <Toaster position="top-right" />
 
       <div className="w-full">
@@ -153,51 +155,8 @@ export default function ContactImport() {
 ">Contacts</span>
           </h1>
 
-          <div className="grid grid-cols-3 gap-6 max-md:grid-cols-1 max-lg:grid-cols-2">
-            <ObjectSelect
-              options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []}
-              label="Campaign"
-              value={importData.Campaign.id}
-              getLabel={(item) => item?.Name || ""}
-              getId={(item) => item?._id || ""}
-              onChange={(selectedId) => {
-                const selectedObj = fieldOptions.Campaign.find((i) => i._id === selectedId);
-                if (selectedObj) {
-                  setImportData((prev) => ({
-                    ...prev,
-                    Campaign: { id: selectedObj._id, name: selectedObj.Name },
-                    ContactType: { id: "", name: "" }, // reset on change
-                  }));
-                }
-              }}
-              error={errors.Campaign}
-            />
-
-            <ObjectSelect
-              options={Array.isArray(fieldOptions?.ContactType) ? fieldOptions.ContactType : []}
-              label="Contact Type"
-              value={importData.ContactType.id}
-              getLabel={(item) => item?.Name || ""}
-              getId={(item) => item?._id || ""}
-              onChange={(selectedId) => {
-                const selectedObj = fieldOptions.ContactType.find((i) => i._id === selectedId);
-                if (selectedObj) {
-                  setImportData((prev) => ({
-                    ...prev,
-                    ContactType: { id: selectedObj._id, name: selectedObj.Name },
-                  }));
-                }
-              }}
-              error={errors.ContactType}
-            />
-
-            <SingleSelect
-              options={rangeOptions}
-              label="Range"
-              value={importData.Range}
-              onChange={(v) => handleSelectChange("Range", v)}
-              error={errors.Range}
-            />
+          <div className=" w-full">
+           
 
             <FileUpload
               label="Choose Excel File"

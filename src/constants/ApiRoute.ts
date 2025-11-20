@@ -1,4 +1,4 @@
-export const BASE_URL = "https://live-project-backend-viiy.onrender.com/api";
+export const BASE_URL = "https://live-project-backend-1.onrender.com/api";
 
 export const API_ROUTES = {
   CONTACT: {
@@ -10,6 +10,7 @@ export const API_ROUTES = {
     DELETE: (id: string) => `${BASE_URL}/contact/${id}`,
     DELETEALL: `${BASE_URL}/contact/delete/all`,
     CONTACTIMPORT: `${BASE_URL}/contact/import`,
+    CONTACTEXCELHEADERS: `${BASE_URL}/contact/import/headers`,
     ASSIGNCONTACT:`${BASE_URL}/contact/assign`
   },
   CUSTOMER: {
@@ -22,6 +23,7 @@ export const API_ROUTES = {
     DELETE: (id: string) => `${BASE_URL}/customer/${id}`,
     DELETEALL: `${BASE_URL}/customer`,
     CUSTOMERIMPORT: `${BASE_URL}/customer/import`,
+    CUSTOMEREXCELHEADERS: `${BASE_URL}/customer/import/headers`,
     ASSIGNCUSTOMER:`${BASE_URL}/customer/assign`
   },
   COMPANYPROJECTS: {

@@ -14,6 +14,8 @@ import { Separator } from "../components/ui/separator";
 import ProtectedRoute from "./component/ProtectedRoutes";
 import { AuthProvider } from "@/context/AuthContext";
 import { Poppins,Manrope,Schibsted_Grotesk } from 'next/font/google'
+import { CustomerImportProvider } from "@/context/CustomerImportContext";
+import { ContactImportProvider } from "@/context/ContactImportContext";
  
 const poppins = Schibsted_Grotesk({
   weight:'400',
@@ -28,6 +30,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" className={`min-h-screen w-full overflow-x-hidden ${poppins.className}`}>
       <body className="min-h-screen w-full bg-violet-100 overflow-x-hidden">
         <AuthProvider>
+          <CustomerImportProvider>
+            <ContactImportProvider>
           {isAdminPage ? (
             <main className="min-h-screen ">{children}</main>
           ) : (
@@ -73,6 +77,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               </SidebarProvider>
             </ProtectedRoute>
           )}
+          </ContactImportProvider>
+          </CustomerImportProvider>
         </AuthProvider>
       </body>
     </html>

@@ -4,50 +4,19 @@ import { useEffect, useRef, useState } from "react";
 import { FaArrowTrendUp } from "react-icons/fa6";
 import { MdOutlineFileDownload } from "react-icons/md";
 import { LuCalendar, LuChartNoAxesColumnIncreasing, LuCalendarRange } from "react-icons/lu";
+import { getCustomer } from "@/store/customer";
+import { useDashboardData } from "../data/useDashboardSectionOne";
+import { getAllCustomerFollowups } from "@/store/customerFollowups";
+import { getIncomeMarketing } from "@/store/financial/incomemarketing/incomemarketing";
 
 // ✅ Interface for card data
-interface DashboardCard {
-  name: string;
-  value: number;
-  prefix?: string; // like "$"
-  bg: string;
-icon: React.ReactNode;
-  footerlineColor: string;
-}
+
 
 export default function DashboardSectionOne() {
   // ✅ Dashboard data
-  const dashboardSectionOneCardData: DashboardCard[] = [
-    {
-      name: "Total Customers",
-      value: 302,
-      prefix: "$",
-      bg: "bg-gradient-to-r from-sky-500 to-sky-800",
-      icon: <LuChartNoAxesColumnIncreasing />,
-      footerlineColor: "from-sky-800 to-sky-500",
-    },
-    {
-      name: "Converted Leads",
-      value: 290,
-      bg: "bg-gradient-to-r from-red-500 to-red-800",
-      icon: <LuCalendarRange />,
-      footerlineColor: "from-red-800 to-red-500",
-    },
-    {
-      name: "Active FollowUps",
-      value: 145,
-      bg: "bg-gradient-to-r from-teal-500 to-teal-800",
-      icon: <LuCalendar />,
-      footerlineColor: "from-teal-800 to-teal-500",
-    },
-    {
-      name: "Revenue Growth",
-      value: 500,
-      bg: "bg-gradient-to-r from-indigo-500 to-indigo-800",
-      icon: <MdOutlineFileDownload />,
-      footerlineColor: "from-indigo-800 to-indigo-500",
-    },
-  ];
+  const { dashboardSectionOneCardData, setDashboardSectionOneCardData } = useDashboardData();
+  const [dataLoading, setDataLoading] = useState(false);
+
 
   // ✅ Counter logic
   const [counts, setCounts] = useState<number[]>(
@@ -56,8 +25,13 @@ export default function DashboardSectionOne() {
   const countersRef = useRef<HTMLDivElement | null>(null);
   const [countersInView, setCountersInView] = useState<boolean>(false);
 
+  /*  useEffect(() => {
+   setCounts(dashboardSectionOneCardData.map(() => 0));
+ }, [dashboardSectionOneCardData]); */
+
   // Observe section visibility
   useEffect(() => {
+    //fetch dashboard data 
     const observer = new IntersectionObserver(
       ([entry]) => setCountersInView(entry.isIntersecting),
       { threshold: 0.5 }
@@ -69,6 +43,71 @@ export default function DashboardSectionOne() {
     };
   }, []);
 
+
+
+
+  useEffect(() => {
+    DashboardSectionOneDataFetch();
+  }, [])
+
+  const DashboardSectionOneDataFetch = async () => {
+    const LeadsResponse = await getCustomer();
+    const FollowupResponseRaw = await getAllCustomerFollowups();
+
+    const FollowupResponse = FollowupResponseRaw?.map((item: any) => ({
+      customerid: item.customer._id,
+      StatusType: item.StatusType,
+      Date: item.Date,
+      _id: item._id,
+      Name: item.customer.customerName,
+      ContactNumber: item.customer.ContactNumber,
+      User: item.customer.AssignTo?.name ?? "",
+    }));
+
+    const IncomeResponse = await getIncomeMarketing();
+
+    if (LeadsResponse && FollowupResponse && IncomeResponse) {
+      const totalCustomer = LeadsResponse.length;
+      const convertedLeads = FollowupResponse.filter(
+        (item, index, arr) =>
+          arr.findIndex((row) => row.customerid === item.customerid) === index //keeps only first occurrence
+      ).length;
+      const activeFollowups = FollowupResponse.filter(
+        (item, index, arr) => (item.StatusType === "Active")
+      ).length;
+      const totalRevenue = IncomeResponse.reduce((sum: number, item: any) => sum + (Number(item.Income) || 0), 0);
+
+      setDashboardSectionOneCardData((prev) => {
+        // Create a copy of the previous array
+        const newData = [...prev];
+
+        // Update only the first element (index 0)
+        newData[0] = {
+          ...newData[0], // keep other properties
+          value: totalCustomer || 0, // update value
+        };
+        newData[1] = {
+          ...newData[1], // keep other properties
+          value: convertedLeads || 0, // update value // or any other dynamic property
+        };
+
+        newData[2] = {
+          ...newData[2], // keep other properties
+          value: activeFollowups || 0, // update value
+        };
+        newData[3] = {
+          ...newData[3], // keep other properties
+          value: totalRevenue || 0, // update value
+          prefix: "₹", // or any other dynamic property
+        };
+        setDataLoading(true);
+
+        return newData;
+      })
+    }
+  }
+
+
   // Start count animation
   useEffect(() => {
     if (!countersInView) return;
@@ -76,26 +115,33 @@ export default function DashboardSectionOne() {
     const intervals: number[] = [];
 
     dashboardSectionOneCardData.forEach((item, index) => {
-      const increment = Math.ceil(item.value / 50);
+      const increment = item.value < 10 ? 1 : Math.ceil(item.value / 50);
+      const intervalTime = item.value < 10 ? 200 : 30; // slower for very small numbers
 
-      const intervalId = window.setInterval(() => {
-        setCounts((prev) => {
-          const newCounts = [...prev];
-          if (newCounts[index] < item.value) {
-            newCounts[index] = Math.min(
-              newCounts[index] + increment,
-              item.value
-            );
-          }
-          return newCounts;
-        });
-      }, 30);
 
-      intervals.push(intervalId);
+      if (dataLoading) {
+        const intervalId = window.setInterval(() => {
+          setCounts((prev) => {
+            const newCounts = [...prev];
+            if (newCounts[index] < item.value) {
+              newCounts[index] = Math.min(newCounts[index] + increment, item.value);
+            }
+            return newCounts;
+          });
+        }, intervalTime);
+
+
+        intervals.push(intervalId);
+      }
+
     });
 
     return () => intervals.forEach((id) => clearInterval(id));
-  }, [countersInView]);
+  }, [countersInView, dashboardSectionOneCardData]);
+
+  // Data Apis
+
+
 
   return (
     <div ref={countersRef} className="p-4 ">

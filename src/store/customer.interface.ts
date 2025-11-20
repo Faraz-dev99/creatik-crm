@@ -24,6 +24,30 @@ export interface customerAllDataInterface {
   SitePlan: File
 }
 
+export interface customerImportDataInterface {
+  Campaign: { id: string; name: string };
+  CustomerType: { id: string; name: string };
+  customerName: string;
+  CustomerSubtype: { id: string; name: string };
+  ContactNumber: string;
+  City: string;
+  Location: string;
+  Area: string;
+  Address: string;
+  Email: string;
+  Facilities: string;
+  ReferenceId: string;
+  CustomerId: string;
+  CustomerDate: string;
+  CustomerYear: string;
+  Others: string;
+  Description: string;
+  Video: string;
+  GoogleMap: string;
+  isFavourite?: boolean;
+  Verified: string;
+}
+
 export interface customerGetDataInterface {
   _id: string;
   Campaign: string;

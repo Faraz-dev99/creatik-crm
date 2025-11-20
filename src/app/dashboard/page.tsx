@@ -2,10 +2,12 @@
 
 import DashboardSectionOne from "./components/DashboardSectionOne";
 import DonutChart from "./components/DonutChart";
+import OwnerFollowups from "./components/OwnerFollowups";
 import RadarChart from "./components/RadarChart";
 import SmallGraph from "./components/SmallGraph";
 import SmallScreenData from "./components/SmallScreenData";
 import TableComponent from "./components/TableComponent";
+import TenantFollowups from "./components/TenantFollowup";
 import VisitorsChart from "./components/VisitorsChart";
 
 
@@ -16,8 +18,17 @@ export default function Dashboard() {
         <div className="">
           <DashboardSectionOne />
         </div>
+
+        <div className=" p-4">
+          <OwnerFollowups />
+        </div>
+
+        <div className=" p-4">
+          <TenantFollowups />
+        </div>
+        
         <div className=" ">
-          <div className="flex max-sm:flex-col max-lg:flex-row p-4  gap-4 ">
+          <div className="flex sm:flex-col lg:flex-row p-4  gap-4 ">
             <VisitorsChart />
             <SmallGraph />
 

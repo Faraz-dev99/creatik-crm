@@ -12,6 +12,7 @@ export interface customerFollowupAllDataInterface {
 export interface customerFollowupGetDataInterface {
     _id: string;
     customerid:string;
+    StatusType?:string;
     Name: string;
     ContactNumber: string;
     User:string;

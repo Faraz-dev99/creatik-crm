@@ -243,10 +243,10 @@ export default function RadarChart() {
   
 
   return (
-    <div className="flex flex-col w-full h-full min-h-0">
+    <div className="flex flex-col w-full h-auto min-h-[350px]">
       <div className="w-full h-full bg-white shadow-lg p-4 sm:p-6 flex flex-col min-h-0">
         <div id="chart-container" className="w-full h-full flex flex-col min-h-0 flex-1">
-          <div className="flex-1 min-h-0">
+          <div className="flex-1 py-6 min-h-0">
             <svg
               width="100%"
               height="100%"
@@ -442,7 +442,7 @@ export default function RadarChart() {
           </div>
 
           {/* User selector dropdown with smart positioning */}
-          <div className="mt-4 sm:mt-6 flex justify-center flex-shrink-0">
+          <div className="mt-4 sm:mt-6 flex justify-center shrink-0">
             <div className="relative w-full max-w-[200px]" ref={dropdownRef}>
               <button
                 ref={dropdownButtonRef}

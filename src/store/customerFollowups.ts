@@ -11,7 +11,7 @@ export const getAllCustomerFollowups = async (): Promise<customerFollowupGetData
     const response = await fetch(API_ROUTES.FOLLOWUPS.CUSTOMER.GET_ALL);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const data= await response.json();
-    console.log(" follwoups ", data)
+    //console.log(" follwoups ", data)
     return data.data;
   } catch (error) {
     console.log("SERVER ERROR (getAllCustomerFollowups):", error);
