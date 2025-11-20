@@ -53,7 +53,7 @@ export default function ObjectSelect<T>({
     <div
       ref={containerRef}
       className="relative w-full"
-      style={{ minWidth: "200px" }} // same width as SingleSelect
+      style={{ minWidth: "170px" }} // same width as SingleSelect
     >
       {/* Floating Label */}
       <label

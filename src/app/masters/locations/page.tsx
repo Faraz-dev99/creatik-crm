@@ -62,6 +62,11 @@ export default function LocationPage() {
     fetchLocations();
   }, []);
 
+  useEffect(() => {
+    setRowsPerTablePage(Number(limit));
+    setCurrentTablePage(1);
+  }, [limit])
+
   // Filter and limit data
   const filteredLocations = useMemo(() => {
     return locations
@@ -74,7 +79,6 @@ export default function LocationPage() {
           l.City.toLowerCase() === selectedCity.toLowerCase();
         return matchesKeyword && matchesCity;
       })
-      .slice(0, Number(limit));
   }, [locations, keyword, selectedCity, limit]);
 
   // Pagination

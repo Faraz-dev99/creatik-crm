@@ -47,6 +47,11 @@ export default function ReferencePage() {
     useEffect(() => {
         fetchReferences();
     }, []);
+    
+    useEffect(() => {
+        setRowsPerTablePage(Number(limit));
+        setCurrentTablePage(1);
+    }, [limit])
 
     // Filtered references
     const filteredReferences = useMemo(() => {

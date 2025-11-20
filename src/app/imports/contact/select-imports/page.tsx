@@ -221,7 +221,7 @@ export default function SelectImports() {
                             <h2 className=" text-xl font-semibold text-gray-700 my-5 mt-10">Map Fields</h2>
                             <div className="grid grid-cols-3 max-lg:grid-cols-2 max-md:grid-cols-1 gap-4 w-full">
                                     {excelHeaders.map((header) => (
-                                        <div key={header} className="flex flex-col">
+                                        <div key={header} className="flex flex-col m-4">
                                             <label className="text-sm font-medium mb-4">{header}</label>
 
                                             <SingleSelect

@@ -44,6 +44,11 @@ export default function CustomerTypePage() {
     fetchTypes();
   }, []);
 
+  useEffect(() => {
+    setRowsPerTablePage(Number(limit));
+    setCurrentTablePage(1);
+  }, [limit])
+
   const filteredTypes = useMemo(() => {
     return types
       .filter(
@@ -52,8 +57,7 @@ export default function CustomerTypePage() {
           t.Name.toLowerCase().includes(keyword.toLowerCase()) ||
           t.Campaign.Name.toLowerCase().includes(keyword.toLowerCase())
       )
-      .slice(0, Number(limit));
-  }, [types, keyword, limit]);
+  }, [types, keyword]);
 
   const handleDelete = async (data: typesDialogDataInterface | null) => {
     if (!data) return;
@@ -196,8 +200,8 @@ export default function CustomerTypePage() {
                         <div className="w-[120px]">
                           <span
                             className={`px-3 py-1 rounded-[2px] text-xs font-semibold ${t.Status === "Active"
-                                ? "bg-[#C8E6C9] text-green-700"
-                                : "bg-red-100 text-red-700"
+                              ? "bg-[#C8E6C9] text-green-700"
+                              : "bg-red-100 text-red-700"
                               }`}
                           >
                             {t.Status}

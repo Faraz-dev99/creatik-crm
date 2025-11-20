@@ -47,6 +47,11 @@ export default function StatusTypePage() {
     fetchStatusTypes();
   }, []);
 
+  useEffect(() => {
+    setRowsPerTablePage(Number(limit));
+    setCurrentTablePage(1);
+  }, [limit])
+
   // Filtered Data
   const filteredStatusTypes = useMemo(() => {
     return statusTypes

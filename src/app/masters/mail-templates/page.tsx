@@ -40,12 +40,16 @@ export default function MailPage() {
     fetchMails();
   }, []);
 
+  useEffect(() => {
+    setRowsPerTablePage(Number(limit));
+    setCurrentTablePage(1);
+  }, [limit])
+  
   // Filter mails
   const filteredMails = useMemo(() => {
     return mails
       .filter((m) => keyword === "" || m.name.toLowerCase().includes(keyword.toLowerCase()))
-      .slice(0, Number(limit));
-  }, [mails, keyword, limit]);
+  }, [mails, keyword]);
 
   // Delete mail
   const handleDelete = async (data: mailDialogDataInterface | null) => {
@@ -186,8 +190,8 @@ export default function MailPage() {
                         <div className="w-[120px]">
                           <span
                             className={`px-3 py-1 rounded-[2px] text-xs font-semibold ${m.status === "Active"
-                                ? "bg-[#C8E6C9] text-green-700"
-                                : "bg-red-100 text-red-700"
+                              ? "bg-[#C8E6C9] text-green-700"
+                              : "bg-red-100 text-red-700"
                               }`}
                           >
                             {m.status}

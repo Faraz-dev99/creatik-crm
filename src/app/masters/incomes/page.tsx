@@ -44,12 +44,17 @@ export default function IncomesPage() {
         fetchIncomes();
     }, []);
 
+    useEffect(() => {
+        setRowsPerTablePage(Number(limit));
+        setCurrentTablePage(1);
+    }, [limit])
+
     // Filtered incomes
     const filteredIncomes = useMemo(() => {
         return incomes
             .filter(i => keyword === "" || i.Name.toLowerCase().includes(keyword.toLowerCase()))
             .slice(0, Number(limit));
-    }, [incomes, keyword, limit]);
+    }, [incomes, keyword]);
 
     // Delete income
     const handleDelete = async (data: incomeDialogDataInterface | null) => {

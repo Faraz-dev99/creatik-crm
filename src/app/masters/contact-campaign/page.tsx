@@ -48,12 +48,17 @@ export default function ContactCampaignPage() {
         fetchContactCampaigns();
     }, []);
 
+     useEffect(()=>{
+            setRowsPerTablePage(Number(limit));
+            setCurrentTablePage(1); 
+        },[limit])
+
     // Filtered campaigns
     const filteredCampaigns = useMemo(() => {
         return contactCampaigns
             .filter((c) => keyword === "" || c.Name.toLowerCase().includes(keyword.toLowerCase()))
-            .slice(0, Number(limit));
-    }, [contactCampaigns, keyword, limit]);
+    }, [contactCampaigns, keyword]);
+    
 
     // Delete contact campaign
     const handleDelete = async (data: contactcampaignDialogDataInterface | null) => {

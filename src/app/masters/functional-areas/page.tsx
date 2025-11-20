@@ -40,13 +40,16 @@ export default function FunctionalAreaPage() {
   useEffect(() => {
     fetchFunctionalAreas();
   }, []);
+  useEffect(() => {
+    setRowsPerTablePage(Number(limit));
+    setCurrentTablePage(1);
+  }, [limit])
 
   // Filtered functional areas
   const filteredFunctionalAreas = useMemo(() => {
     return functionalAreas
       .filter((fa) => keyword === "" || fa.Name.toLowerCase().includes(keyword.toLowerCase()))
-      .slice(0, Number(limit));
-  }, [functionalAreas, keyword, limit]);
+  }, [functionalAreas, keyword]);
 
   // Delete functional area
   const handleDelete = async (data: functionalareaDialogDataInterface | null) => {
@@ -190,8 +193,8 @@ export default function FunctionalAreaPage() {
                         <div className="w-[120px]">
                           <span
                             className={`px-3 py-1 rounded-[2px] text-xs font-semibold ${fa.Status === "Active"
-                                ? "bg-[#C8E6C9] text-green-700"
-                                : "bg-red-100 text-red-700"
+                              ? "bg-[#C8E6C9] text-green-700"
+                              : "bg-red-100 text-red-700"
                               }`}
                           >
                             {fa.Status}

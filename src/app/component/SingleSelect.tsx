@@ -35,7 +35,7 @@ export default function SingleSelect({className, options, label, value, onChange
     <div
       ref={containerRef}
       className="relative w-full"
-      style={{ minWidth: "200px" }} // mimic MUI minWidth behavior
+      style={{ minWidth: "170px" }} // mimic MUI minWidth behavior
     >
       {/* Label */}
       <label

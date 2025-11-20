@@ -58,12 +58,16 @@ export default function FacilitiesPage() {
     fetchFacilities();
   }, []);
 
+  useEffect(() => {
+    setRowsPerTablePage(Number(limit));
+    setCurrentTablePage(1);
+  }, [limit])
+
   // Filtered facilities
   const filteredFacilities = useMemo(() => {
     return facilities
       .filter((f) => keyword === "" || f.Name.toLowerCase().includes(keyword.toLowerCase()))
-      .slice(0, Number(limit));
-  }, [facilities, keyword, limit]);
+  }, [facilities, keyword]);
 
   // Delete facility
   const handleDelete = async (data: DeleteDialogData | null) => {

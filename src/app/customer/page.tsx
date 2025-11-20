@@ -30,6 +30,7 @@ import FavouriteDialog from "../component/popups/FavouriteDialog";
 import AddButton from "../component/buttons/AddButton";
 import PageHeader from "../component/labels/PageHeader";
 import ListPopup from "../component/popups/ListPopup";
+import LoaderCircle from "../component/LoaderCircle";
 
 
 interface DeleteAllDialogDataInterface { }
@@ -501,6 +502,7 @@ export default function Customer() {
 
 
         {/* ---------- TABLE START ---------- */}
+        <LoaderCircle />
         <div className="p-4 max-md:p-3 w-full rounded-md bg-white">
           <div className="flex justify-between items-center p-2">
             <PageHeader title="Dashboard" subtitles={["Customer"]} />
@@ -515,8 +517,8 @@ export default function Customer() {
           
           {/* TABLE */}
           <section className="flex flex-col mt-6 p-2 rounded-md">
-            <div className="m-5 relative cursor-pointer" onClick={() => setToggleSearchDropdown(!toggleSearchDropdown)}>
-              <div className="flex justify-between items-center py-1 px-2 border border-gray-800 rounded-md">
+            <div className="m-5 relative ">
+              <div className="flex justify-between cursor-pointer items-center py-1 px-2 border border-gray-800 rounded-md"  onClick={() => setToggleSearchDropdown(!toggleSearchDropdown)}>
                 <h3 className="flex items-center gap-1"><CiSearch />Advance Search</h3>
                 <button
                   type="button"

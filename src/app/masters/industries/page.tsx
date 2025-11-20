@@ -49,12 +49,16 @@ export default function IndustriesPage() {
         fetchIndustries();
     }, []);
 
+    useEffect(() => {
+        setRowsPerTablePage(Number(limit));
+        setCurrentTablePage(1);
+    }, [limit])
+
     // Filtered industries
     const filteredIndustries = useMemo(() => {
         return industries
             .filter((c) => keyword === "" || c.Name.toLowerCase().includes(keyword.toLowerCase()))
-            .slice(0, Number(limit));
-    }, [industries, keyword, limit]);
+    }, [industries, keyword]);
 
     // Delete industry
     const handleDelete = async (data: industriesDialogDataInterface | null) => {

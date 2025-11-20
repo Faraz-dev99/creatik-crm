@@ -44,12 +44,16 @@ export default function ExpensesPage() {
         fetchExpenses();
     }, []);
 
+    useEffect(() => {
+        setRowsPerTablePage(Number(limit));
+        setCurrentTablePage(1);
+    }, [limit])
+
     // Filtered expenses
     const filteredExpenses = useMemo(() => {
         return expenses
             .filter((c) => keyword === "" || c.Name.toLowerCase().includes(keyword.toLowerCase()))
-            .slice(0, Number(limit));
-    }, [expenses, keyword, limit]);
+    }, [expenses, keyword]);
 
     // Delete expense
     const handleDelete = async (data: expensesDialogDataInterface | null) => {

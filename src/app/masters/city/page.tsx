@@ -55,6 +55,11 @@ export default function CityPage() {
     fetchCities();
   }, []);
 
+   useEffect(()=>{
+          setRowsPerTablePage(Number(limit));
+          setCurrentTablePage(1); 
+      },[limit])
+
   // Filtered and limited data
   const filteredCities = useMemo(() => {
     return cities
@@ -63,8 +68,9 @@ export default function CityPage() {
           keyword === "" ||
           c.Name.toLowerCase().includes(keyword.toLowerCase())
       )
-      .slice(0, Number(limit));
-  }, [cities, keyword, limit]);
+  }, [cities, keyword]);
+
+
 
   // Pagination
   const totalTablePages = Math.ceil(filteredCities.length / rowsPerTablePage);

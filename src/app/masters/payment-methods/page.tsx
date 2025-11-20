@@ -40,12 +40,16 @@ export default function PaymentMethodPage() {
     fetchPayments();
   }, []);
 
+  useEffect(() => {
+    setRowsPerTablePage(Number(limit));
+    setCurrentTablePage(1);
+  }, [limit])
+
   // Filtered payments
   const filteredPayments = useMemo(() => {
     return payments
       .filter((p) => keyword === "" || p.Name.toLowerCase().includes(keyword.toLowerCase()))
-      .slice(0, Number(limit));
-  }, [payments, keyword, limit]);
+  }, [payments, keyword]);
 
   // Delete payment method
   const handleDelete = async (data: paymentsDialogDataInterface | null) => {
