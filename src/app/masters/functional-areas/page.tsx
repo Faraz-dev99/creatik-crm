@@ -186,7 +186,7 @@ export default function FunctionalAreaPage() {
                       className="border-t flex justify-between items-center w-full hover:bg-[#f7f6f3] transition-all duration-200"
                     >
                       <td className="flex items-center gap-10 px-8 py-3 w-1/2">
-                        <p className="w-[60px]">{i + 1}</p>
+                        <p className="w-[60px]">{(currentTablePage - 1) * rowsPerTablePage + (i + 1)}</p>
                         <p className="w-[200px] font-semibold">{fa.Name}</p>
                       </td>
                       <td className="flex items-center gap-10 px-8 py-3 w-1/2 justify-end">

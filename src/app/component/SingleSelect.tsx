@@ -76,7 +76,7 @@ export default function SingleSelect({className, options, label, value, onChange
           <li
             key={idx}
             onClick={() => handleSelect(opt)}
-            className="px-3 py-2 hover:bg-gray-100 cursor-pointer truncate"
+            className={`px-3 py-2 hover:bg-gray-100 cursor-pointer truncate`}
           >
             {opt}
           </li>

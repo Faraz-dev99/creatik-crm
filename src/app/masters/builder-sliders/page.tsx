@@ -62,7 +62,6 @@ export default function BuilderSlidersPage() {
           keyword === "" ||
           s.Status.toLowerCase().includes(keyword.toLowerCase())
       )
-      .slice(0, Number(limit));
   }, [sliders, keyword]);
 
   // ✅ Delete

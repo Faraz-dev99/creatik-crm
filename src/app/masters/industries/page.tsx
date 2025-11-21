@@ -199,7 +199,7 @@ export default function IndustriesPage() {
                                         >
                                             {/* Left section (S.No + Name) */}
                                             <td className="flex items-center gap-10 px-8 py-3 w-1/2">
-                                                <p className="w-[60px]">{i + 1}</p>
+                                                <p className="w-[60px]">{(currentTablePage - 1) * rowsPerTablePage + (i + 1)}</p>
                                                 <p className="w-[200px] font-semibold">{c.Name}</p>
                                             </td>
 

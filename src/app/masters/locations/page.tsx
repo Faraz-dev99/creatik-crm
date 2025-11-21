@@ -19,7 +19,10 @@ import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 interface LocationType {
   _id?: string;
   Name: string;
-  City: string;
+  City: {
+    _id:string;
+    Name:string;
+  };
   Status: string;
 }
 
@@ -52,7 +55,7 @@ export default function LocationPage() {
     const dataFormat = data.map((l: locationAllDataInterface) => ({
       ...l,
       Name: l.Name.charAt(0).toUpperCase() + l.Name.slice(1),
-      City: l.City.charAt(0).toUpperCase() + l.City.slice(1),
+    
     }));
 
     setLocations(dataFormat);
@@ -76,7 +79,7 @@ export default function LocationPage() {
           l.Name.toLowerCase().includes(keyword.toLowerCase());
         const matchesCity =
           selectedCity === "" ||
-          l.City.toLowerCase() === selectedCity.toLowerCase();
+          l.City?.Name.toLowerCase() === selectedCity.toLowerCase();
         return matchesKeyword && matchesCity;
       })
   }, [locations, keyword, selectedCity, limit]);
@@ -241,9 +244,9 @@ export default function LocationPage() {
                       className="border-t flex justify-between items-center w-full hover:bg-[#f7f6f3] transition-all duration-200"
                     >
                       <td className="flex items-center gap-10 px-8 py-3 w-2/3">
-                        <p className="w-[60px]">{i + 1}</p>
+                        <p className="w-[60px]">{(currentTablePage - 1) * rowsPerTablePage + (i + 1)}</p>
                         <p className="w-[200px] font-semibold">{l.Name}</p>
-                        <p className="w-[200px]">{l.City}</p>
+                        <p className="w-[200px]">{l.City?.Name}</p>
                       </td>
 
                       <td className="flex items-center gap-10 px-8 py-3 w-1/3 justify-end">

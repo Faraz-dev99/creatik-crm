@@ -56,7 +56,6 @@ export default function StatusTypePage() {
   const filteredStatusTypes = useMemo(() => {
     return statusTypes
       .filter(s => keyword === "" || s.Name.toLowerCase().includes(keyword.toLowerCase()))
-      .slice(0, Number(limit));
   }, [statusTypes, keyword, limit]);
 
   // Delete Status Type
@@ -181,7 +180,7 @@ export default function StatusTypePage() {
                   currentRows.map((s, i) => (
                     <tr key={s._id || i} className="border-t flex justify-between items-center w-full hover:bg-[#f7f6f3] transition-all duration-200">
                       <td className="flex items-center gap-10 px-8 py-3 w-1/2">
-                        <p className="w-[60px]">{i + 1}</p>
+                        <p className="w-[60px]">{(currentTablePage - 1) * rowsPerTablePage + (i + 1)}</p>
                         <p className="w-[200px] font-semibold">{s.Name}</p>
                       </td>
                       <td className="flex items-center gap-10 px-8 py-3 w-1/2 justify-end">
