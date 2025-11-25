@@ -186,7 +186,7 @@ export default function Customer() {
 
     const queryParams = new URLSearchParams();
     Object.entries(updatedFilters).forEach(([key, value]) => {
-      if (key === "Limit") return; // 
+      if (key === "Limit") return;
       if (Array.isArray(value) && value.length > 0) {
         value.forEach((v) => queryParams.append(key, v));
       } else if (typeof value === "string" && value) {
@@ -234,7 +234,7 @@ export default function Customer() {
       Location: [],
       User: [],
       Keyword: "",
-      Limit: [],
+      Limit: ["10"],
     });
     await getCustomers();
   };
@@ -587,6 +587,7 @@ export default function Customer() {
               <div className={`overflow-hidden ${toggleSearchDropdown ? "max-h-[2000px]" : "max-h-0"} transition-all duration-500 ease-in-out px-5`}>
                 <div className="flex flex-col gap-5 my-5">
                   <div className="grid grid-cols-3 gap-5 max-md:grid-cols-1 max-lg:grid-cols-2">
+                    
 
                     <SingleSelect options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []} value={filters.Campaign[0]} label="Campaign" onChange={(v) => handleSelectChange("Campaign", v)} />
 
@@ -603,6 +604,7 @@ export default function Customer() {
                     <SingleSelect options={["10", "25", "50", "100"]} value={filters.Limit[0]} label="Limit" onChange={(v) => handleSelectChange("Limit", v)} />
 
                   </div>
+                  
 
                 </div>
 
@@ -694,10 +696,11 @@ export default function Customer() {
                       />
                     </th>
 
-                    <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">S.No.</th>
+                    <th className="px-2 py-3 border border-[var(--color-secondary-dark)] text-left  max-w-[60px]">S.No.</th>
                     <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Campaign</th>
                     <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Customer Type</th>
                     <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Customer Subtype</th>
+                    <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Name</th>
                     <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Description</th>
                     <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Location</th>
                     <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Contact No</th>
@@ -721,18 +724,19 @@ export default function Customer() {
                           />
                         </td>
 
-                        <td className="px-2 py-3 border border-gray-200">{(currentTablePage - 1) * rowsPerTablePage + (index + 1)}</td>
+                        <td className="px-2 py-3 border border-gray-200 break-all whitespace-normal max-w-[60px]">{(currentTablePage - 1) * rowsPerTablePage + (index + 1)}</td>
                         <td className="px-2 py-3 border border-gray-200">{item.Campaign}</td>
-                        <td className="px-2 py-3 border border-gray-200  ">{item.Type}</td>
-                        <td className="px-2 py-3  border-gray-200 break-all whitespace-normal w-full max-w-[120px] inline-block ">{item.SubType}</td>
+                        <td className="px-2 py-3 border border-gray-200 break-all whitespace-normal w-[130px]">{item.Type}</td>
+                        <td className="px-2 py-3  border-gray-200 break-all whitespace-normal max-w-[120px] inline-block ">{item.SubType}</td>
+                        <td className="px-2 py-3 border border-gray-200  ">{item.Name}</td>
                         <td
-                          className={`px-2 py-3 border border-gray-200 max-w-[200px] ${item.Description ? "min-w-[200px]" : ""
+                          className={`px-2 py-3 border border-gray-200 max-w-[160px] ${item.Description ? "min-w-[160px]" : ""
                             }`}
                         >
                           {item.Description}
                         </td>
                         <td className="px-2 py-3 border border-gray-200">{item.Location}</td>
-                        <td className="px-2 py-3 min-w-[100px]  border-gray-200 break-all whitespace-normal w-full max-w-[150px] block">{item.ContactNumber}</td>
+                        <td className="px-2 py-3 min-w-[100px]  border-gray-200 break-all whitespace-normal max-w-[150px] block">{item.ContactNumber}</td>
                         <td className="px-2 py-3 border border-gray-200">{item.AssignTo}</td>
                         <td className="px-2 py-3 border border-gray-200 min-w-[100px]">{item.Date}</td>
 
@@ -793,7 +797,6 @@ export default function Customer() {
                   )}
                 </tbody>
               </table>
-
 
             </div>
             {/* Pagination */}

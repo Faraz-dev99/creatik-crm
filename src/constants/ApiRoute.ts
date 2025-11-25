@@ -42,7 +42,7 @@ export const API_ROUTES = {
       GET_BY_PARAMS: (params: string) => `${BASE_URL}/cus/followup?${params}`,
       ADD: (id: string) => `${BASE_URL}/cus/followup/${id}`,
       UPDATE: (id: string) => `${BASE_URL}/cus/followup/${id}`,
-      CUSTOMER_FOLLOWUP_DELETE: (id: string) => `${BASE_URL}/cus/followup/${id}`,
+      CUSTOMER_FOLLOWUP_DELETE: (id: string) => `${BASE_URL}/cus/followup/customer/${id}`,
       FOLLOWUP_DELETE: (id: string) => `${BASE_URL}/cus/followup/${id}`,
     },
     CONTACT: {
@@ -52,7 +52,7 @@ export const API_ROUTES = {
       GET_BY_PARAMS: (params: string) => `${BASE_URL}/con/follow/add?${params}`,
       ADD: (id: string) => `${BASE_URL}/con/follow/add/${id}`,
       UPDATE: (id: string) => `${BASE_URL}/con/follow/add/${id}`,
-      CONTACT_FOLLOWUP_DELETE: (id: string) => `${BASE_URL}/con/follow/add/${id}`,
+      CONTACT_FOLLOWUP_DELETE: (id: string) => `${BASE_URL}/con/follow/add/contact/${id}`,
       FOLLOWUP_DELETE: (id: string) => `${BASE_URL}/con/follow/add/${id}`,
     },
   },

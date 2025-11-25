@@ -193,7 +193,7 @@ export default function CustomerTypePage() {
                       <td className="flex items-center gap-10 px-8 py-3 w-1/2">
                         <p className="w-[60px]">{(currentTablePage - 1) * rowsPerTablePage + (i + 1)}</p>
                         <p className="w-[200px]">{t.Campaign?.Name}</p>
-                        <p className="w-[200px] font-semibold">{t.Name}</p>
+                        <p className="w-[200px] font-semibold break-all whitespace-normal max-w-[200px]">{t.Name}</p>
                       </td>
 
                       <td className="flex items-center gap-10 px-8 py-3 w-1/2 justify-end">

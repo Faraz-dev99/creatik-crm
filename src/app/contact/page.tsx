@@ -464,7 +464,7 @@ export default function Contacts() {
       Location: [],
       User: [],
       Keyword: "",
-      Limit: [],
+      Limit: ["10"],
     });
     await getContacts();
   };
@@ -601,7 +601,7 @@ export default function Contacts() {
                   </div>
 
                   <div className="flex justify-center items-center">
-                    <button type="submit" className="border border-gray-900 text-[var(--color-secondary-darker)] hover:bg-gray-900 hover:text-white transition-all duration-300 cursor-pointer px-3 py-2 mt-6 rounded-md">
+                    <button type="submit" className="border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-all duration-300 cursor-pointer px-3 py-2 mt-6 rounded-md">
                       Explore
                     </button>
                     <button type="reset" onClick={clearFilter} className="text-red-500 cursor-pointer hover:underline text-sm px-5 py-2 mt-6 rounded-md ml-3">

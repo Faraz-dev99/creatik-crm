@@ -153,7 +153,7 @@ export default function CustomerSubtypePage() {
                     <p className="w-[60px]">S.No.</p>
                     <p className="w-[160px]">Campaign</p>
                     <p className="w-[160px]">Customer Type</p>
-                    <p className="w-[200px]">Name</p>
+                    <p className="w-[200px]">Customer Subtype</p>
                   </th>
 
                   <th className="flex items-center gap-10 px-8 py-3 border border-[var(--color-secondary-dark)] text-left w-1/3 justify-end">
@@ -170,8 +170,8 @@ export default function CustomerSubtypePage() {
                       <td className="flex items-center gap-8 px-8 py-3 w-2/3">
                         <p className="w-[60px]">{indexOfFirstRow + i + 1}</p>
                         <p className="w-[160px]">{s.Campaign?.Name}</p>
-                        <p className="w-[160px] text-gray-700">{s.CustomerType?.Name}</p>
-                        <p className="w-[200px] font-semibold">{s.Name}</p>
+                        <p className="w-[160px] text-gray-700  break-all whitespace-normal max-w-[160px]">{s.CustomerType?.Name}</p>
+                        <p className="w-[200px] font-semibold break-all whitespace-normal max-w-[200px]">{s.Name}</p>
                       </td>
 
                       <td className="flex items-center gap-10 px-8 py-3 w-1/3 justify-end">
