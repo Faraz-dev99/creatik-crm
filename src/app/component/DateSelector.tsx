@@ -36,7 +36,7 @@ export default function DateSelector({ label, value, onChange }: DateSelectorPro
           },
           minWidth: {
             md: 200,
-            lg: 300,
+            lg: 200,
           },
         }}
       >
@@ -47,7 +47,6 @@ export default function DateSelector({ label, value, onChange }: DateSelectorPro
           slotProps={{
             textField: {
               fullWidth: true,
-              variant: "outlined",
               sx: {
                 "& .MuiInputBase-root": {
                   borderRadius: "8px",

@@ -557,7 +557,7 @@ export default function Customer() {
 
 
         {/* ---------- TABLE START ---------- */}
-        <LoaderCircle />
+        
         <div className="p-4 max-md:p-3 w-full rounded-md bg-white">
           <div className="flex justify-between items-center p-2">
             <PageHeader title="Dashboard" subtitles={["Customer"]} />
