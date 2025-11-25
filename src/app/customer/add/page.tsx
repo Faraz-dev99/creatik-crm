@@ -134,8 +134,7 @@ export default function CustomerAdd() {
       setErrors(validationErrors);
       return;
     }
-
-    try {
+    
       const formData = new FormData();
 
       // Append fields
@@ -176,12 +175,9 @@ export default function CustomerAdd() {
         toast.success("Customer added successfully!");
         router.push("/customer");
       } else {
-        toast.error("Failed to add customer");
+        //toast.error(result??"Failed to add customer");
       }
-    } catch (error) {
-      toast.error("Error adding customer");
-      console.error("Customer Add Error:", error);
-    }
+    
   };
 
   const dropdownOptions = ["Option1", "Option2", "Option3"];

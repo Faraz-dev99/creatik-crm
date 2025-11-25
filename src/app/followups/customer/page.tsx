@@ -153,6 +153,7 @@ export default function CustomerFollowups() {
 
         const queryParams = new URLSearchParams();
         Object.entries(updatedFilters).forEach(([key, value]) => {
+            if (key === "Limit") return;
             if (Array.isArray(value) && value.length > 0) value.forEach(v => queryParams.append(key, v));
             else if (typeof value === "string" && value) queryParams.append(key, value);
         });

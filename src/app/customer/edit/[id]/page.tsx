@@ -228,7 +228,7 @@ export default function CustomerEdit() {
       return;
     }
 
-    try {
+
       const formData = new FormData();
 
       // Append normal fields
@@ -287,10 +287,7 @@ export default function CustomerEdit() {
       } else {
         toast.error("Update failed");
       }
-    } catch (error) {
-      toast.error("Error updating customer");
-      console.error("Update Error:", error);
-    }
+    
   };
 
   const dropdownOptions = ["Option1", "Option2", "Option3"];

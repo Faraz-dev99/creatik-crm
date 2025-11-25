@@ -661,7 +661,7 @@ export default function Contacts() {
               <table className="table-auto w-full border-collapse text-sm border border-gray-200">
                 <thead className="bg-[var(--color-primary)] rounmd text-white">
                   <tr>
-                    {/* ✅ SELECT ALL */}
+                    {/* SELECT ALL */}
                     <th className="px-2 py-3 text-left">
                       <input
                         id="selectall"
@@ -713,7 +713,7 @@ export default function Contacts() {
                         <td className="px-4 py-3 border border-gray-200">{item.AssignTo ? item.AssignTo : "N/A"}</td>
                         <td className="px-4 py-3 border border-gray-200">{item.date}</td>
 
-                        <td className="px-4 py-2 border border-gray-200 flex gap-2 items-center">
+                        <td className="px-4 py-2 flex gap-2 items-center">
                           <Button
                             sx={{
                               backgroundColor: "#E8F5E9",
