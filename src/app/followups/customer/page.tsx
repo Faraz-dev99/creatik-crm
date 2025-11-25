@@ -289,14 +289,14 @@ export default function CustomerFollowups() {
                 {
                     isfollowupDialogOpen && Array.isArray(followupDialogData) && followupDialogData.length > 0 && (
                         <PopupMenu onClose={() => { setIsFollowupDialogOpen(false); setFollowupDialogData([]); }}>
-                            <div className="flex flex-col border border-gray-300/30 overflow-y-auto  bg-gray-100 text-gray-900 rounded-xl shadow-lg p-6 max-w-[800px] gap-6 m-2 w-full  max-h-[80vh] overflow-auto">
+                            <div className="flex flex-col border border-gray-300/30 overflow-y-auto  bg-gray-100 text-[var(--color-secondary-darker)] rounded-xl shadow-lg p-6 max-w-[800px] gap-6 m-2 w-full  max-h-[80vh] overflow-auto">
                                 <h2 className="text-2xl text-[var(--color-secondary-darker)] font-extrabold">Customer <span className=" text-[var(--color-primary)]">Followups</span></h2>
                                 <div className=" overflow-y-auto max-h-[100vh]">
                                     {
                                         followupDialogData.map((item, index) => (
                                             <div key={item._id ?? +index} className=" flex justify-between border border-gray-300 rounded-md p-4">
                                                 <div className=" flex flex-col gap-2">
-                                                    <p><span className="font-semibold">Followup Date:</span> {item.FollowupNextDate}</p>
+                                                    <p><span className="font-semibold">Followup Date:</span> {item.StartDate}</p>
                                                     <p><span className="font-semibold">Status Type:</span> {item.StatusType}</p>
                                                     <p><span className="font-semibold">Next Followup Date:</span> {item.FollowupNextDate}</p>
                                                     <p><span className="font-semibold">Description:</span> {item.Description}</p>
@@ -381,7 +381,7 @@ export default function CustomerFollowups() {
 
                                 <form className="flex flex-wrap max-md:flex-col justify-between items-center mb-5">
                                     <div className="min-w-[80%]">
-                                        <label className="block mb-2 text-sm font-medium text-gray-900">AI Genie</label>
+                                        <label className="block mb-2 text-sm font-medium text-[var(--color-secondary-darker)]">AI Genie</label>
                                         <input
                                             type="text"
                                             placeholder="type text here.."
@@ -391,7 +391,7 @@ export default function CustomerFollowups() {
                                         />
                                     </div>
                                     <div className="flex justify-center items-center">
-                                        <button type="submit" className="border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-all duration-300 cursor-pointer px-3 py-2 mt-6 rounded-md">
+                                        <button type="submit" className="border border-gray-900 text-[var(--color-secondary-darker)] hover:bg-gray-900 hover:text-white transition-all duration-300 cursor-pointer px-3 py-2 mt-6 rounded-md">
                                             Explore
                                         </button>
                                         <button type="reset" onClick={clearFilter} className="text-red-500 text-sm px-5 py-2 mt-6 rounded-md ml-3">

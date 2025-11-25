@@ -228,7 +228,7 @@ export default function TaskPage() {
                       <td className="px-4 py-3 border border-gray-200">{s.Description}</td>
                       <td className="px-4 py-3 border border-gray-200">{s.User}</td>
                       <td className="px-4 py-2 flex gap-2 items-center">
-                        <Button sx={{backgroundColor: "#C8E6C9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px"}} onClick={() => editTask(s._id || String(i))}><MdEdit /></Button>
+                        <Button sx={{backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px"}} onClick={() => editTask(s._id || String(i))}><MdEdit /></Button>
                         <Button sx={{backgroundColor: "#F9D0C4", color: "#C62828", minWidth: "32px", height: "32px", borderRadius: "8px"}}
                           onClick={() => { setTaskIds([s._id || ""]); setIsDeleteDialogOpen(true); setDeleteDialogData({ id: s._id || String(i), description: s.Description, date: s.date }); }}>
                           <MdDelete />

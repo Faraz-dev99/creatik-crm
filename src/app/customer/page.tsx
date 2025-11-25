@@ -31,6 +31,8 @@ import AddButton from "../component/buttons/AddButton";
 import PageHeader from "../component/labels/PageHeader";
 import ListPopup from "../component/popups/ListPopup";
 import LoaderCircle from "../component/LoaderCircle";
+import useHorizontalScroll from "@/hooks/useHorizontalScroll";
+import { Description } from "@radix-ui/react-dialog";
 
 
 interface DeleteAllDialogDataInterface { }
@@ -64,13 +66,14 @@ export default function Customer() {
   const [isFavrouteCustomer, setIsFavrouteCustomer] = useState<boolean>(false);
   const [deleteAllDialogData, setDeleteAllDialogData] =
     useState<DeleteAllDialogDataInterface | null>(null);
+  const scrollRef = useHorizontalScroll();
 
   const [rowsPerTablePage, setRowsPerTablePage] = useState(10);
   const [filters, setFilters] = useState({
     StatusAssign: [] as string[],
     Campaign: [] as string[],
     CustomerType: [] as string[],
-    CustomerSubtype: [] as string[],
+    CustomerSubType: [] as string[],
     City: [] as string[],
     Location: [] as string[],
     User: [] as string[],
@@ -102,6 +105,7 @@ export default function Customer() {
             Type: item.CustomerType,
             SubType: item.CustomerSubType,
             Name: item.customerName,
+            Description: item.Description,
             Email: item.Email,
             City: item.City,
             Location: item.Location,
@@ -206,6 +210,7 @@ export default function Customer() {
           Type: item.CustomerType,
           SubType: item.CustomerSubType,
           Name: item.customerName,
+          Description:item.Description,
           Email: item.Email,
           City: item.City,
           Location: item.Location,
@@ -224,7 +229,7 @@ export default function Customer() {
       StatusAssign: [],
       Campaign: [],
       CustomerType: [],
-      CustomerSubtype: [],
+      CustomerSubType: [],
       City: [],
       Location: [],
       User: [],
@@ -239,7 +244,9 @@ export default function Customer() {
   }, [customerData, rowsPerTablePage]);
 
   const startIndex = (currentTablePage - 1) * rowsPerTablePage;
-  const currentRows = customerData.slice(startIndex, startIndex + rowsPerTablePage);
+  const currentRows = useMemo(()=>{
+    return customerData.slice(startIndex, startIndex + rowsPerTablePage);
+  },[customerData,rowsPerTablePage]) 
 
 
   useEffect(() => {
@@ -585,7 +592,7 @@ export default function Customer() {
 
                     <SingleSelect options={Array.isArray(fieldOptions?.CustomerType) ? fieldOptions.CustomerType : []} value={filters.CustomerType[0]} label="Customer Type" onChange={(v) => handleSelectChange("CustomerType", v)} />
 
-                    <SingleSelect options={Array.isArray(fieldOptions?.CustomerSubtype) ? fieldOptions.CustomerSubtype : []} value={filters.CustomerSubtype[0]} label="Customer Subtype" onChange={(v) => handleSelectChange("CustomerSubtype", v)} />
+                    <SingleSelect options={Array.isArray(fieldOptions?.CustomerSubtype) ? fieldOptions.CustomerSubtype : []} value={filters.CustomerSubType[0]} label="Customer SubType" onChange={(v) => handleSelectChange("CustomerSubType", v)} />
 
                     <SingleSelect options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []} value={filters.City[0]} label="City" onChange={(v) => handleSelectChange("City", v)} />
 
@@ -599,10 +606,10 @@ export default function Customer() {
 
                 </div>
 
-                {/* ✅ Keyword Search */}
+                {/* Keyword Search */}
                 <form className="flex flex-wrap max-md:flex-col justify-between items-center mb-5">
                   <div className="min-w-[80%]">
-                    <label className="block mb-2 text-sm font-medium text-gray-900">AI Genie</label>
+                    <label className="block mb-2 text-sm font-medium text-[var(--color-secondary-darker)]">AI Genie</label>
                     <input
                       type="text"
                       placeholder="type text here.."
@@ -613,17 +620,17 @@ export default function Customer() {
                   </div>
 
                   <div className="flex justify-center items-center">
-                    <button type="submit" className="border border-gray-900 text-gray-900 hover:bg-gray-900 hover:text-white transition-all duration-300 cursor-pointer px-3 py-2 mt-6 rounded-md">
+                    <button type="submit" className="border border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)] hover:text-white transition-all duration-300 cursor-pointer px-3 py-2 mt-6 rounded-md">
                       Explore
                     </button>
-                    <button type="reset" onClick={clearFilter} className="text-red-500 text-sm px-5 py-2 mt-6 rounded-md ml-3">
+                    <button type="reset" onClick={clearFilter} className="text-red-500 cursor-pointer hover:underline text-sm px-5 py-2 mt-6 rounded-md ml-3">
                       Clear Search
                     </button>
                   </div>
                 </form>
               </div>
             </div>
-            <div className=" overflow-auto">
+            <div className=" overflow-auto" ref={scrollRef}>
               <div className="flex gap-10 items-center px-3 py-4 min-w-max text-gray-700">
 
                 <label htmlFor="selectall" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer">
@@ -691,6 +698,7 @@ export default function Customer() {
                     <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Campaign</th>
                     <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Customer Type</th>
                     <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Customer Subtype</th>
+                    <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Description</th>
                     <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Location</th>
                     <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Contact No</th>
                     <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Assign To</th>
@@ -713,32 +721,38 @@ export default function Customer() {
                           />
                         </td>
 
-                        <td className="px-4 py-3 border border-gray-200">{(currentTablePage - 1) * rowsPerTablePage + (index + 1)}</td>
-                        <td className="px-4 py-3 border border-gray-200">{item.Campaign}</td>
-                        <td className="px-4 py-3 border border-gray-200">{item.Type}</td>
-                        <td className="px-4 py-3 border border-gray-200">{item.SubType}</td>
-                        <td className="px-4 py-3 border border-gray-200">{item.Location}</td>
-                        <td className="px-4 py-3 border border-gray-200 break-all whitespace-normal w-full max-w-[200px]">{item.ContactNumber}</td>
-                        <td className="px-4 py-3 border border-gray-200">{item.AssignTo}</td>
-                        <td className="px-4 py-3 border border-gray-200">{item.Date}</td>
+                        <td className="px-2 py-3 border border-gray-200">{(currentTablePage - 1) * rowsPerTablePage + (index + 1)}</td>
+                        <td className="px-2 py-3 border border-gray-200">{item.Campaign}</td>
+                        <td className="px-2 py-3 border border-gray-200  ">{item.Type}</td>
+                        <td className="px-2 py-3  border-gray-200 break-all whitespace-normal w-full max-w-[120px] inline-block ">{item.SubType}</td>
+                        <td
+                          className={`px-2 py-3 border border-gray-200 max-w-[200px] ${item.Description ? "min-w-[200px]" : ""
+                            }`}
+                        >
+                          {item.Description}
+                        </td>
+                        <td className="px-2 py-3 border border-gray-200">{item.Location}</td>
+                        <td className="px-2 py-3 min-w-[100px]  border-gray-200 break-all whitespace-normal w-full max-w-[150px] block">{item.ContactNumber}</td>
+                        <td className="px-2 py-3 border border-gray-200">{item.AssignTo}</td>
+                        <td className="px-2 py-3 border border-gray-200 min-w-[100px]">{item.Date}</td>
 
-                        <td className="px-4 py-2 flex gap-2 items-center">
+                        <td className=" py-2 px-[8px] min-w-[90px] grid grid-cols-2 gap-3  items-center">
                           <Button
-                            sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px" }}
+                            sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px", }}
                             onClick={() => router.push(`/followups/customer/add/${item._id}`)}
                           >
                             <MdAdd />
                           </Button>
 
                           <Button
-                            sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px" }}
+                            sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px", }}
                             onClick={() => router.push(`/customer/edit/${item._id}`)}
                           >
                             <MdEdit />
                           </Button>
 
                           <Button
-                            sx={{ backgroundColor: "#FDECEA", color: "#C62828", minWidth: "32px", height: "32px", borderRadius: "8px" }}
+                            sx={{ backgroundColor: "#FDECEA", color: "#C62828", minWidth: "32px", height: "32px", borderRadius: "8px", }}
                             onClick={() => {
                               setIsDeleteDialogOpen(true);
                               setDialogType("delete");
@@ -759,6 +773,7 @@ export default function Customer() {
                               minWidth: "32px",
                               height: "32px",
                               borderRadius: "8px",
+
                             }}
                             onClick={() =>
                               handleFavouriteToggle(item._id, item.Name, item.ContactNumber, item.isFavourite ?? false)

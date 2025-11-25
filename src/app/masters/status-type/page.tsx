@@ -187,19 +187,19 @@ export default function StatusTypePage() {
                       </td>
                       <td className="flex items-center gap-10 px-8 py-3 w-1/2 justify-end">
                         <div className="w-[120px]">
-                          <span className={`px-3 py-1 rounded-[2px] text-xs font-semibold ${s.Status === "Active" ? "bg-[#C8E6C9] text-green-700" : "bg-red-100 text-red-700"}`}>
+                          <span className={`px-3 py-1 rounded-[2px] text-xs font-semibold ${s.Status === "Active" ? "bg-[#E8F5E9] text-green-700" : "bg-red-100 text-red-700"}`}>
                             {s.Status}
                           </span>
                         </div>
                         <div className="w-[120px] flex gap-2 items-center justify-start">
                           <Button
-                            sx={{ backgroundColor: "#C8E6C9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px" }}
+                            sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px" }}
                             onClick={() => handleEdit(s._id)}
                           >
                             <MdEdit />
                           </Button>
                           <Button
-                            sx={{ backgroundColor: "#F9D0C4", color: "#C62828", minWidth: "32px", height: "32px", borderRadius: "8px" }}
+                            sx={{ backgroundColor: "#FDECEA", color: "#C62828", minWidth: "32px", height: "32px", borderRadius: "8px" }}
                             onClick={() => {
                               setIsDeleteDialogOpen(true);
                               setDeleteDialogData({ id: s._id, Name: s.Name, Status: s.Status });

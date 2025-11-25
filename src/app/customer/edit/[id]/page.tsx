@@ -21,6 +21,7 @@ import SaveButton from "@/app/component/buttons/SaveButton";
 import { handleFieldOptionsObject } from "@/app/utils/handleFieldOptionsObject";
 import ObjectSelect from "@/app/component/ObjectSelect";
 import { InputField } from "@/app/component/InputField";
+import TextareaField from "@/app/component/datafields/TextareaField";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -418,7 +419,7 @@ export default function CustomerEdit() {
               <ObjectSelect
                 options={Array.isArray(fieldOptions?.CustomerType) ? fieldOptions.CustomerType : []}
                 label="Customer Type"
-                value={customerData.CustomerType.id}
+                value={customerData.CustomerType.name}
                 getLabel={(item) => item?.Name || ""}
                 getId={(item) => item?._id || ""}
                 onChange={(selectedId) => {
@@ -437,7 +438,7 @@ export default function CustomerEdit() {
               <ObjectSelect
                 options={Array.isArray(fieldOptions?.CustomerSubtype) ? fieldOptions.CustomerSubtype : []}
                 label="Customer Subtype"
-                value={customerData.CustomerSubtype?.id}
+                value={customerData.CustomerSubtype?.name}
                 getLabel={(item) => item?.Name || ""}
                 getId={(item) => item?._id || ""}
                 onChange={(selectedId) => {
@@ -498,7 +499,7 @@ export default function CustomerEdit() {
               <DateSelector label="Customer Date" value={customerData.CustomerDate} onChange={(val) => handleSelectChange("CustomerDate", val)} />
               <InputField label="Customer Year" name="CustomerYear" value={customerData.CustomerYear} onChange={handleInputChange} />
               <InputField label="Others" name="Others" value={customerData.Others} onChange={handleInputChange} />
-              <InputField label="Description" name="Description" value={customerData.Description} onChange={handleInputChange} />
+              <TextareaField label="Description" name="Description" value={customerData.Description} onChange={handleInputChange} />
               <InputField label="Video" name="Video" value={customerData.Video} onChange={handleInputChange} />
               <InputField label="Google Map" name="GoogleMap" value={customerData.GoogleMap} onChange={handleInputChange} />
               <SingleSelect options={Array.isArray(fieldOptions?.Verified) ? fieldOptions.Verified : []} label="Verified" value={customerData.Verified} onChange={(v) => handleSelectChange("Verified", v)} />
@@ -524,27 +525,7 @@ export default function CustomerEdit() {
 // Input field component
 
 
-// Textarea field
-const TextareaField: React.FC<{
-  label: string;
-  name: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-}> = ({ label, name, value, onChange }) => (
-  <label className="relative block w-full">
-    <textarea
-      name={name}
-      value={value}
-      onChange={onChange}
-      placeholder=" "
-      className="peer w-full border rounded-sm border-gray-400 bg-transparent py-3 px-4 outline-none focus:border-blue-500 min-h-[100px]"
-    ></textarea>
-    <p className={`absolute left-2 bg-white px-1 text-gray-500 text-sm transition-all duration-300
-      ${value ? "-top-2 text-xs text-blue-500" : "peer-placeholder-shown:top-3 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-focus:-top-2 peer-focus:text-xs peer-focus:text-blue-500"}`}>
-      {label}
-    </p>
-  </label>
-);
+
 
 // File upload with preview and remove
 const FileUpload: React.FC<{

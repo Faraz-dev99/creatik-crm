@@ -134,7 +134,9 @@ export default function ContactEdit() {
         const payload = {
             ...contactData,
             Campaign: contactData.Campaign?.name,
-            ContactType: contactData.ContactType?.name
+            ContactType: contactData.ContactType?.name,
+            City: contactData.City?.name,
+            Location: contactData.Location?.name
         };
         if (contactData.date == "") delete (payload as any).date;
 
@@ -268,7 +270,7 @@ export default function ContactEdit() {
                                 <ObjectSelect
                                     options={Array.isArray(fieldOptions?.ContactType) ? fieldOptions.ContactType : []}
                                     label="Contact Type"
-                                    value={contactData.ContactType.id}
+                                    value={contactData.ContactType.name}
                                     getLabel={(item) => item?.Name || ""}
                                     getId={(item) => item?._id || ""}
                                     onChange={(selectedId) => {

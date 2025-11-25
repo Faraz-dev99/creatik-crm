@@ -13,6 +13,7 @@ import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
 import { handleFieldOptions } from "@/app/utils/handleFieldOptions";
 import { getStatusType } from "@/store/masters/statustype/statustype";
+import dayjs from "dayjs";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -21,7 +22,7 @@ interface ErrorInterface {
 export default function ContactFollowupAdd() {
   const [followupData, setFollowupData] = useState<contactFollowupAllDataInterface>({
     contact: "",
-    StartDate: "",
+    StartDate: dayjs().format("YYYY-MM-DD"),
     StatusType: "",
     FollowupNextDate: "",
     Description: "",

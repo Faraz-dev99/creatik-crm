@@ -91,7 +91,9 @@ export default function ContactAdd() {
     const payload = {
       ...contactData,
       Campaign: contactData.Campaign?.name,
-      ContactType: contactData.ContactType?.name
+      ContactType: contactData.ContactType?.name,
+      City:contactData.City?.name,
+      Location:contactData.Location?.name
     };
     if (contactData.date === "") delete (payload as any).date;
 

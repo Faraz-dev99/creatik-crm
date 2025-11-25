@@ -10,6 +10,7 @@ interface DateSelectorProps {
   label: string;
   value?: string; // optional initial value
   onChange?: (selected: string) => void;
+   error?: string;
 }
 
 export default function DateSelector({ label, value, onChange }: DateSelectorProps) {
