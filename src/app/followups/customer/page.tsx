@@ -37,6 +37,7 @@ import { getLocation } from "@/store/masters/location/location";
 import { getAllAdmins } from "@/store/auth";
 import PageHeader from "@/app/component/labels/PageHeader";
 import { getTypes } from "@/store/masters/types/types";
+import { getStatusType } from "@/store/masters/statustype/statustype";
 
 export default function CustomerFollowups() {
     const router = useRouter();
@@ -240,7 +241,7 @@ export default function CustomerFollowups() {
     const fetchFields = async () => {
         await handleFieldOptions(
             [
-                { key: "StatusTypes", staticData: ["Active", "Inactive"] },
+                { key: "StatusTypes", fetchFn:getStatusType },
                 { key: "Campaign", fetchFn: getCampaign },
                 { key: "PropertyTypes", fetchFn: getTypes },
                 { key: "City", fetchFn: getCity },

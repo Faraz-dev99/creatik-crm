@@ -34,6 +34,7 @@ import { getAllAdmins } from "@/store/auth";
 import PageHeader from "@/app/component/labels/PageHeader";
 import { getContactType } from "@/store/masters/contacttype/contacttype";
 import { getContactCampaign } from "@/store/masters/contactcampaign/contactcampaign";
+import { getContactStatusType } from "@/store/masters/contactstatustype/contactstatustype";
 
 export default function ContactFollowups() {
     const router = useRouter();
@@ -228,7 +229,7 @@ export default function ContactFollowups() {
     const fetchFields = async () => {
         await handleFieldOptions(
             [
-                { key: "StatusTypes", staticData: ["Active", "Inactive"] },
+                { key: "StatusTypes", fetchFn:getContactStatusType},
                 { key: "Campaign", fetchFn: getContactCampaign },
                 { key: "PropertyTypes", fetchFn: getContactType },
                 { key: "City", fetchFn: getCity },
