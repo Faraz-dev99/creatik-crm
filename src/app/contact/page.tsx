@@ -42,6 +42,7 @@ import { mailAllContactInterface, mailGetDataInterface } from "@/store/masters/m
 import { getWhatsapp, whatsappAllContact } from "@/store/masters/whatsapp/whatsapp";
 import { whatsappAllContactInterface, whatsappGetDataInterface } from "@/store/masters/whatsapp/whatsapp.interface";
 import ListPopup from "../component/popups/ListPopup";
+import { getContactCampaign } from "@/store/masters/contactcampaign/contactcampaign";
 
 interface DeleteAllDialogDataInterface { }
 
@@ -444,7 +445,7 @@ export default function Contacts() {
     await handleFieldOptions(
       [
         { key: "StatusAssign", staticData: ["Assigned", "Unassigned"] },
-        { key: "Campaign", fetchFn: getCampaign },
+        { key: "Campaign", fetchFn: getContactCampaign },
         { key: "ContactType", fetchFn: getContactType },
         { key: "City", fetchFn: getCity },
         { key: "Location", fetchFn: getLocation },

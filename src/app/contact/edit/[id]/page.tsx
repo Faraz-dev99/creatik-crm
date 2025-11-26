@@ -23,6 +23,7 @@ import BackButton from "@/app/component/buttons/BackButton";
 import SaveButton from "@/app/component/buttons/SaveButton";
 import { handleFieldOptionsObject } from "@/app/utils/handleFieldOptionsObject";
 import ObjectSelect from "@/app/component/ObjectSelect";
+import { getContactCampaign } from "@/store/masters/contactcampaign/contactcampaign";
 
 
 interface ErrorInterface {
@@ -153,7 +154,7 @@ export default function ContactEdit() {
 
     // Object-based fields (for ObjectSelect)
     const objectFields = [
-        { key: "Campaign", fetchFn: getCampaign },
+        { key: "Campaign", fetchFn: getContactCampaign },
         { key: "ContactType", staticData: [] },
         { key: "City", fetchFn: getCity },
         { key: "Location", staticData: [] }

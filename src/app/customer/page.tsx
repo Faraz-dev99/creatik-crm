@@ -492,10 +492,10 @@ const phonetableheader=[{
 
   return (
     <ProtectedRoute>
-      <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-md:py-10">
+      <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-sm:py-10">
         <LeadsSection leads ={customerData} labelLeads={phonetableheader}/>
       </div>
-      <div className=" min-h-[calc(100vh-56px)] max-md:hidden overflow-auto max-md:py-10">
+      <div className=" min-h-[calc(100vh-56px)] max-sm:hidden overflow-auto max-md:py-10">
         <Toaster position="top-right" />
 
         {/* Delete Dialog */}
