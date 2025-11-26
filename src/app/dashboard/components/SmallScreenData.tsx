@@ -15,36 +15,36 @@ const SmallScreenData = () => {
     
     },
     {
-      pTag: "Follow Up",
+      pTag: "Customer",
       icon: <Podcast />,
       color: "bg-purple-500/50",
-      url:"/followups/customer"
+      url:"/customer"
      
     },
        {
-        pTag:"Schedule",
+        pTag:"Followups",
         icon:<School/>,
         color:"bg-teal-500/50",
-        url:"/schedules"
+        url:"/followups/customer"
 
     }, {
-        pTag:"Task",
+        pTag:"Contact",
         icon: <Cable/>,
         color:"bg-green-500/50",
-        url:"/task"
+        url:"/contact"
        
     },
        {
-        pTag:"Customers",
+        pTag:"Task",
         icon:<ShieldUser/>,
         color:"bg-blue-500/50",
-        url:"/customer"
+        url:"/task"
        
     }, {
-        pTag:"Contacts",
+        pTag:"Status Type",
         icon: <NotebookTabs/>,
         color:"bg-gray-500/50",
-        url:"/contact"
+        url:"/masters/status-type"
     },
   ];
 

@@ -1,0 +1,58 @@
+"use client";
+import { IoIosArrowForward } from "react-icons/io";
+import Button from "@mui/material/Button";
+
+interface LeadStatusItem {
+  name: string;
+}
+
+interface LeadStatusProps {
+  leadStatuses: LeadStatusItem[];
+}
+
+export default function LeadStatus({ leadStatuses }: LeadStatusProps) {
+  // Your color palette
+  const objectcolor = [
+    "#7C3AED", // purple
+    "#3B82F6", // blue
+    "#F97316", // orange
+    "#22C55E", // green
+    "#9CA3AF", // gray
+    "#FB923C", // light orange
+    "#8B5CF6", // purple
+  ];
+
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="p-4 flex flex-col gap-4">
+        {leadStatuses.map((status, index) => {
+          const colorIndex = index % objectcolor.length;
+
+          return (
+            <Button
+              key={index}
+              variant="contained"
+              fullWidth
+              sx={{
+                backgroundColor: objectcolor[colorIndex],
+                minWidth: "32px",
+                height: "48px",
+                borderRadius: "12px",
+                justifyContent: "space-between",
+                paddingLeft: "16px",
+                paddingRight: "16px",
+                textTransform: "none",
+                fontSize: "16px",
+                fontWeight: 600,
+              }}
+              className="text-white shadow-md"
+            >
+              {status.name}
+              <IoIosArrowForward />
+            </Button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

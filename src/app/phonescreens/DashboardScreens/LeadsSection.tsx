@@ -6,9 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MdPhone, MdEmail } from "react-icons/md";
 import { FaWhatsapp } from "react-icons/fa";
 import { AiOutlineHeart } from "react-icons/ai";
-import { GrFormNext , GrFormPrevious } from "react-icons/gr";
+import { GrFormNext, GrFormPrevious } from "react-icons/gr";
 
-import { AiOutlineBackward,AiOutlineForward } from "react-icons/ai"
+import { AiOutlineBackward, AiOutlineForward } from "react-icons/ai"
 export interface LabelConfig {
   key: string;
   label: string;
@@ -24,32 +24,32 @@ export default function LeadsSection<T extends Record<string, any>>({
   labelLeads,
 }: LeadsSectionProps<T>) {
   const [toggleSearchDropdown, setToggleSearchDropdown] = useState(false);
-  const[currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const itemsperpage = 5;
 
-  const totalPages = Math.ceil(leads.length/itemsperpage);
+  const totalPages = Math.ceil(leads.length / itemsperpage);
   const startIndex = (currentPage - 1) * itemsperpage;
-  const paginatedLeads =  leads.slice(startIndex,startIndex + itemsperpage);
+  const paginatedLeads = leads.slice(startIndex, startIndex + itemsperpage);
 
 
-  const nextPage =()=>{
-    if(currentPage < totalPages) setCurrentPage(currentPage + 1);
-  
+  const nextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+
   };
 
-  const prevPage = () =>{
-    if(currentPage > 1) setCurrentPage(currentPage - 1);
+  const prevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
   }
 
   const getDisplayedPages = () => {
-  if (totalPages <= 3) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    if (totalPages <= 3) return Array.from({ length: totalPages }, (_, i) => i + 1);
 
-  if (currentPage === 1) return [1, 2, 3];
-  if (currentPage === totalPages) return [totalPages - 2, totalPages - 1, totalPages];
+    if (currentPage === 1) return [1, 2, 3];
+    if (currentPage === totalPages) return [totalPages - 2, totalPages - 1, totalPages];
 
-  return [currentPage - 1, currentPage, currentPage + 1];
-};
-const pages = getDisplayedPages();
+    return [currentPage - 1, currentPage, currentPage + 1];
+  };
+  const pages = getDisplayedPages();
   return (
     <>
       {/* LEAD CARDS */}
@@ -95,31 +95,31 @@ const pages = getDisplayedPages();
         ))}
         {/* animated button */}
         {paginatedLeads.length > 0 && (
-      <div  className="flex items-center justify-center w-full">
-          <div className="flex items-center space-x-2 p-2  rounded-lg">
-             <button onClick={()=>setCurrentPage(1)}  className=" h-[30px] w-[30px] bg-neutral-200 rounded-full text-sm grid place-items-center"><AiOutlineBackward/> </button>
-            <button onClick={prevPage} 
-        disabled = {currentPage === 1}
-         className= {`h-[30px] w-[30px] bg-neutral-200 rounded-full text-sm grid place-items-center ${currentPage === 1 ? "bg-gray-200 opacity-50 cursor-not-allowed" : "bg-neutral-200 "}`}><GrFormPrevious/></button>
-    <AnimatePresence mode="popLayout">
-    {pages.map((num,i)=>( 
-      <motion.button
-      key={i}
-       onClick={()=>setCurrentPage(num)}
-        className={`h-[30px] w-[30px] bg-neutral-200 rounded-full text-sm grid place-items-center  ${num === currentPage? "bg-table text-white w-[35px] h-[35px]": "bg-neutral-200 text-black w-[30px] h-[30px]" 
-    }`}>
-          {num}
-          </motion.button>
-        ))}
-        </AnimatePresence>
-     
-      <button 
-      onClick={nextPage} 
-        disabled = {currentPage === totalPages}
-      className={`h-[30px] w-[30px] bg-neutral-200 rounded-full text-sm grid place-items-center ${currentPage === totalPages ? "bg-gray-200 opacity-50 cursor-not-allowed" : "bg-neutral-200 "}`}><GrFormNext/> </button>
-            <button onClick={()=>setCurrentPage(totalPages)} className=" h-[30px] w-[30px] bg-neutral-200 rounded-full text-sm grid place-items-center"><AiOutlineForward/> </button>
-    </div>
-      </div>)}
+          <div className="flex items-center justify-center w-full">
+            <div className="flex items-center space-x-2 p-2  rounded-lg">
+              <button onClick={() => setCurrentPage(1)} className=" h-[30px] w-[30px] bg-white rounded-full text-sm grid place-items-center"><AiOutlineBackward /> </button>
+              <button onClick={prevPage}
+                disabled={currentPage === 1}
+                className={`h-[30px] w-[30px] bg-white rounded-full text-sm grid place-items-center ${currentPage === 1 ? "bg-gray-200 opacity-50 cursor-not-allowed" : "bg-white "}`}><GrFormPrevious /></button>
+              <AnimatePresence mode="popLayout">
+                {pages.map((num, i) => (
+                  <motion.button
+                    key={i}
+                    onClick={() => setCurrentPage(num)}
+                    className={`h-[30px] w-[30px] bg-white rounded-full text-sm grid place-items-center  ${num === currentPage ? "bg-table text-white w-[35px] h-[35px]" : "bg-white text-black w-[30px] h-[30px]"
+                      }`}>
+                    {num}
+                  </motion.button>
+                ))}
+              </AnimatePresence>
+
+              <button
+                onClick={nextPage}
+                disabled={currentPage === totalPages}
+                className={`h-[30px] w-[30px] bg-white rounded-full text-sm grid place-items-center ${currentPage === totalPages ? "bg-gray-200 opacity-50 cursor-not-allowed" : "bg-white "}`}><GrFormNext /> </button>
+              <button onClick={() => setCurrentPage(totalPages)} className=" h-[30px] w-[30px] bg-white rounded-full text-sm grid place-items-center"><AiOutlineForward /> </button>
+            </div>
+          </div>)}
       </div>
       {/* <div>
         <button onClick={prevPage} 
@@ -133,7 +133,7 @@ const pages = getDisplayedPages();
       ${currentPage === totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-table text-white"}
     `}>next</button>
       </div> */}
-      
+
     </>
   );
 }

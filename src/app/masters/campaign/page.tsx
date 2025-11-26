@@ -14,6 +14,7 @@ import DeleteDialog from "@/app/component/popups/DeleteDialog";
 import AddButton from "@/app/component/buttons/AddButton";
 import PageHeader from "@/app/component/labels/PageHeader";
 import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
+import LeadStatus from "@/app/phonescreens/DashboardScreens/LeadStatus";
 
 /* import { getCampaigns, deleteCampaign } from "@/store/campaigns"; */ // you'll create these API helpers
 
@@ -99,7 +100,10 @@ export default function CampaignPage() {
     return (
         <MasterProtectedRoute>
             <Toaster position="top-right" />
-            <div className="min-h-[calc(100vh-56px)] overflow-auto max-md:py-10">
+            <div className=" sm:hidden">
+                <LeadStatus leadStatuses={campaigns.map((item) => ({ name: item.Name }))} />
+            </div>
+            <div className="min-h-[calc(100vh-56px)] overflow-auto max-md:py-10 max-sm:hidden">
                 {/* Header */}
 
                 {/* DELETE POPUP */}

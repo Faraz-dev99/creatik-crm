@@ -43,6 +43,7 @@ import { getWhatsapp, whatsappAllContact } from "@/store/masters/whatsapp/whatsa
 import { whatsappAllContactInterface, whatsappGetDataInterface } from "@/store/masters/whatsapp/whatsapp.interface";
 import ListPopup from "../component/popups/ListPopup";
 import { getContactCampaign } from "@/store/masters/contactcampaign/contactcampaign";
+import LeadsSection from "../phonescreens/DashboardScreens/LeadsSection";
 
 interface DeleteAllDialogDataInterface { }
 
@@ -470,9 +471,25 @@ export default function Contacts() {
     await getContacts();
   };
 
+  const phonetableheader=[{ 
+  key: "Campaign", label: "Campaign"
+ },
+{
+  key:"Name", label:"Name"
+},
+{
+  key:"Location", label:"Location"
+},
+{
+  key:"ContactNo", label:"Contact No"
+}]
+
   return (
     <ProtectedRoute>
-      <div className=" min-h-[calc(100vh-56px)] overflow-auto bg-gray-200 max-md:py-10">
+      <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-sm:py-10">
+              <LeadsSection leads ={contactData} labelLeads={phonetableheader}/>
+            </div>
+      <div className=" min-h-[calc(100vh-56px)] max-sm:hidden overflow-auto bg-gray-200 max-md:py-10">
         <Toaster position="top-right" />
 
         {/*DELETE SINGLE POPUP */}
