@@ -73,7 +73,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                       </div>
 
                       {/* Actual Page */}
-                      <div className="p-8 max-md:px-2 max-md:py-0">{children}</div>
+                      <div className="p-8 max-md:px-2 max-md:py-2">{children}</div>
                     </main>
                   </SidebarInset>
                 </div>
