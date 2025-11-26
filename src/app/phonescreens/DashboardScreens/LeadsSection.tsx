@@ -53,7 +53,7 @@ export default function LeadsSection<T extends Record<string, any>>({
   return (
     <>
       {/* LEAD CARDS */}
-      <div className="px-4 pb-4">
+      <div className="px-2 pb-4">
         {paginatedLeads.map((lead, index) => (
           <div key={index} className="w-full  bg-white shadow-md rounded-xl overflow-hidden border border-gray-200 mb-5">
             <div className="bg-table h-2"></div>
@@ -61,13 +61,21 @@ export default function LeadsSection<T extends Record<string, any>>({
             <div className="flex justify-between items-start p-4">
               <div>
                 {labelLeads.map((item, j) => (
-                  <div key={j} className="mb-2 flex items-center">
-                    <span className="font-semibold text-black text-lg">{item.label}</span>
-                    <span className="mx-2">-</span>
-                    <span className="text-gray-700 text-lg">
+                  <div
+                    key={j}
+                    className="mb-2 grid grid-cols-[1fr_auto_2fr] items-center gap-2"
+                  >
+                    <span className="font-semibold text-black">
+                      {item.label}
+                    </span>
+
+                    <span className="text-gray-500">-</span>
+
+                    <span className="text-gray-700  break-words">
                       {String(lead[item.key])}
                     </span>
                   </div>
+
                 ))}
               </div>
 

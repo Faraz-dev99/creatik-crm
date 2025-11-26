@@ -17,14 +17,14 @@ export default function LeadStatus({ leadStatuses }: LeadStatusProps) {
     "#3B82F6", // blue
     "#F97316", // orange
     "#22C55E", // green
+    "#8B5CF6", // light purple
     "#9CA3AF", // gray
-    "#FB923C", // light orange
-    "#8B5CF6", // purple
+    "#FB923C", // light orange 
   ];
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="p-4 flex flex-col gap-4">
+    <div className="min-h-screen">
+      <div className=" px-2 py-4 flex flex-col gap-4">
         {leadStatuses.map((status, index) => {
           const colorIndex = index % objectcolor.length;
 
@@ -46,6 +46,8 @@ export default function LeadStatus({ leadStatuses }: LeadStatusProps) {
                 fontWeight: 600,
               }}
               className="text-white shadow-md"
+
+
             >
               {status.name}
               <IoIosArrowForward />

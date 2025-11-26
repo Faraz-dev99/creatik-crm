@@ -44,13 +44,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                   {/* Main Area */}
                   <SidebarInset className="flex flex-col flex-1 min-h-screen overflow-hidden">
                     {/* Navbar */}
-                    <header className="flex items-center gap-2 shrink-0 bg-white text-gray-800 px-4 shadow-sm z-10">
+                    <header className="flex items-center gap-2 shrink-0 bg-white max-sm:bg-indigo-600 text-gray-800 px-4 shadow-sm z-10">
                       <div className="flex items-center gap-2 max-sm:hidden ">
                         <SidebarTrigger className="-ml-1 cursor-pointer" />
                         <Separator
                           orientation="vertical"
                           className="mr-2 data-[orientation=vertical]:h-4"
                         />
+                      </div>
+                      <div className=" text-white font-extrabold text-shadow-2xs text-shadow-black text-xl py-1 sm:hidden">
+                         Dashboard
                       </div>
 
                       <div className="ml-auto w-full">
@@ -70,7 +73,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                       </div>
 
                       {/* Actual Page */}
-                      <div className="p-8 max-md:px-0 max-md:py-2">{children}</div>
+                      <div className="p-8 max-md:px-2 max-md:py-0">{children}</div>
                     </main>
                   </SidebarInset>
                 </div>

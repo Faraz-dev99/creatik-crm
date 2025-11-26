@@ -68,7 +68,7 @@ export default function Navbar() {
 
   return (
     <ProtectedRoute>
-      <div className="flex justify-end items-end bg-white text-gray-800">
+      <div className="flex justify-end items-end bg-white max-sm:bg-indigo-600 max-sm:text-white text-gray-800">
         <div className=" max-md:hidden" />
         <nav className="px-2" style={{ zIndex: 1000 }}>
           <ul className="flex">
@@ -145,7 +145,7 @@ export default function Navbar() {
             {/* Admin Mail */}
             <li ref={adminMailRef} className="flex items-center relative cursor-pointer gap-2">
               <div
-                className="flex items-center gap-2 w-full h-full text-gray-800 p-4 max-md:p-2 hover:bg-gray-100"
+                className="flex items-center gap-2 w-full h-full text-gray-800 max-sm:text-white p-4 max-md:p-2 hover:bg-gray-100"
                 onClick={() =>
                   setOpenMenu(openMenu === "adminMail" ? null : "adminMail")
                 }
@@ -163,7 +163,7 @@ export default function Navbar() {
                    style={{zIndex:1000}}
               >
                 <PopUps>
-                  <div className="flex flex-col border-t-[3px] border-t-[var(--color-primary)]">
+                  <div className="flex flex-col border-t-[3px] border-t-[var(--color-primary)] max-sm:border-t-indigo-600">
                     <div className="flex items-center gap-2 hover:bg-gray-100 py-3 px-3" onClick={() => {
                       setOpenMenu(null);
                       router.push(`/users/edit/${admin?._id}`)

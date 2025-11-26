@@ -38,6 +38,7 @@ import { getAllAdmins } from "@/store/auth";
 import PageHeader from "@/app/component/labels/PageHeader";
 import { getTypes } from "@/store/masters/types/types";
 import { getStatusType } from "@/store/masters/statustype/statustype";
+import LeadsSection from "@/app/phonescreens/DashboardScreens/LeadsSection";
 
 export default function CustomerFollowups() {
     const router = useRouter();
@@ -258,11 +259,26 @@ export default function CustomerFollowups() {
     const cities = ['Mumbai', 'Delhi', 'Bangalore'];
     const locations = ['Andheri', 'Borivali', 'Powai'];
     const users = ['Admin', 'Agent1', 'Agent2'];
-
+const phonetableheader=[{ 
+  key: "Name", label: "Name"
+ },
+{
+  key:"ContactNumber", label:"Contact No"
+},
+{
+  key:"User", label:"User"
+},
+{
+  key:"Date", label:"Date"
+},]
     // 🔹 UI
     return (
         <ProtectedRoute>
-            <div className="min-h-[calc(100vh-56px)] overflow-auto max-md:py-10">
+            <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-sm:py-5">
+                <h1 className=" text-indigo-500 font-bold text-2xl px-2 py-2 mb-4">Followups</h1>
+                    <LeadsSection leads ={followupData} labelLeads={phonetableheader}/>
+                  </div>
+            <div className="min-h-[calc(100vh-56px)] max-sm:hidden overflow-auto max-md:py-10">
                 <Toaster position="top-right" />
 
                 {/* DELETE POPUP */}

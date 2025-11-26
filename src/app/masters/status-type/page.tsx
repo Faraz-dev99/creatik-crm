@@ -16,6 +16,7 @@ import { deleteStatusType, getStatusType } from "@/store/masters/statustype/stat
 import PageHeader from "@/app/component/labels/PageHeader";
 import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 import AddButton from "@/app/component/buttons/AddButton";
+import LeadStatus from "@/app/phonescreens/DashboardScreens/LeadStatus";
 
 export default function StatusTypePage() {
   const [statusTypes, setStatusTypes] = useState<statustypeGetDataInterface[]>([]);
@@ -103,7 +104,11 @@ export default function StatusTypePage() {
   return (
     <MasterProtectedRoute>
       <Toaster position="top-right" />
-      <div className="min-h-[calc(100vh-56px)] overflow-auto max-md:py-10">
+      <div className=" sm:hidden py-5">
+        <h1 className=" text-indigo-600 font-bold text-2xl px-2 py-2">Status Types</h1>
+        <LeadStatus leadStatuses={statusTypes.map((item) => ({ name: item.Name }))} />
+      </div>
+      <div className="min-h-[calc(100vh-56px)] max-sm:hidden overflow-auto max-md:py-10">
 
 
         {/* DELETE DIALOG */}
