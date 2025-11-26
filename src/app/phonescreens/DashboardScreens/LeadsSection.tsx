@@ -82,11 +82,11 @@ const pages = getDisplayedPages();
               </button>
 
               <div className="flex items-center gap-5">
-                <a href={`tel:${lead["number"] ?? ""}`}>
+                <a href={`tel:+91${String(lead["ContactNumber"]) ?? String(lead["ContactNo"]) ?? ""}`}>
                   <MdPhone size={20} className="text-white" />
                 </a>
                 <MdEmail size={20} className="text-white" />
-                <a href={`https://wa.me/${lead["number"] ?? ""}`} target="_blank">
+                <a href={`https://wa.me/+91${String(lead["ContactNumber"]) ?? String(lead["ContactNo"]) ?? ""}`} target="_blank">
                   <FaWhatsapp size={20} className="text-white" />
                 </a>
               </div>
