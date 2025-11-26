@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useState } from "react";
 import { CiSearch } from "react-icons/ci";
-import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
+import { IoIosArrowUp, IoIosArrowDown, IoMdClose } from "react-icons/io";
 import { MdEdit, MdDelete, MdAdd } from "react-icons/md";
 import Button from '@mui/material/Button';
 import SingleSelect from "@/app/component/SingleSelect";
@@ -277,7 +277,10 @@ export default function ContactFollowups() {
                 {isfollowupDialogOpen && Array.isArray(followupDialogData) && followupDialogData.length > 0 && (
                     <PopupMenu onClose={() => { setIsFollowupDialogOpen(false); setFollowupDialogData([]); }}>
                         <div className="flex flex-col border border-gray-300/30 overflow-y-auto bg-gray-100 text-[var(--color-secondary-darker)] rounded-xl shadow-lg p-6 max-w-[800px] gap-6 m-2 w-full max-h-[80vh]">
-                            <h2 className="text-2xl text-[var(--color-secondary-darker)] font-extrabold">Contact <span className="text-[var(--color-primary)]">Followups</span></h2>
+                            <h2 className="text-2xl text-[var(--color-secondary-darker)] font-extrabold flex justify-between items-center"><div>Contact <span className="text-[var(--color-primary)]">Followups</span></div><button className=" cursor-pointer" onClick={() => {
+                                                    setFollowupDialogData(null)
+                                                    setIsFollowupDialogOpen(false);
+                                                }}><IoMdClose /></button></h2>
                             <div className="overflow-y-auto max-h-[100vh]">
                                 {followupDialogData.map((item, index) => (
                                     <div key={item._id ?? +index} className="flex justify-between border border-gray-300 rounded-md p-4">
@@ -337,7 +340,7 @@ export default function ContactFollowups() {
                                         <SingleSelect options={Array.isArray(fieldOptions?.StatusTypes) ? fieldOptions.StatusTypes : []} value={filters.StatusType[0]} label="Status Type" onChange={(val) => handleSelectChange("StatusType", val)} />
                                         <SingleSelect options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []} value={filters.City[0]} label="City" onChange={(val) => handleSelectChange("City", val)} />
                                         <SingleSelect options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []} value={filters.Location[0]} label="Location" onChange={(val) => handleSelectChange("Location", val)} />
-                                        <SingleSelect options={Array.isArray(fieldOptions?.Users) ? fieldOptions.Users : []} value={filters.User[0]} label="User" onChange={(val) => handleSelectChange("User", val)} />
+                                        {/* <SingleSelect options={Array.isArray(fieldOptions?.Users) ? fieldOptions.Users : []} value={filters.User[0]} label="User" onChange={(val) => handleSelectChange("User", val)} /> */}
                                         <SingleSelect options={["10", "25", "50", "100"]} value={filters.Limit[0]} label="Limit" onChange={(val) => handleSelectChange("Limit", val)} />
                                     </div>
                                 </div>

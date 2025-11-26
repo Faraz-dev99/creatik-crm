@@ -14,6 +14,7 @@ import SaveButton from "@/app/component/buttons/SaveButton";
 import { handleFieldOptions } from "@/app/utils/handleFieldOptions";
 import { getStatusType } from "@/store/masters/statustype/statustype";
 import dayjs from "dayjs";
+import { getContactStatusType } from "@/store/masters/contactstatustype/contactstatustype";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -94,7 +95,7 @@ export default function ContactFollowupAdd() {
    const fetchFields = async () => {
       await handleFieldOptions(
         [
-          { key: "StatusType", fetchFn:getStatusType },
+          { key: "StatusType", fetchFn:getContactStatusType },
         ],
         setFieldOptions
       );

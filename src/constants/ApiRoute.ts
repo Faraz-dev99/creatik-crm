@@ -215,6 +215,14 @@ export const API_ROUTES = {
       UPDATE: (id: string) => `${BASE_URL}/mas/statustype/${id}`,
       DELETE: (id: string) => `${BASE_URL}/mas/statustype/${id}`,
     },
+     CONTACTSTATUSTYPE: {
+      GET_ALL: `${BASE_URL}/mas/con/statustype`,
+      GET_BY_ID: (id: string) => `${BASE_URL}/mas/con/statustype/${id}`,
+      GET_BY_PARAMS: (params: string) => `${BASE_URL}/mas/con/statustype?${params}`,
+      ADD: `${BASE_URL}/mas/con/statustype`,
+      UPDATE: (id: string) => `${BASE_URL}/mas/con/statustype/${id}`,
+      DELETE: (id: string) => `${BASE_URL}/mas/con/statustype/${id}`,
+    },
     PAYMENTS: {
       GET_ALL: `${BASE_URL}/mas/payments`,
       GET_BY_ID: (id: string) => `${BASE_URL}/mas/payments/${id}`,

@@ -73,7 +73,7 @@ export default function Navbar() {
         <nav className="px-2" style={{ zIndex: 1000 }}>
           <ul className="flex">
             {/* Notifications */}
-            <li ref={notificationsRef} className="grid place-items-center relative">
+            <li ref={notificationsRef} className="grid place-items-center relative max-md:hidden">
               <div
                 className="grid place-items-center w-full h-full max-md:text-xs text-gray-800 cursor-pointer p-4 max-md:p-2 hover:bg-gray-100"
                 onClick={() =>
@@ -104,7 +104,7 @@ export default function Navbar() {
             </li>
 
             {/* Quick Add */}
-            <li ref={quickAddRef} className="flex items-center relative z-50 gap-1">
+            <li ref={quickAddRef} className="flex items-center relative max-md:hidden z-50 gap-1">
               <div
                 className="flex items-center gap-2 w-full h-full text-gray-800 cursor-pointer p-4 max-md:p-2 hover:bg-gray-100"
                 onClick={() =>

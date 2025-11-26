@@ -33,6 +33,7 @@ import ListPopup from "../component/popups/ListPopup";
 import LoaderCircle from "../component/LoaderCircle";
 import useHorizontalScroll from "@/hooks/useHorizontalScroll";
 import { Description } from "@radix-ui/react-dialog";
+import LeadsSection from "../phonescreens/DashboardScreens/LeadsSection";
 
 
 interface DeleteAllDialogDataInterface { }
@@ -473,11 +474,28 @@ export default function Customer() {
   };
 
 
-
+const phonetableheader=[{ 
+  key: "Campaign", label: "Campaign"
+ },
+{
+  key:"Name", label:"Name"
+},
+{
+  key:"Description", label:"Description"
+},
+{
+  key:"Location", label:"Location"
+},
+{
+  key:"ContactNumber", label:"Contact No"
+}]
 
   return (
     <ProtectedRoute>
-      <div className=" min-h-[calc(100vh-56px)] overflow-auto max-md:py-10">
+      <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-md:py-10">
+        <LeadsSection leads ={customerData} labelLeads={phonetableheader}/>
+      </div>
+      <div className=" min-h-[calc(100vh-56px)] max-md:hidden overflow-auto max-md:py-10">
         <Toaster position="top-right" />
 
         {/* Delete Dialog */}
@@ -557,8 +575,13 @@ export default function Customer() {
 
 
         {/* ---------- TABLE START ---------- */}
+
+          
+  
+
+       
         
-        <div className="p-4 max-md:p-3 w-full rounded-md bg-white">
+        <div className="p-4 max-md:p-3 w-full rounded-md bg-white max-[450px]:hidden">
           <div className="flex justify-between items-center p-2">
             <PageHeader title="Dashboard" subtitles={["Customer"]} />
 
@@ -573,6 +596,7 @@ export default function Customer() {
           {/* TABLE */}
           <section className="flex flex-col mt-6 p-2 rounded-md">
             <div className="m-5 relative ">
+              
               <div className="flex justify-between cursor-pointer items-center py-1 px-2 border border-gray-800 rounded-md" onClick={() => setToggleSearchDropdown(!toggleSearchDropdown)}>
                 <h3 className="flex items-center gap-1"><CiSearch />Advance Search</h3>
                 <button
