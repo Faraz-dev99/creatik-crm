@@ -15,6 +15,7 @@ import AddButton from "@/app/component/buttons/AddButton";
 import PageHeader from "@/app/component/labels/PageHeader";
 import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 import LeadStatus from "@/app/phonescreens/DashboardScreens/LeadStatus";
+import CampaignFilter from "@/app/phonescreens/DashboardScreens/CampaignFilter";
 
 /* import { getCampaigns, deleteCampaign } from "@/store/campaigns"; */ // you'll create these API helpers
 
@@ -102,7 +103,7 @@ export default function CampaignPage() {
             <Toaster position="top-right" />
             <div className=" sm:hidden py-5">
                 <h1 className=" text-[var(--color-primary)] font-bold text-2xl px-2 py-2">Campaign</h1>
-                <LeadStatus leadStatuses={campaigns.map((item) => ({ name: item.Name }))} />
+                <CampaignFilter leadStatuses={campaigns.map((item) => ({ name: item.Name }))} />
             </div>
             <div className="min-h-[calc(100vh-56px)] overflow-auto max-md:py-10 max-sm:hidden">
                 {/* Header */}

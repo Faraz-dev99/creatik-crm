@@ -11,7 +11,7 @@ interface LeadStatusProps {
   leadStatuses: LeadStatusItem[];
 }
 
-export default function LeadStatus({ leadStatuses }: LeadStatusProps) {
+export default function CampaignFilter({ leadStatuses }: LeadStatusProps) {
   const router = useRouter();
   // Your color palette
   const objectcolor = [
@@ -25,7 +25,7 @@ export default function LeadStatus({ leadStatuses }: LeadStatusProps) {
   ];
 
     const handleClick = (name: string) => {
-    router.push(`/followups/customer?StatusType=${encodeURIComponent(name)}`);
+    router.push(`/customer?Campaign=${encodeURIComponent(name)}`);
   };
 
   return (

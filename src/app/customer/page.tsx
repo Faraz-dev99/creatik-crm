@@ -5,7 +5,7 @@ import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { MdEdit, MdDelete, MdAdd, MdFavorite, MdFavoriteBorder } from "react-icons/md";
 import Button from '@mui/material/Button';
 import SingleSelect from "@/app/component/SingleSelect";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { PlusSquare } from "lucide-react";
 import ProtectedRoute from "../component/ProtectedRoutes";
@@ -70,6 +70,7 @@ export default function Customer() {
   const [deleteAllDialogData, setDeleteAllDialogData] =
     useState<DeleteAllDialogDataInterface | null>(null);
   const scrollRef = useHorizontalScroll();
+  const searchParams = useSearchParams();
 
   const [rowsPerTablePage, setRowsPerTablePage] = useState(10);
   const [filters, setFilters] = useState({
@@ -91,6 +92,21 @@ export default function Customer() {
     getCustomers();
     fetchFields();
   }, []);
+
+  useEffect(() => {
+    const status = searchParams.get("Campaign");
+
+    if (status) {
+      // Auto set filter
+      setFilters((prev) => ({
+        ...prev,
+        StatusAssign: [status],
+      }));
+
+      // Fetch filtered data
+      handleSelectChange("Campaign", status);
+    }
+  }, [searchParams, customerData]);
 
   const getCustomers = async () => {
     const data = await getCustomer();
@@ -545,21 +561,21 @@ export default function Customer() {
           <DynamicAdvance>
             <SingleSelect options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []} value={filters.Campaign[0]} label="Campaign" onChange={(v) => handleSelectChange("Campaign", v)} />
 
-                    <SingleSelect options={Array.isArray(fieldOptions?.CustomerType) ? fieldOptions.CustomerType : []} value={filters.CustomerType[0]} label="Customer Type" onChange={(v) => handleSelectChange("CustomerType", v)} />
+            <SingleSelect options={Array.isArray(fieldOptions?.CustomerType) ? fieldOptions.CustomerType : []} value={filters.CustomerType[0]} label="Customer Type" onChange={(v) => handleSelectChange("CustomerType", v)} />
 
-                    <SingleSelect options={Array.isArray(fieldOptions?.CustomerSubtype) ? fieldOptions.CustomerSubtype : []} value={filters.CustomerSubType[0]} label="Customer SubType" onChange={(v) => handleSelectChange("CustomerSubType", v)} />
+            <SingleSelect options={Array.isArray(fieldOptions?.CustomerSubtype) ? fieldOptions.CustomerSubtype : []} value={filters.CustomerSubType[0]} label="Customer SubType" onChange={(v) => handleSelectChange("CustomerSubType", v)} />
 
-                    <SingleSelect options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []} value={filters.City[0]} label="City" onChange={(v) => handleSelectChange("City", v)} />
+            <SingleSelect options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []} value={filters.City[0]} label="City" onChange={(v) => handleSelectChange("City", v)} />
 
-                    <SingleSelect options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []} value={filters.Location[0]} label="Location" onChange={(v) => handleSelectChange("Location", v)} />
+            <SingleSelect options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []} value={filters.Location[0]} label="Location" onChange={(v) => handleSelectChange("Location", v)} />
 
-                    <SingleSelect options={Array.isArray(fieldOptions?.User) ? fieldOptions.User : []} value={filters.User[0]} label="User" onChange={(v) => handleSelectChange("User", v)} />
+            <SingleSelect options={Array.isArray(fieldOptions?.User) ? fieldOptions.User : []} value={filters.User[0]} label="User" onChange={(v) => handleSelectChange("User", v)} />
             <div className=" w-full flex justify-end">
               <button type="reset" onClick={clearFilter} className="text-red-500 cursor-pointer hover:underline text-sm px-5 py-2 rounded-md">
                 Clear Search
               </button>
             </div>
-                      
+
           </DynamicAdvance>
         </div>
         <CustomerTable

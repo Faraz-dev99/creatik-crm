@@ -6,7 +6,7 @@ import { MdEdit, MdDelete, MdAdd } from "react-icons/md";
 import Button from '@mui/material/Button';
 import SingleSelect from "@/app/component/SingleSelect";
 import DateSelector from "@/app/component/DateSelector";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { PlusSquare } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
@@ -56,6 +56,7 @@ export default function CustomerFollowups() {
     const [isfollowupDialogOpen, setIsFollowupDialogOpen] = useState(false);
     const [followupDialogData, setFollowupDialogData] = useState<customerFollowupAllDataInterface[] | null>([]);
     const [fieldOptions, setFieldOptions] = useState<Record<string, any[]>>({});
+    const searchParams = useSearchParams();
 
     const [rowsPerTablePage, setRowsPerTablePage] = useState(10);
 
@@ -78,7 +79,20 @@ export default function CustomerFollowups() {
         fetchFields();
     }, []);
 
+    useEffect(() => {
+        const status = searchParams.get("StatusType");
 
+        if (status) {
+            // Auto set filter
+            setFilters((prev) => ({
+                ...prev,
+                StatusAssign: [status],
+            }));
+
+            // Fetch filtered data
+            handleSelectChange("StatusType", status);
+        }
+    }, [searchParams, followupData]);
     const getFollowups = async () => {
         const data = await getAllCustomerFollowups();
         // console.log(" data of luffy , ", data)
