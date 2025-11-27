@@ -44,6 +44,8 @@ import { whatsappAllContactInterface, whatsappGetDataInterface } from "@/store/m
 import ListPopup from "../component/popups/ListPopup";
 import { getContactCampaign } from "@/store/masters/contactcampaign/contactcampaign";
 import LeadsSection from "../phonescreens/DashboardScreens/LeadsSection";
+import ContactTable from "../phonescreens/DashboardScreens/tables/ContactTable";
+import DynamicAdvance from "../phonescreens/DashboardScreens/DynamicAdvance";
 
 interface DeleteAllDialogDataInterface { }
 
@@ -471,27 +473,91 @@ export default function Contacts() {
     await getContacts();
   };
 
-  const phonetableheader=[{ 
-  key: "Campaign", label: "Campaign"
- },
-{
-  key:"Name", label:"Name"
-},
-{
-  key:"Location", label:"Location"
-},
-{
-  key:"ContactNo", label:"Contact No"
-}]
+  const phonetableheader = [{
+    key: "Campaign", label: "Campaign"
+  },
+  {
+    key: "Name", label: "Name"
+  },
+  {
+    key: "Location", label: "Location"
+  },
+  {
+    key: "ContactNo", label: "Contact No"
+  }]
 
   return (
     <ProtectedRoute>
+      <Toaster position="top-right" />
+      {/* mail all popup */}
+      {isMailAllOpen && selectedContacts.length > 0 && (
+        <ListPopup
+          title="Mail to All Contacts"
+          list={mailTemplates}
+          selected={selectedMailtemplate}
+          onSelect={handleSelectMailtemplate}
+          onSubmit={handleMailAll}
+          submitLabel="Mail All"
+          onClose={() => setIsMailAllOpen(false)}
+        />
+      )}
+
+
+      {/* whatsapp all popup */}
+      {isWhatsappAllOpen && selectedContacts.length > 0 && (
+        <ListPopup
+          title="Whatsapp to All Contacts"
+          list={whatsappTemplates}
+          selected={selectedWhatsapptemplate}
+          onSelect={handleSelectWhatsapptemplate}
+          onSubmit={handleWhatsappAll}
+          submitLabel="Whatsapp All"
+          onClose={() => setIsWhatsappAllOpen(false)}
+        />
+      )}
       <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-sm:py-5">
-        <h1 className=" text-indigo-500 font-bold text-2xl px-2 py-2 mb-4">Contacts</h1>
-              <LeadsSection leads ={contactData} labelLeads={phonetableheader}/>
-            </div>
+
+        <div className=" flex justify-between items-center px-2 py-2  mb-4">
+          <h1 className=" text-[var(--color-primary)] font-extrabold text-2xl ">Contacts</h1>
+          <AddButton url="/contact/add" text="Add" icon={<PlusSquare size={18} />} />
+        </div>
+        <div className=" w-full">
+          <DynamicAdvance>
+            <SingleSelect options={Array.isArray(fieldOptions.StatusAssign) ? fieldOptions.StatusAssign : []} value={filters.StatusAssign[0]} label="Status Assign" onChange={(v) => handleSelectChange("StatusAssign", v)} />
+
+            <SingleSelect options={Array.isArray(fieldOptions.Campaign) ? fieldOptions.Campaign : []} value={filters.Campaign[0]} label="Campaign" onChange={(v) => handleSelectChange("Campaign", v)} />
+
+            <SingleSelect options={Array.isArray(fieldOptions.ContactType) ? fieldOptions.ContactType : []} value={filters.ContactType[0]} label="Contact Type" onChange={(v) => handleSelectChange("ContactType", v)} />
+
+            <SingleSelect options={Array.isArray(fieldOptions.City) ? fieldOptions.City : []} value={filters.City[0]} label="City" onChange={(v) => handleSelectChange("City", v)} />
+
+            <SingleSelect options={Array.isArray(fieldOptions.Location) ? fieldOptions.Location : []} value={filters.Location[0]} label="Location" onChange={(v) => handleSelectChange("Location", v)} />
+
+            <SingleSelect options={Array.isArray(fieldOptions.User) ? fieldOptions.User : []} value={filters.User[0]} label="User" onChange={(v) => handleSelectChange("User", v)} />
+              <div className=" w-full flex justify-end">
+                        <button type="reset" onClick={clearFilter} className="text-red-500 cursor-pointer hover:underline text-sm px-5 py-2 rounded-md">
+                      Clear Search
+                    </button>
+                      </div>
+          </DynamicAdvance>
+        </div>
+        <ContactTable
+          leads={contactData}
+          labelLeads={phonetableheader}
+          onWhatsappClick={(lead) => {
+            setSelectedContacts([lead._id]);
+            setIsWhatsappAllOpen(true);
+            fetchWhatsappTemplates();
+          }}
+          onMailClick={(lead) => {
+            setSelectedContacts([lead._id]);
+            setIsMailAllOpen(true);
+            fetchEmailTemplates();
+          }}
+        />
+      </div>
       <div className=" min-h-[calc(100vh-56px)] max-sm:hidden overflow-auto bg-gray-200 max-md:py-10">
-        <Toaster position="top-right" />
+
 
         {/*DELETE SINGLE POPUP */}
         <DeleteDialog<DeleteDialogDataInterface>
@@ -530,32 +596,7 @@ export default function Contacts() {
           />
         )}
 
-        {/* mail all popup */}
-        {isMailAllOpen && selectedContacts.length > 0 && (
-          <ListPopup
-            title="Mail to All Contacts"
-            list={mailTemplates}
-            selected={selectedMailtemplate}
-            onSelect={handleSelectMailtemplate}
-            onSubmit={handleMailAll}
-            submitLabel="Mail All"
-            onClose={() => setIsMailAllOpen(false)}
-          />
-        )}
 
-
-        {/* whatsapp all popup */}
-        {isWhatsappAllOpen && selectedContacts.length > 0 && (
-          <ListPopup
-            title="Whatsapp to All Contacts"
-            list={whatsappTemplates}
-            selected={selectedWhatsapptemplate}
-            onSelect={handleSelectWhatsapptemplate}
-            onSubmit={handleWhatsappAll}
-            submitLabel="Whatsapp All"
-            onClose={() => setIsWhatsappAllOpen(false)}
-          />
-        )}
 
         {/* ✅ TABLE */}
         <div className="p-4 max-md:p-3 bg-white rounded-md w-full">

@@ -13,6 +13,7 @@ import AddButton from "../component/buttons/AddButton";
 import PageHeader from "../component/labels/PageHeader";
 import DeleteDialog from "../component/popups/DeleteDialog";
 import LeadsSection from "../phonescreens/DashboardScreens/LeadsSection";
+import TaskTable from "../phonescreens/DashboardScreens/tables/TaskTable";
 
 export default function TaskPage() {
   const [task, setTask] = useState<TaskGetDataInterface[]>([]);
@@ -127,9 +128,40 @@ export default function TaskPage() {
   return (
     <ProtectedRoute>
       <Toaster position="top-right" />
+      {/* DELETE POPUPS */}
+      <DeleteDialog<DeleteDialogDataInterface>
+        isOpen={isDeleteDialogOpen}
+        title="Are you sure you want to delete this task?"
+        data={deleteDialogData}
+        onClose={() => {
+          setIsDeleteDialogOpen(false);
+          setDeleteDialogData(null);
+        }}
+        onDelete={deleteTaskFunc}
+      />
+      <DeleteDialog<{}>
+        isOpen={isDeleteAllDialogOpen}
+        title="Are you sure you want to delete ALL selected tasks?"
+        data={{}}
+        onClose={() => setIsDeleteAllDialogOpen(false)}
+        onDelete={deleteTaskFunc}
+      />
+
       <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-sm:py-5">
-        <h1 className=" text-indigo-500 font-bold text-2xl px-2 py-2 mb-4">Tasks</h1>
-        <LeadsSection leads={task} labelLeads={phonetableheader} />
+        <div className=" flex justify-between items-center px-2 py-2  mb-4">
+          <h1 className=" text-[var(--color-primary)] font-extrabold text-2xl ">Tasks</h1>
+          <AddButton url="/task/add" text="Add" icon={<PlusSquare size={18} />} />
+        </div>
+        <TaskTable
+          leads={task}
+          labelLeads={phonetableheader}
+          onEdit={(id) => editTask(id)}
+          onDelete={(lead) => {
+            setTaskIds([lead._id || ""]);
+            setIsDeleteDialogOpen(true);
+            setDeleteDialogData({ id: lead._id, description: lead.Description, date: lead.date });
+          }}
+        />
       </div>
       <div className="min-h-[calc(100vh-56px)] max-sm:hidden overflow-auto max-md:py-10">
 

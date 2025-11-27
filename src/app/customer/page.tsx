@@ -34,6 +34,8 @@ import LoaderCircle from "../component/LoaderCircle";
 import useHorizontalScroll from "@/hooks/useHorizontalScroll";
 import { Description } from "@radix-ui/react-dialog";
 import LeadsSection from "../phonescreens/DashboardScreens/LeadsSection";
+import CustomerTable from "../phonescreens/DashboardScreens/tables/CustomerTable";
+import DynamicAdvance from "../phonescreens/DashboardScreens/DynamicAdvance";
 
 
 interface DeleteAllDialogDataInterface { }
@@ -211,7 +213,7 @@ export default function Customer() {
           Type: item.CustomerType,
           SubType: item.CustomerSubType,
           Name: item.customerName,
-          Description:item.Description,
+          Description: item.Description,
           Email: item.Email,
           City: item.City,
           Location: item.Location,
@@ -245,9 +247,9 @@ export default function Customer() {
   }, [customerData, rowsPerTablePage]);
 
   const startIndex = (currentTablePage - 1) * rowsPerTablePage;
-  const currentRows = useMemo(()=>{
+  const currentRows = useMemo(() => {
     return customerData.slice(startIndex, startIndex + rowsPerTablePage);
-  },[customerData,rowsPerTablePage]) 
+  }, [customerData, rowsPerTablePage])
 
 
   useEffect(() => {
@@ -474,30 +476,116 @@ export default function Customer() {
   };
 
 
-const phonetableheader=[{ 
-  key: "Campaign", label: "Campaign"
- },
-{
-  key:"Name", label:"Name"
-},
-{
-  key:"Description", label:"Description"
-},
-{
-  key:"Location", label:"Location"
-},
-{
-  key:"ContactNumber", label:"Contact No"
-}]
+  const phonetableheader = [{
+    key: "Campaign", label: "Campaign"
+  },
+  {
+    key: "Name", label: "Name"
+  },
+  {
+    key: "Description", label: "Description"
+  },
+  {
+    key: "Location", label: "Location"
+  },
+  {
+    key: "ContactNumber", label: "Contact No"
+  }]
+
+  const addFollowup = (id: string) => router.push(`/followups/customer/add/${id}`);
 
   return (
     <ProtectedRoute>
+      {/* whatsapp all popup */}
+      <Toaster position="top-right" />
+      {isWhatsappAllOpen && selectedCustomers.length > 0 && (
+        <ListPopup
+          title="Whatsapp to All Customers"
+          list={whatsappTemplates}
+          selected={selectedWhatsapptemplate}
+          onSelect={handleSelectWhatsapptemplate}
+          onSubmit={handleWhatsappAll}
+          submitLabel="Whatsapp All"
+          onClose={() => setIsWhatsappAllOpen(false)}
+        />
+      )}
+      {/* mail all popup */}
+      {isMailAllOpen && selectedCustomers.length > 0 && (
+        <ListPopup
+          title="Mail to All Customers"
+          list={mailTemplates}
+          selected={selectedMailtemplate}
+          onSelect={handleSelectMailtemplate}
+          onSubmit={handleMailAll}
+          submitLabel="Mail All"
+          onClose={() => setIsMailAllOpen(false)}
+        />
+      )}
+
+      {/* Favourite Dialog */}
+      <FavouriteDialog<DeleteDialogDataInterface>
+        isOpen={isFavouriteDialogOpen}
+        title={`Are you sure you want to ${isFavrouteCustomer ? "unfavourite" : "favourite"} this customer?`}
+        data={dialogData}
+        onClose={() => {
+          setIsFavouriteDialogOpen(false);
+          setDialogData(null);
+        }}
+        onDelete={handleFavourite}
+      />
+
+      {/* Mobile Customer Page */}
       <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-sm:py-5">
-        <h1 className=" text-indigo-500 font-bold text-2xl px-2 py-2 mb-4">Leads</h1>
-        <LeadsSection leads ={customerData} labelLeads={phonetableheader}/>
+
+        <div className=" flex justify-between items-center px-2 py-2  mb-4">
+          <h1 className=" text-[var(--color-primary)] font-extrabold text-2xl ">Leads</h1>
+          <AddButton url="/customer/add" text="Add" icon={<PlusSquare size={18} />} />
+        </div>
+        <div className=" w-full">
+          <DynamicAdvance>
+            <SingleSelect options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []} value={filters.Campaign[0]} label="Campaign" onChange={(v) => handleSelectChange("Campaign", v)} />
+
+                    <SingleSelect options={Array.isArray(fieldOptions?.CustomerType) ? fieldOptions.CustomerType : []} value={filters.CustomerType[0]} label="Customer Type" onChange={(v) => handleSelectChange("CustomerType", v)} />
+
+                    <SingleSelect options={Array.isArray(fieldOptions?.CustomerSubtype) ? fieldOptions.CustomerSubtype : []} value={filters.CustomerSubType[0]} label="Customer SubType" onChange={(v) => handleSelectChange("CustomerSubType", v)} />
+
+                    <SingleSelect options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []} value={filters.City[0]} label="City" onChange={(v) => handleSelectChange("City", v)} />
+
+                    <SingleSelect options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []} value={filters.Location[0]} label="Location" onChange={(v) => handleSelectChange("Location", v)} />
+
+                    <SingleSelect options={Array.isArray(fieldOptions?.User) ? fieldOptions.User : []} value={filters.User[0]} label="User" onChange={(v) => handleSelectChange("User", v)} />
+            <div className=" w-full flex justify-end">
+              <button type="reset" onClick={clearFilter} className="text-red-500 cursor-pointer hover:underline text-sm px-5 py-2 rounded-md">
+                Clear Search
+              </button>
+            </div>
+                      
+          </DynamicAdvance>
+        </div>
+        <CustomerTable
+          leads={customerData}
+          labelLeads={phonetableheader}
+          onAdd={(id) => addFollowup(id)}
+          onWhatsappClick={(lead) => {
+            setSelectedCustomers([lead._id]);
+            setIsWhatsappAllOpen(true);
+            fetchWhatsappTemplates();
+          }}
+          onMailClick={(lead) => {
+            setSelectedCustomers([lead._id]);
+            setIsMailAllOpen(true);
+            fetchEmailTemplates();
+          }}
+          onFavourite={(lead) => {
+            handleFavouriteToggle(lead._id, lead.Name, lead.ContactNumber, lead.isFavourite ?? false)
+          }}
+        />
+
       </div>
+
+      {/* Desktop Customer page */}
       <div className=" min-h-[calc(100vh-56px)] max-sm:hidden overflow-auto max-md:py-10">
-        <Toaster position="top-right" />
+
 
         {/* Delete Dialog */}
         <DeleteDialog<DeleteDialogDataInterface>
@@ -522,17 +610,7 @@ const phonetableheader=[{
           onDelete={handleDeleteAll}
         />
 
-        {/* Favourite Dialog */}
-        <FavouriteDialog<DeleteDialogDataInterface>
-          isOpen={isFavouriteDialogOpen}
-          title={`Are you sure you want to ${isFavrouteCustomer ? "unfavourite" : "favourite"} this customer?`}
-          data={dialogData}
-          onClose={() => {
-            setIsFavouriteDialogOpen(false);
-            setDialogData(null);
-          }}
-          onDelete={handleFavourite}
-        />
+
 
         {/* Assign User Popup */}
         {isAssignOpen && selectedCustomers.length > 0 && (
@@ -547,41 +625,9 @@ const phonetableheader=[{
           />
         )}
 
-        {/* mail all popup */}
-        {isMailAllOpen && selectedCustomers.length > 0 && (
-          <ListPopup
-            title="Mail to All Customers"
-            list={mailTemplates}
-            selected={selectedMailtemplate}
-            onSelect={handleSelectMailtemplate}
-            onSubmit={handleMailAll}
-            submitLabel="Mail All"
-            onClose={() => setIsMailAllOpen(false)}
-          />
-        )}
-
-
-        {/* whatsapp all popup */}
-        {isWhatsappAllOpen && selectedCustomers.length > 0 && (
-          <ListPopup
-            title="Whatsapp to All Customers"
-            list={whatsappTemplates}
-            selected={selectedWhatsapptemplate}
-            onSelect={handleSelectWhatsapptemplate}
-            onSubmit={handleWhatsappAll}
-            submitLabel="Whatsapp All"
-            onClose={() => setIsWhatsappAllOpen(false)}
-          />
-        )}
-
 
         {/* ---------- TABLE START ---------- */}
 
-          
-  
-
-       
-        
         <div className="p-4 max-md:p-3 w-full rounded-md bg-white max-[450px]:hidden">
           <div className="flex justify-between items-center p-2">
             <PageHeader title="Dashboard" subtitles={["Customer"]} />
@@ -597,7 +643,7 @@ const phonetableheader=[{
           {/* TABLE */}
           <section className="flex flex-col mt-6 p-2 rounded-md">
             <div className="m-5 relative ">
-              
+
               <div className="flex justify-between cursor-pointer items-center py-1 px-2 border border-gray-800 rounded-md" onClick={() => setToggleSearchDropdown(!toggleSearchDropdown)}>
                 <h3 className="flex items-center gap-1"><CiSearch />Advance Search</h3>
                 <button
@@ -612,7 +658,7 @@ const phonetableheader=[{
               <div className={`overflow-hidden ${toggleSearchDropdown ? "max-h-[2000px]" : "max-h-0"} transition-all duration-500 ease-in-out px-5`}>
                 <div className="flex flex-col gap-5 my-5">
                   <div className="grid grid-cols-3 gap-5 max-md:grid-cols-1 max-lg:grid-cols-2">
-                    
+
 
                     <SingleSelect options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []} value={filters.Campaign[0]} label="Campaign" onChange={(v) => handleSelectChange("Campaign", v)} />
 
@@ -629,7 +675,7 @@ const phonetableheader=[{
                     <SingleSelect options={["10", "25", "50", "100"]} value={filters.Limit[0]} label="Limit" onChange={(v) => handleSelectChange("Limit", v)} />
 
                   </div>
-                  
+
 
                 </div>
 

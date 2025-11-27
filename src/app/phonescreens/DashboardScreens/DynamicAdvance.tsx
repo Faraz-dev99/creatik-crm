@@ -11,20 +11,20 @@ const DynamicAdvance = ({ children }: { children: React.ReactNode }) => {
       {/* 🔽 Toggle Button */}
       <div
         onClick={() => setOpen(!open)}
-        className="bg-table px-3 py-1.5 w-fit rounded-2xl my-4 ml-5 flex items-center gap-2 cursor-pointer select-none"
+        className="bg-[var(--color-primary)] px-3 py-1.5 w-fit rounded-2xl my-4 mb-2 ml-2 flex items-center gap-2 cursor-pointer select-none"
       >
         <button className="text-white text-xs font-semibold">
           ADVANCED SEARCH
         </button>
 
-        <button type="button" className="p-2 hover:bg-gray-200 rounded-md">
+        <button type="button" className="p-2 text-white hover:bg-gray-200 rounded-md">
           {open ? <IoIosArrowUp /> : <IoIosArrowDown />}
         </button>
       </div>
 
       {/* 🔽 Dropdown Container */}
       {open && (
-        <div className="flex flex-col justify-center items-center gap-4 p-4 mt-2 bg-white border rounded-xl shadow-md">
+        <div className="flex flex-col justify-center items-center gap-4 p-4 mb-4 bg-white border rounded-xl shadow-md">
           {children}
         </div>
       )}

@@ -68,7 +68,7 @@ export default function Navbar() {
 
   return (
     <ProtectedRoute>
-      <div className="flex justify-end items-end bg-white max-sm:bg-indigo-600 max-sm:text-white text-gray-800">
+      <div className="flex justify-end items-end bg-white max-sm:bg-[var(--color-primary)] max-sm:text-white text-gray-800">
         <div className=" max-md:hidden" />
         <nav className="px-2" style={{ zIndex: 1000 }}>
           <ul className="flex">
@@ -163,7 +163,7 @@ export default function Navbar() {
                    style={{zIndex:1000}}
               >
                 <PopUps>
-                  <div className="flex flex-col border-t-[3px] border-t-[var(--color-primary)] max-sm:border-t-indigo-600">
+                  <div className="flex flex-col border-t-[3px] border-t-[var(--color-primary)] max-sm:border-t-[var(--color-primary)]">
                     <div className="flex items-center gap-2 hover:bg-gray-100 py-3 px-3" onClick={() => {
                       setOpenMenu(null);
                       router.push(`/users/edit/${admin?._id}`)
