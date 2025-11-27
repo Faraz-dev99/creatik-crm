@@ -9,6 +9,7 @@ import { AiOutlineHeart } from "react-icons/ai";
 import { GrFormNext, GrFormPrevious } from "react-icons/gr";
 
 import { AiOutlineBackward, AiOutlineForward } from "react-icons/ai"
+import { MdEdit, MdDelete, MdAdd } from "react-icons/md";
 import { IoIosHeart } from "react-icons/io";
 import Link from "next/link";
 export interface LabelConfig {
@@ -19,6 +20,7 @@ export interface LabelConfig {
 interface LeadsSectionProps<T extends Record<string, any>> {
     leads: T[];
     labelLeads: LabelConfig[];
+    onEdit?: (id: string) => void;
     onWhatsappClick?: (lead: T) => void;
     onMailClick?: (lead: T) => void;
     onFavourite?: (lead: T) => void;
@@ -27,6 +29,7 @@ interface LeadsSectionProps<T extends Record<string, any>> {
 export default function ContactTable<T extends Record<string, any>>({
     leads,
     labelLeads,
+    onEdit,
     onWhatsappClick,
     onMailClick,
     onFavourite,
@@ -92,12 +95,20 @@ export default function ContactTable<T extends Record<string, any>>({
                                 ))}
                             </div>
 
+                            <button
+                                onClick={() => onEdit?.(lead._id)}
+                                className="p-2 bg-gray-100 rounded-full shadow text-[var(--color-primary)]"
+                            >
+                                <MdEdit size={20} />
+
+                            </button>
+
 
                         </div>
 
                         <div className="bg-[var(--color-primary)] p-3 flex justify-between">
-                        
-                           <div></div>
+
+                            <div></div>
 
 
                             <div className="flex items-center gap-5">

@@ -534,16 +534,17 @@ export default function Contacts() {
             <SingleSelect options={Array.isArray(fieldOptions.Location) ? fieldOptions.Location : []} value={filters.Location[0]} label="Location" onChange={(v) => handleSelectChange("Location", v)} />
 
             <SingleSelect options={Array.isArray(fieldOptions.User) ? fieldOptions.User : []} value={filters.User[0]} label="User" onChange={(v) => handleSelectChange("User", v)} />
-              <div className=" w-full flex justify-end">
-                        <button type="reset" onClick={clearFilter} className="text-red-500 cursor-pointer hover:underline text-sm px-5 py-2 rounded-md">
-                      Clear Search
-                    </button>
-                      </div>
+            <div className=" w-full flex justify-end">
+              <button type="reset" onClick={clearFilter} className="text-red-500 cursor-pointer hover:underline text-sm px-5 py-2 rounded-md">
+                Clear Search
+              </button>
+            </div>
           </DynamicAdvance>
         </div>
         <ContactTable
           leads={contactData}
           labelLeads={phonetableheader}
+          onEdit={(id)=>router.push(`/contact/edit/${id}`)}
           onWhatsappClick={(lead) => {
             setSelectedContacts([lead._id]);
             setIsWhatsappAllOpen(true);

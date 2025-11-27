@@ -7,6 +7,7 @@ import { MdPhone, MdEmail } from "react-icons/md";
 import { FaWhatsapp } from "react-icons/fa";
 import { AiOutlineHeart } from "react-icons/ai";
 import { GrFormNext, GrFormPrevious } from "react-icons/gr";
+import { MdEdit, MdDelete, MdAdd } from "react-icons/md";
 
 import { AiOutlineBackward, AiOutlineForward } from "react-icons/ai"
 import { IoIosHeart } from "react-icons/io";
@@ -21,6 +22,7 @@ interface LeadsSectionProps<T extends Record<string, any>> {
     labelLeads: LabelConfig[];
     isCustomerPage?: boolean
     onAdd?: (id: string) => void;
+    onEdit?: (id: string) => void;
     onWhatsappClick?: (lead: T) => void;
     onMailClick?: (lead: T) => void;
     onFavourite?: (lead: T) => void;
@@ -31,6 +33,7 @@ export default function CustomerTable<T extends Record<string, any>>({
     leads,
     labelLeads,
     onAdd,
+    onEdit,
     onWhatsappClick,
     onMailClick,
     onFavourite,
@@ -96,13 +99,24 @@ export default function CustomerTable<T extends Record<string, any>>({
                                 ))}
                             </div>
 
-                            <button
-                                onClick={() => onFavourite?.(lead)}
-                                className="p-2 bg-gray-100 rounded-full shadow"
-                            >
+                            <div className=" flex flex-col gap-4">
 
-                                {lead.isFavourite ? <IoIosHeart size={20} className="text-[var(--color-primary)]" /> : <AiOutlineHeart size={20} className="text-[var(--color-primary)]" />}
-                            </button>
+                                <button
+                                    onClick={() => onEdit?.(lead._id)}
+                                    className="p-2 bg-gray-100 rounded-full shadow text-[var(--color-primary)]"
+                                >
+                                    <MdEdit size={20} />
+
+                                </button>
+                                <button
+                                    onClick={() => onFavourite?.(lead)}
+                                    className="p-2 bg-gray-100 rounded-full shadow"
+                                >
+
+                                    {lead.isFavourite ? <IoIosHeart size={20} className="text-[var(--color-primary)]" /> : <AiOutlineHeart size={20} className="text-[var(--color-primary)]" />}
+                                </button>
+                            </div>
+
 
 
                         </div>

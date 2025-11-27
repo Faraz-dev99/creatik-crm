@@ -53,35 +53,9 @@ const SmallScreenData = () => {
     <>
     <></>
     <ImageSlider/>
-    <div className="bg-gray-200 flex flex-col">
+    <div className=" flex flex-col mb-4">
         
       <div className="px-4">
-        {/* ✅ Infinite Smooth Slider */}
-        {/* <div className="relative w-full overflow-hidden bg-gray-900 py-4">
-          <div
-            ref={sliderRef}
-            className={`flex ${
-              isTransitioning ? "transition-transform duration-2000 ease-in-out" : ""
-            }`}
-            style={{
-              transform: `translateX(-${imageIndex * 100}%)`,
-            }}
-          >
-            {[...images, images[0]].map((src, i) => (
-              <div key={i} className="shrink-0 w-full flex justify-center px-2">
-                <div className="w-[300px] sm:w-[400px] md:w-[500px]">
-                  <img
-                    src={src}
-                    alt={`slide-${i}`}
-                    width={500}
-                    height={300}
-                    className="rounded-xl object-cover w-full h-auto"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div> */}
     
         {/* ✅ Button Grid */}
         <div className="grid grid-cols-2 gap-4 mt-4 w-full ">

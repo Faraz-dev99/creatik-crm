@@ -566,6 +566,7 @@ export default function Customer() {
           leads={customerData}
           labelLeads={phonetableheader}
           onAdd={(id) => addFollowup(id)}
+          onEdit={(id) => router.push(`/customer/edit/${id}`)}
           onWhatsappClick={(lead) => {
             setSelectedCustomers([lead._id]);
             setIsWhatsappAllOpen(true);
