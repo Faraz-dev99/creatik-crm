@@ -8,7 +8,7 @@ import { getCustomer, getFilteredCustomer } from "@/store/customer";
 interface User {
   id: number;
   name: string;
-  followups: number;
+  customers: number;
 }
 
 interface UserData {
@@ -51,9 +51,8 @@ export default function RadarChart() {
   const [tooltip, setTooltip] = useState({ show: false, x: 0, y: 0, value: 0 });
   const [dropdownDirection, setDropdownDirection] = useState<'bottom' | 'top'>('bottom');
   const [hoveredZone, setHoveredZone] = useState<string | null>(null);
-  const { userFollowups, setUserFollowups } = useDashboardData();
-  const [selectedUser, setSelectedUser] = useState(userFollowups.users[0]);
-
+  const { userCustomers, setUserCustomers } = useDashboardData();
+  const [selectedUser, setSelectedUser] = useState(userCustomers.users[0]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -138,7 +137,7 @@ export default function RadarChart() {
   // Animate needle when user changes
   useEffect(() => {
     setAnimatedSpeed(0);
-    const targetSpeed = selectedUser?.followups;
+    const targetSpeed = selectedUser?.customers;
     const duration = 1500; // 1.5 seconds
     const steps = 60;
     const increment = targetSpeed / steps;
@@ -245,48 +244,54 @@ export default function RadarChart() {
   const needleAngle = calculateNeedleAngle(animatedSpeed);
 
 
-const RedarChartDataFetch = async () => {
-  // STEP 1: Get all customers
-  const customers = await getCustomer();
-
-  if (!customers || customers.length === 0) {
-    console.log("No customers found");
-    return [];
-  }
-
-  // STEP 2: Build a map of users and their customers
-  const userMap: any = {};
-
-  customers.forEach((customer: any) => {
-    const assignedUser = customer.AssignTo; // could be "", null, or user object
-
-    let userId = null;
-    let userName = "Unassigned";
-
-    if (assignedUser && typeof assignedUser === "object") {
-      userId = assignedUser._id;
-      userName = assignedUser.name || "Unknown User";
-    }
-
-    // If user not in map, create entry
-    if (!userMap[userId]) {
-      userMap[userId] = {
-        userId,
-        userName,
-        customers: []
-      };
-    }
-
-    // Push customer into this user bucket
-    userMap[userId].customers.push(customer);
+  const getUsers = async () => {
+    const response = await getCustomer();
+      const users = response.filter((item: any) => {
+    return item.AssignTo && item.AssignTo !== "";
   });
+    console.log("users are ", users);
+    return users
+  }
+const RedarChartDataFetch = async () => {
+  try {
+    const allCustomers = await getUsers(); // all customers with AssignTo
 
-  // STEP 3: Convert map → array
-  const groupedUsers = Object.values(userMap);
+    if (!allCustomers || allCustomers.length === 0) {
+      console.log("No customers found");
+      setUserCustomers({ users: [] });
+      return;
+    }
 
-  console.log("Grouped User → Customers:", groupedUsers);
-  return groupedUsers;
+    // Step 1: Create a map of unique users
+    const userMap: Record<string, { id: string; name: string; customers: number }> = {};
+
+    allCustomers.forEach((customer: any) => {
+      const userName = customer.AssignTo?.name;
+      const userId = customer.AssignTo?._id;
+
+      if (!userName || !userId) return;
+
+      if (!userMap[userId]) {
+        userMap[userId] = { id: userId, name: userName, customers: 0 };
+      }
+
+      // Increment customer count
+      userMap[userId].customers += 1;
+    });
+
+    // Step 2: Convert map to array
+    const result = Object.values(userMap);
+
+    setUserCustomers({ users: result });
+    setSelectedUser(result[0] || null);
+
+    console.log("Final Users With Filtered Customer Count:", result);
+  } catch (error) {
+    console.error("Error fetching radar chart data:", error);
+  }
 };
+
+
 
 
   useEffect(() => {
@@ -296,7 +301,7 @@ const RedarChartDataFetch = async () => {
 
   return (
     <div className="flex flex-col w-full h-auto min-h-[350px]">
-      <div className="w-full h-full bg-white shadow-lg p-4 sm:p-6 flex flex-col min-h-0">
+      <div className="w-full h-full bg-white shadow-lg p-4 py-6 sm:p-6 flex flex-col min-h-0">
         <div id="chart-container" className="w-full h-full flex flex-col min-h-0 flex-1">
           <div className="flex-1 py-0 min-h-0">
             <svg
@@ -474,7 +479,7 @@ const RedarChartDataFetch = async () => {
                     textAnchor="middle"
                     className="text-sm font-medium fill-white"
                   >
-                    Speed: {animatedSpeed}
+                    Assigned: {animatedSpeed}
                   </text>
                   <text
                     x={tooltip.x}
@@ -482,7 +487,7 @@ const RedarChartDataFetch = async () => {
                     textAnchor="middle"
                     className="text-sm font-medium fill-white"
                   >
-                    Zone: {getZoneLabel(animatedSpeed)}
+                    Total: {getZoneLabel(animatedSpeed)}
                   </text>
                   <polygon
                     points={`${tooltip.x - 10},${tooltip.y - 5} ${tooltip.x + 10},${tooltip.y - 5} ${tooltip.x},${tooltip.y + 10}`}
@@ -494,7 +499,7 @@ const RedarChartDataFetch = async () => {
           </div>
 
           {/* User selector dropdown with smart positioning */}
-          {(userFollowups.users.length > 0) && <div className="mt-4 sm:mt-6 flex justify-center shrink-0">
+          {(userCustomers.users.length > 0) && <div className="mt-4 sm:mt-6 flex justify-center shrink-0">
             <div className="relative w-full max-w-[200px]" ref={dropdownRef}>
               <button
                 ref={dropdownButtonRef}
@@ -518,7 +523,7 @@ const RedarChartDataFetch = async () => {
                     }`}
                 >
 
-                  {userFollowups.users.map((user, index) => {
+                  {userCustomers.users.map((user, index) => {
 
                     return <button
                       key={index}
@@ -533,13 +538,13 @@ const RedarChartDataFetch = async () => {
                     >
                       <div className="flex justify-between items-center">
                         <span className="truncate">{user?.name}</span>
-                        <span className={`text-xs sm:text-sm font-medium ml-2 ${user?.followups <= 90
+                        <span className={`text-xs sm:text-sm font-medium ml-2 ${user?.customers <= 90
                           ? 'text-green-600'
-                          : user.followups <= 210
+                          : user.customers <= 210
                             ? 'text-gray-600'
                             : 'text-red-600'
                           }`}>
-                          {user?.followups}
+                          {user?.customers}
                         </span>
                       </div>
                     </button>

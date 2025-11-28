@@ -45,6 +45,7 @@ export default function CustomerTable<T extends Record<string, any>>({
     const totalPages = Math.ceil(leads.length / itemsperpage);
     const startIndex = (currentPage - 1) * itemsperpage;
     const paginatedLeads = leads.slice(startIndex, startIndex + itemsperpage);
+    const [loader, setLoader] = useState(true);
 
 
     const nextPage = () => {
@@ -65,6 +66,20 @@ export default function CustomerTable<T extends Record<string, any>>({
         return [currentPage - 1, currentPage, currentPage + 1];
     };
     const pages = getDisplayedPages();
+    useEffect(() => {
+        if (!leads || leads.length === 0) {
+            setLoader(true);
+        } else {
+            setLoader(false);
+        }
+    }, [leads])
+    if (loader) {
+        return <div className=" px-2 pb-4">
+            <div className="w-full flex justify-center items-center py-10 text-lg text-gray-500">
+                Loading Customers...
+            </div>
+        </div>
+    }
     return (
         <>
             {/* LEAD CARDS */}

@@ -41,6 +41,7 @@ export default function ContactTable<T extends Record<string, any>>({
     const totalPages = Math.ceil(leads.length / itemsperpage);
     const startIndex = (currentPage - 1) * itemsperpage;
     const paginatedLeads = leads.slice(startIndex, startIndex + itemsperpage);
+     const [loader, setLoader] = useState(true);
 
 
     const nextPage = () => {

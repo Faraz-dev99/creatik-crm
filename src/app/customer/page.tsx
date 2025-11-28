@@ -263,9 +263,7 @@ export default function Customer() {
   }, [customerData, rowsPerTablePage]);
 
   const startIndex = (currentTablePage - 1) * rowsPerTablePage;
-  const currentRows = useMemo(() => {
-    return customerData.slice(startIndex, startIndex + rowsPerTablePage);
-  }, [customerData, rowsPerTablePage])
+  const currentRows = customerData.slice(startIndex, startIndex + rowsPerTablePage);
 
 
   useEffect(() => {

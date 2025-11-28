@@ -10,43 +10,45 @@ const SmallScreenData = () => {
     {
       pTag: "Campigns",
       icon: <BrickWallFire />,
-      color: "bg-red-500/50",
+      color: " backdrop-blur-[2px] bg-red-600/50",
       url:"/masters/campaign"
     
     },
     {
       pTag: "Customer",
       icon: <Podcast />,
-      color: "bg-purple-500/50",
+      color: "backdrop-blur-[2px] bg-purple-600/50",
       url:"/customer"
      
     },
        {
         pTag:"Followups",
         icon:<School/>,
-        color:"bg-teal-500/50",
+        color:"backdrop-blur-[2px] bg-teal-600/50",
         url:"/followups/customer"
 
     }, {
         pTag:"Contact",
         icon: <Cable/>,
-        color:"bg-green-500/50",
+        color:" backdrop-blur-[2px] bg-green-600/50",
         url:"/contact"
        
     },
        {
         pTag:"Task",
         icon:<ShieldUser/>,
-        color:"bg-blue-500/50",
+        color:" backdrop-blur-[2px] bg-blue-600/50",
         url:"/task"
        
     }, {
         pTag:"Status Type",
         icon: <NotebookTabs/>,
-        color:"bg-gray-500/50",
+        color:"backdrop-blur-[2px] bg-gray-600/50",
         url:"/masters/status-type"
     },
   ];
+
+  
 
  
   return (
@@ -69,8 +71,8 @@ const SmallScreenData = () => {
               <div
                 className={`${data.color} py-9 px-4 rounded-md flex flex-col h-full items-center justify-center`}
               >
-                <div className="text-white text-4xl">{data.icon}</div>
-                <p className="text-white mt-2 text-center">{data.pTag}</p>
+                <div className="text-white text-6xl">{data.icon}</div>
+                <p className="text-white mt-2 text-lg text-center">{data.pTag}</p>
               </div>
             </Link>
           ))}
