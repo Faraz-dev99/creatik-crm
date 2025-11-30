@@ -18,7 +18,7 @@ const data = [
     },
     {
      title: "FollowUp",
-      url: "/FollowUps/customer",
+      url: "/followUps/customer",
       icon: <School size={16}/>,
     },
      {
@@ -28,12 +28,12 @@ const data = [
     },
     {
      title: "Contact",
-      url: "/Contact",
+      url: "/contact",
       icon:  <Cable size={16}/>,
     },
     {
      title: "Task",
-      url: "/Task",
+      url: "/task",
       icon: <ShieldUser size={16}/>,
     },
    

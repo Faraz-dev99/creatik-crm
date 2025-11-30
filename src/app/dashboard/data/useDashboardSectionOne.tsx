@@ -17,10 +17,21 @@ interface User {
   id: string;
   name: string;
   customers: number;
+  percentage?: number;
 }
 
 export interface UserFollowupsInterface {
   users: User[];
+}
+
+interface LocationData {
+  location: string;
+  customers: number;
+}
+
+export interface FeedbackData {
+  name: string;
+  value: number;
 }
 
 export function useDashboardData() {
@@ -62,10 +73,17 @@ export function useDashboardData() {
       users: [],
     });
 
+  const [locationStats, setLocationStats] = useState<LocationData[]>([]);
+   const [feedbackStats, setFeedbackStats] = useState<FeedbackData[]>([]);
+
   return {
     dashboardSectionOneCardData,
     setDashboardSectionOneCardData,
     userCustomers,
-    setUserCustomers
+    setUserCustomers,
+    locationStats,
+    setLocationStats,
+    feedbackStats,
+    setFeedbackStats,
   };
 }
