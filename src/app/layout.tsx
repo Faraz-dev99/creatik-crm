@@ -17,6 +17,7 @@ import { Poppins,Manrope,Schibsted_Grotesk } from 'next/font/google'
 import { CustomerImportProvider } from "@/context/CustomerImportContext";
 import { ContactImportProvider } from "@/context/ContactImportContext";
 import MobileHamburger from "./component/HamburgerMenu";
+import Link from "next/link";
  
 const poppins = Schibsted_Grotesk({
   weight:'400',
@@ -57,9 +58,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                       
                         <MobileHamburger />
             
-                      <div className=" text-white font-extrabold text-shadow-2xs text-shadow-black text-xl py-1 sm:hidden">
+                      <Link href={"/dashboard"} className=" text-white cursor-pointer font-extrabold text-shadow-2xs text-shadow-black text-xl py-1 sm:hidden">
                          Dashboard
-                      </div>
+                      </Link>
 
                       <div className="ml-auto w-full">
                         <Navbar />
