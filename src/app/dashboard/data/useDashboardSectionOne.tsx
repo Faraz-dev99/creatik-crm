@@ -32,6 +32,7 @@ interface LocationData {
 export interface FeedbackData {
   name: string;
   value: number;
+  [key: string]: any;
 }
 
 export function useDashboardData() {
