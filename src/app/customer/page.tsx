@@ -551,7 +551,7 @@ export default function Customer() {
       {/* Mobile Customer Page */}
       <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-sm:py-5">
 
-        <div className=" flex justify-between items-center px-2 py-2  mb-4">
+        <div className=" flex justify-between items-center px-0 py-2  mb-4">
           <h1 className=" text-[var(--color-primary)] font-extrabold text-2xl ">Leads</h1>
           <AddButton url="/customer/add" text="Add" icon={<PlusSquare size={18} />} />
         </div>
