@@ -35,7 +35,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <link rel="icon" href="/icons/favicon-16x16.png" />
        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
         <link rel="apple-touch-startup-image" href="/icons/icon-512x512.png" />
-
+        <title>Prime Consultancy Leads</title>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       <body className="min-h-screen w-full bg-violet-100 overflow-x-hidden">
