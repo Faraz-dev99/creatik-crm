@@ -9,40 +9,40 @@ const SmallScreenData = () => {
   const boxeButtons = [
     {
       pTag: "Campigns",
-      icon: <BrickWallFire />,
+      icon: <BrickWallFire size={34}/>,
       color: " backdrop-blur-[2px] bg-red-600",
       url:"/masters/campaign"
     
     },
     {
       pTag: "Customer",
-      icon: <Podcast />,
+      icon: <Podcast size={34}/>,
       color: "backdrop-blur-[2px] bg-purple-600",
       url:"/customer"
      
     },
        {
         pTag:"Followups",
-        icon:<School/>,
+        icon:<School size={34}/>,
         color:"backdrop-blur-[2px] bg-teal-600",
         url:"/followups/customer"
 
     }, {
         pTag:"Contact",
-        icon: <Cable/>,
+        icon: <Cable size={34}/>,
         color:" backdrop-blur-[2px] bg-green-600",
         url:"/contact"
        
     },
        {
         pTag:"Task",
-        icon:<ShieldUser/>,
+        icon:<ShieldUser size={34}/>,
         color:" backdrop-blur-[2px] bg-blue-600",
         url:"/task"
        
     }, {
         pTag:"Status Type",
-        icon: <NotebookTabs/>,
+        icon: <NotebookTabs size={34}/>,
         color:"backdrop-blur-[2px] bg-gray-600",
         url:"/masters/status-type"
     },
@@ -55,12 +55,12 @@ const SmallScreenData = () => {
     <>
     <></>
     <ImageSlider/>
-    <div className=" flex flex-col mb-4">
+    <div className=" flex flex-col mb-2 px-1">
         
-      <div className="px-4">
+      <div className="">
     
         {/* ✅ Button Grid */}
-        <div className="grid grid-cols-2 gap-4 mt-4 w-full ">
+        <div className="grid grid-cols-2 gap-2 mt-4 w-full ">
           {boxeButtons.map((data, index) => (
             <Link
               key={index}
@@ -71,8 +71,8 @@ const SmallScreenData = () => {
               <div
                 className={`${data.color} py-9 px-4 rounded-md flex flex-col h-full items-center justify-center`}
               >
-                <div className="text-white text-6xl">{data.icon}</div>
-                <p className="text-white mt-2 text-lg text-center">{data.pTag}</p>
+                <div className="text-white">{data.icon}</div>
+                <p className="text-white mt-2 font-semibold text-lg text-center">{data.pTag}</p>
               </div>
             </Link>
           ))}
