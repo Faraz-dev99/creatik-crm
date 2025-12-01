@@ -12,6 +12,7 @@ import { MdEdit, MdDelete, MdAdd } from "react-icons/md";
 import { AiOutlineBackward, AiOutlineForward } from "react-icons/ai"
 import { IoIosHeart } from "react-icons/io";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 export interface LabelConfig {
     key: string;
     label: string;
@@ -46,6 +47,7 @@ export default function CustomerTable<T extends Record<string, any>>({
     const startIndex = (currentPage - 1) * itemsperpage;
     const paginatedLeads = leads.slice(startIndex, startIndex + itemsperpage);
     const [loader, setLoader] = useState(true);
+    const router= useRouter();
 
 
     const nextPage = () => {
@@ -73,6 +75,12 @@ export default function CustomerTable<T extends Record<string, any>>({
             setLoader(false);
         }
     }, [leads])
+
+        const followupRedirect= ()=>{
+        router.push('/followups/customer');
+    }
+    
+
     if (loader) {
         return <div className=" px-2 pb-4">
             <div className="w-full flex justify-center items-center py-10 text-lg text-gray-500">
@@ -144,7 +152,7 @@ export default function CustomerTable<T extends Record<string, any>>({
 
 
                             <div className="flex items-center gap-5">
-                                <a href={`tel:+91${String(lead["ContactNumber"]) ?? String(lead["ContactNo"]) ?? ""}`}>
+                                <a href={`tel:+91${String(lead["ContactNumber"]) ?? String(lead["ContactNo"]) ?? ""}`} onClick={followupRedirect}>
                                     <MdPhone size={20} className="text-white" />
                                 </a>
 
