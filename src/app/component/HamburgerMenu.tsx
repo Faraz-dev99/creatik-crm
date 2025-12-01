@@ -171,7 +171,7 @@ export default function MobileHamburger() {
                 opacity: 0,
                 transition: { duration: 0.2 },
               }}
-              className="fixed top-0 left-0 h-screen w-[260px] bg-cyan-600/70 backdrop-blur-md shadow-xl"
+              className="fixed top-0 left-0 h-screen max-h-screen overflow-y-auto w-[260px] bg-cyan-600/70 backdrop-blur-md shadow-xl"
               style={{zIndex:2000}}
             >
               <div className="flex flex-col p-5 pt-16 gap-10">
