@@ -51,7 +51,7 @@ export function useDashboardData() {
       footerlineColor: "from-red-800 to-red-500",
     },
     {
-      name: "Active FollowUps",
+      name: "Total Contacts",
       value: 0,
       bg: "bg-gradient-to-r from-teal-500 to-teal-800",
       icon: <LuCalendar />,

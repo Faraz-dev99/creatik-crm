@@ -85,7 +85,7 @@ export default function MobileHamburger() {
         <button
           ref={buttonRef}
           onClick={() => setOpen(!open)}
-          className="ml-2 relative z-[999] outline-0 w-8 h-8 flex items-center justify-center"
+          className="ml-2 relative z-[2001] outline-0 w-8 h-8 flex items-center justify-center"
         >
           <motion.div
             initial={false}
@@ -129,31 +129,31 @@ export default function MobileHamburger() {
 
 
 
-        {/* Overlay */}
+
+        {/* Left Side Overlay */}
         <AnimatePresence>
           {open && (
             <motion.div
               key="overlay"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.35 }}
+              animate={{ opacity: 0.4 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="fixed top-[52px] inset-0 z-40 bg-black/70"
-
+              className="fixed inset-0 z-40 bg-black/70"
               onClick={() => setOpen(false)}
             />
           )}
         </AnimatePresence>
 
-        {/* Slider Menu (TOP → DOWN) */}
+        {/* LEFT SLIDE-IN MENU */}
         <AnimatePresence>
           {open && (
             <motion.div
               key="menu"
               ref={menuRef}
-              initial={{ y: -250, opacity: 0 }}
+              initial={{ x: "-100%", opacity: 0 }}
               animate={{
-                y: 0,
+                x: 0,
                 opacity: 1,
                 transition: {
                   type: "spring",
@@ -162,30 +162,30 @@ export default function MobileHamburger() {
                 },
               }}
               exit={{
-                y: -250,
+                x: "-100%",
                 opacity: 0,
                 transition: { duration: 0.2 },
               }}
-              className=" absolute top-[52px] left-0 right-0 mx-auto w-full z-50 bg-cyan-500/70 backdrop-blur-[10px] "
+              className="fixed top-0 left-0 h-screen w-[250px] bg-cyan-600/70 backdrop-blur-md shadow-xl"
+              style={{zIndex:2000}}
             >
-              <div className=" flex justify-center items-center">
-                <ul className="flex flex-col gap-2 p-3 ">
-                  {data.map((item, index) => {
-                    return <li
-                      key={index}
-                      className="px-2   rounded-md text-white flex justify-center ">
-                      <Link href={item.url} className="flex items-center text-left  w-full " onClick={() => setOpen(!open)}>
-                        <span className="text-sm  pr-3">{item.icon}</span>
-                        <span>{item.title}</span>
-                      </Link>
-                    </li>
-                  })}
-                </ul>
+              <div className="flex flex-col p-5 pt-16 gap-3">
+                {data.map((item, index) => (
+                  <Link
+                    key={index}
+                    href={item.url}
+                    className="flex items-center gap-3 text-white text-base py-2 px-2 rounded hover:bg-white/20 transition"
+                    onClick={() => setOpen(false)}
+                  >
+                    <span>{item.icon}</span>
+                    <span>{item.title}</span>
+                  </Link>
+                ))}
               </div>
-
             </motion.div>
           )}
         </AnimatePresence>
+
       </div>
     </>
   );
