@@ -85,12 +85,12 @@ export default function MobileHamburger() {
         <button
           ref={buttonRef}
           onClick={() => setOpen(!open)}
-          className="ml-2 relative z-[2001] outline-0 w-8 h-8 flex items-center justify-center"
+          className="ml-2 relative z-[2001] outline-0 w-6 h-6 flex items-center justify-center"
         >
           <motion.div
             initial={false}
             animate={open ? "open" : "closed"}
-            className="relative w-6 h-6"
+            className="relative w-5 h-5"
           >
             {/* Top line */}
             <motion.span
@@ -100,7 +100,7 @@ export default function MobileHamburger() {
                 closed: { rotate: 0, y: -7 },
               }}
               transition={{ duration: 0.28 }}
-              className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-[3px] bg-white rounded"
+              className="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-[3px] bg-white rounded"
             />
 
             {/* Middle line */}
@@ -111,7 +111,7 @@ export default function MobileHamburger() {
                 closed: { opacity: 1, scaleX: 1 },
               }}
               transition={{ duration: 0.18 }}
-              className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-[3px] bg-white rounded"
+              className="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-[3px] bg-white rounded"
             />
 
             {/* Bottom line */}
@@ -122,7 +122,7 @@ export default function MobileHamburger() {
                 closed: { rotate: 0, y: 7 },
               }}
               transition={{ duration: 0.28 }}
-              className="absolute left-0 top-1/2 -translate-y-1/2 w-6 h-[3px] bg-white rounded"
+              className="absolute left-0 top-1/2 -translate-y-1/2 w-5 h-[3px] bg-white rounded"
             />
           </motion.div>
         </button>
