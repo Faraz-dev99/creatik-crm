@@ -15,13 +15,14 @@ export default function CampaignFilter({ leadStatuses }: LeadStatusProps) {
   const router = useRouter();
   // Your color palette
   const objectcolor = [
-    "#7C3AED", // purple
+    "var(--color-primary)"
+   /*  "#7C3AED", // purple
     "#3B82F6", // blue
     "#F97316", // orange
     "#22C55E", // green
     "#8B5CF6", // light purple
     "#9CA3AF", // gray
-    "#FB923C", // light orange 
+    "#FB923C", */ // light orange 
   ];
 
     const handleClick = (name: string) => {
@@ -42,22 +43,22 @@ export default function CampaignFilter({ leadStatuses }: LeadStatusProps) {
               onClick={() => handleClick(status.name)}
               sx={{
                 backgroundColor: objectcolor[colorIndex],
-                minWidth: "32px",
-                height: "48px",
-                borderRadius: "12px",
-                justifyContent: "space-between",
+                minWidth: "35px",
+                height: "80px",
+                borderRadius: "0px",
+                justifyContent: "center",
                 paddingLeft: "12px",
                 paddingRight: "12px",
                 textTransform: "none",
-                fontSize: "12px",
-                fontWeight: 600,
+                fontSize: "16px",
+                fontWeight: 700,
               }}
-              className="text-white shadow-md"
+              className="text-white text-center text-shadow-md  "
 
 
             >
               {status.name}
-              <IoIosArrowForward />
+             {/*  <IoIosArrowForward /> */}
             </Button>
           );
         })}

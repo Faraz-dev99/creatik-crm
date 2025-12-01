@@ -9,38 +9,43 @@ const data = [
   {
     title: "Dashboard",
     url: "/dashboard",
-    icon: <Home size={16} />,
+    icon: <Home size={22} />,
   },
   {
     title: "Campaign",
     url: "/masters/campaign",
-    icon: <BrickWallFire size={16} />,
+    icon: <BrickWallFire size={22} />,
   },
   {
     title: "Customer",
     url: "/customer",
-    icon: <Podcast size={16} />,
+    icon: <Podcast size={22} />,
   },
   {
     title: "FollowUp",
     url: "/followUps/customer",
-    icon: <School size={16} />,
+    icon: <School size={22} />,
   },
   {
     title: "Status Type",
     url: "/masters/status-type",
-    icon: <NotebookTabs size={16} />,
+    icon: <NotebookTabs size={22} />,
   },
   {
-    title: "Contact",
-    url: "/contact",
-    icon: <Cable size={16} />,
+    title: "Favroites",
+    url: "/favourites",
+    icon: <Cable size={22} />,
   },
   {
     title: "Task",
     url: "/task",
-    icon: <ShieldUser size={16} />,
+    icon: <ShieldUser size={22} />,
   },
+  {
+    title:" Report",
+    url:`/reports/customer`,
+    icon:<BrickWallFire size={22}/>
+  }
 
 ]
 export default function MobileHamburger() {
@@ -169,12 +174,12 @@ export default function MobileHamburger() {
               className="fixed top-0 left-0 h-screen w-[250px] bg-cyan-600/70 backdrop-blur-md shadow-xl"
               style={{zIndex:2000}}
             >
-              <div className="flex flex-col p-5 pt-16 gap-3">
+              <div className="flex flex-col p-5 pt-16 gap-10">
                 {data.map((item, index) => (
                   <Link
                     key={index}
                     href={item.url}
-                    className="flex items-center gap-3 text-white text-base py-2 px-2 rounded hover:bg-white/20 transition"
+                    className="flex items-center gap-3 text-white text-xl py-2 px-2 rounded hover:bg-white/20 transition"
                     onClick={() => setOpen(false)}
                   >
                     <span>{item.icon}</span>
