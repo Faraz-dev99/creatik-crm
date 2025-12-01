@@ -32,6 +32,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" className={`min-h-screen w-full overflow-x-hidden ${poppins.className}`}>
       <link rel="manifest" href="/manifest.json" />
       <meta name="theme-color" content="#ffffff" />
+      <link rel="icon" href="/icons/favicon-16x16.png" />
       <body className="min-h-screen w-full bg-violet-100 overflow-x-hidden">
         <AuthProvider>
           <CustomerImportProvider>

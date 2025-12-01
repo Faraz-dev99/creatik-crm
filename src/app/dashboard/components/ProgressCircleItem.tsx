@@ -2,7 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { BsArrowRightCircle } from "react-icons/bs";
-import ProgressCircle from "../ProgressCircle";
+import ProgressCircle from "./ProgressCircle";
 
 interface ProgressCircleItemProps {
   percentage: number;

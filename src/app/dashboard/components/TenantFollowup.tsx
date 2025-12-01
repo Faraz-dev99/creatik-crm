@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { BsArrowRightCircle } from "react-icons/bs";
 import { getAllCustomerFollowups } from '@/store/customerFollowups';
 import { getCustomer } from '@/store/customer';
-import ProgressCircleItem from './progressCircleItem/ProgressCircleItem';
 import { getAllContactFollowups } from '@/store/contactFollowups';
 import { getContact } from '@/store/contact';
+import ProgressCircleItem from './ProgressCircleItem';
 
 interface FollowupData {
     percentage: number;
