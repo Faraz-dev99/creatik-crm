@@ -64,7 +64,7 @@ export default function ContactEdit() {
             console.log(data)
             if (data) {
                 setContactData({
-                    Campaign: { id: data.Campaign?._id, name: data.Campaign?.Name },
+                    Campaign: { id: data.Campaign?._id, name: data.Campaign?.Name},
                     Name: data.Name,
                     City: { id: data.City?._id, name: data.City?.Name },
                     ContactType: { id: data.ContactType?._id, name: data.ContactType?.Name },

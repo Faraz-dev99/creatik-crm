@@ -24,7 +24,6 @@ export default function AdminCreatePage() {
     MobileNumber: "",
     City: "",
     Password: "",
-    Status:"",
     AddressLine1: "",
     AddressLine2: "",
   });
@@ -92,7 +91,6 @@ export default function AdminCreatePage() {
             : "user",
       city: userData.City, // hide for admin
       phone: userData.MobileNumber,
-      status: userData.Status,
       AddressLine1: userData.AddressLine1,
       AddressLine2: userData.AddressLine2,
     };
@@ -111,7 +109,6 @@ export default function AdminCreatePage() {
           MobileNumber: "",
           City: "",
           Password: "",
-          Status:"",
           AddressLine1: "",
           AddressLine2: "",
         });
@@ -137,7 +134,6 @@ export default function AdminCreatePage() {
       [
 
         { key: "City", fetchFn: getCity },
-        { key: "Status", staticData:["Active", "Inactive"] }
       ],
       setFieldOptions
     );
@@ -218,14 +214,6 @@ export default function AdminCreatePage() {
                     value={userData.City}
                     onChange={(selected) =>
                       handleSelectChange("City", selected)
-                    }
-                  />
-                  <SingleSelect
-                    options={Array.isArray(fieldOptions?.Status) ? fieldOptions.Status : []}
-                    label="Status"
-                    value={userData.Status}
-                    onChange={(selected) =>
-                      handleSelectChange("Status", selected)
                     }
                   />
 
