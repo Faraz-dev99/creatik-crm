@@ -108,6 +108,12 @@ export default function Customer() {
     }
   }, [searchParams, customerData]);
 
+  function getPlainTextFromHTML(htmlString: string) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlString, "text/html");
+  return doc.body.textContent || "";
+}
+
   const getCustomers = async () => {
     const data = await getCustomer();
     if (data) {
@@ -326,7 +332,7 @@ export default function Customer() {
         mailtemplates.map((item: any): mailGetDataInterface => ({
           _id: item?._id ?? "",
           name: item?.name ?? "",
-          body: item?.body ?? ""
+          body: getPlainTextFromHTML(item?.body) ?? ""
         }))
       );
 
