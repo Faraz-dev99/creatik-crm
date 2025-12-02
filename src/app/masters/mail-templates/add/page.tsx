@@ -129,22 +129,22 @@ export default function MailAdd() {
                 error={errors.subject}
               />
 
-              {/* Body Textarea */}
-              <div className="flex flex-col">
-  <label className="text-gray-700 mb-2 font-medium">Body</label>
+                {/* Body Textarea */}
+                <div className="flex flex-col">
+                  <label className="text-gray-700 mb-2 font-medium">Body</label>
 
-  <JoditEditorClient
-    value={mailData.body} // this is string
-    onChange={(html: string) => {
-      setMailData((prev) => ({ ...prev, body: html })); // perfectly fine
-      setErrors((prev) => ({ ...prev, body: "" }));
-    }}
-  />
+                  <JoditEditorClient
+                    value={mailData.body} // this is string
+                    onChange={(html: string) => {
+                      setMailData((prev) => ({ ...prev, body: html })); // perfectly fine
+                      setErrors((prev) => ({ ...prev, body: "" }));
+                    }}
+                  />
 
-  {errors.body && (
-    <span className="text-red-500 text-sm mt-1">{errors.body}</span>
-  )}
-</div>
+                  {errors.body && (
+                    <span className="text-red-500 text-sm mt-1">{errors.body}</span>
+                  )}
+                </div>
 
 
               {/* Save Button */}
