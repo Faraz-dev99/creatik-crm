@@ -146,34 +146,35 @@ export default function CustomerTable<T extends Record<string, any>>({
 
                         <div className="bg-[var(--color-primary)] p-3 flex justify-between">
                             { }
-                            <button onClick={() => onAdd?.(lead._id)} className="text-white border border-white px-3 text-sm py-1 rounded-full">
+                            <button onClick={() => onAdd?.(lead._id)} className="text-white border border-white px-3 text-sm py-2 rounded-full">
                                 FOLLOW UP
                             </button>
 
 
-                            <div className="flex items-center gap-5">
-                                <a href={`tel:+91${String(lead["ContactNumber"]) ?? String(lead["ContactNo"]) ?? ""}`} onClick={() => onAdd?.(lead._id)}>
-                                    <MdPhone size={20} className="text-white" />
+                            <div className="flex items-center gap-10">
+                                <a href={`tel:+91${String(lead["ContactNumber"]) ?? String(lead["ContactNo"]) ?? ""}`} className="" onClick={() => onAdd?.(lead._id)}>
+                                    <MdPhone size={25} className="text-white" />
                                 </a>
 
 
                                 {/* <MdEmail size={20} className="text-white" /> */}
-                                <button
-                                    onClick={() => onMailClick?.(lead)}
-                                    className="text-white p-2"
-                                >
-                                    <MdEmail size={20} />
-                                </button>
-
-
+                                
                                 {/* <a href={`https://wa.me/+91${String(lead["ContactNumber"]) ?? String(lead["ContactNo"]) ?? ""}`} target="_blank">
                   <FaWhatsapp size={20} className="text-white" />
                 </a> */}
                                 <button
-                                    onClick={() => onWhatsappClick?.(lead)}
-                                    className="text-white p-2"
+                                    onClick={() => onMailClick?.(lead)}
+                                    className="text-white"
                                 >
-                                    <FaWhatsapp size={20} />
+                                    <MdEmail size={25} />
+                                </button>
+
+
+                                <button
+                                    onClick={() => onWhatsappClick?.(lead)}
+                                    className="text-white"
+                                >
+                                    <FaWhatsapp size={25} />
                                 </button>
 
 

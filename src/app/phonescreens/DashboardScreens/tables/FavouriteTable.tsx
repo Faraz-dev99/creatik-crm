@@ -41,7 +41,7 @@ export default function FavouriteTable<T extends Record<string, any>>({
     const startIndex = (currentPage - 1) * itemsperpage;
     const paginatedLeads = leads.slice(startIndex, startIndex + itemsperpage);
     const [loader, setLoader] = useState(true);
-    const router= useRouter();
+    const router = useRouter();
 
 
     const nextPage = () => {
@@ -70,10 +70,10 @@ export default function FavouriteTable<T extends Record<string, any>>({
         }
     }, [leads])
 
-        const followupRedirect= ()=>{
+    const followupRedirect = () => {
         router.push('/followups/customer');
     }
-    
+
 
     if (loader) {
         return <div className=" px-2 pb-4">
@@ -122,10 +122,10 @@ export default function FavouriteTable<T extends Record<string, any>>({
                                     onClick={() => onEdit?.(lead._id)}
                                     className="p-2 bg-gray-100 rounded-full shadow text-[var(--color-primary)]"
                                 >
-                                    <MdEdit size={20} />
+                                    <MdEdit size={24} />
 
                                 </button>
-                                
+
                             </div>
 
 
@@ -134,14 +134,14 @@ export default function FavouriteTable<T extends Record<string, any>>({
 
                         <div className="bg-[var(--color-primary)] p-3 flex justify-between">
                             { }
-                           
-<div></div>
 
-                            <div className="flex items-center gap-5">
-                                
+                            <div></div>
 
-                               
-                               
+                            <div className="flex items-center gap-10">
+
+
+
+
 
 
                                 {/* <a href={`https://wa.me/+91${String(lead["ContactNumber"]) ?? String(lead["ContactNo"]) ?? ""}`} target="_blank">
@@ -157,7 +157,7 @@ export default function FavouriteTable<T extends Record<string, any>>({
                                     }}
                                     onClick={() => onDelete?.(lead)}
 
-                                ><MdDelete size={20} /></Button>
+                                ><MdDelete size={25} /></Button>
 
 
 

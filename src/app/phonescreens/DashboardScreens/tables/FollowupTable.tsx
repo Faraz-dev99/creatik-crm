@@ -110,12 +110,12 @@ export default function FollowupTable<T extends Record<string, any>>({
 
                         <div className="bg-[var(--color-primary)] p-3 flex justify-between">
                             { }
-                            <button onClick={() => onFollowup?.(lead)} className="text-white border border-white px-3 text-sm py-1 rounded-full">
+                            <button onClick={() => onFollowup?.(lead)} className="text-white border border-white px-3 text-sm rounded-full">
                                 FOLLOW UP
                             </button>
 
 
-                            <div className="flex items-center gap-5">
+                            <div className="flex items-center gap-10">
 
 
                                 {/* <MdEmail size={20} className="text-white" /> */}
@@ -134,7 +134,7 @@ export default function FollowupTable<T extends Record<string, any>>({
                                     }}
                                     onClick={() => onEdit?.(lead.customerid)}   // ⬅ SEND ID HERE
                                 >
-                                    <MdEdit size={20} />
+                                    <MdEdit size={25} />
                                 </Button>
 
 
@@ -148,7 +148,7 @@ export default function FollowupTable<T extends Record<string, any>>({
                                     }}
                                     onClick={() => onDelete?.(lead)}
 
-                                ><MdDelete size={20} /></Button>
+                                ><MdDelete size={25} /></Button>
 
 
 

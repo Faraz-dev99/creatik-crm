@@ -145,7 +145,7 @@ export default function FavouritePage() {
       {/* FAVOURITE CONFIRMATION POPUP */}
       <DeleteDialog<FavouriteDialogDataInterface>
         isOpen={isFavouriteDialogOpen}
-        title="Are you sure you want to favourite/unfavourite this customer?"
+        title="Are you sure you want to delete this favourite?"
         data={favouriteDialogData}
         onClose={() => {
           setIsFavouriteDialogOpen(false);
