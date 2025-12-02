@@ -24,6 +24,7 @@ export default function AdminCreatePage() {
     MobileNumber: "",
     City: "",
     Password: "",
+    Status:"",
     AddressLine1: "",
     AddressLine2: "",
   });
@@ -62,6 +63,7 @@ export default function AdminCreatePage() {
     else if (!/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(userData.Email))
       newErrors.Email = "Invalid email format";
     if (!userData.Password.trim()) newErrors.Password = "Password is required";
+    if (userData.Password.trim() && userData.Password.trim().length<6) newErrors.Password = "Password is must be 6 characters";
     if (!userData.Role.trim()) newErrors.Role = "Role is required";
     if (!userData.AddressLine1.trim()) newErrors.AddressLine1 = "AddressLine1 is required";
     return newErrors;
@@ -90,6 +92,7 @@ export default function AdminCreatePage() {
             : "user",
       city: userData.City, // hide for admin
       phone: userData.MobileNumber,
+      status: userData.Status,
       AddressLine1: userData.AddressLine1,
       AddressLine2: userData.AddressLine2,
     };
@@ -108,6 +111,7 @@ export default function AdminCreatePage() {
           MobileNumber: "",
           City: "",
           Password: "",
+          Status:"",
           AddressLine1: "",
           AddressLine2: "",
         });
@@ -125,7 +129,7 @@ export default function AdminCreatePage() {
 
   // ✅ Dropdown data
   const roles = ["administrator", "city_admin", "user"];
-  const statusOptions = ["active", "inactive"];
+  const statusOptions = ["Active", "Inactive"];
   const cities = ["Jaipur", "Ajmer", "Udaipur"];
 
   const fetchFields = async () => {
@@ -133,6 +137,7 @@ export default function AdminCreatePage() {
       [
 
         { key: "City", fetchFn: getCity },
+        { key: "Status", staticData:["Active", "Inactive"] }
       ],
       setFieldOptions
     );
@@ -213,6 +218,14 @@ export default function AdminCreatePage() {
                     value={userData.City}
                     onChange={(selected) =>
                       handleSelectChange("City", selected)
+                    }
+                  />
+                  <SingleSelect
+                    options={Array.isArray(fieldOptions?.Status) ? fieldOptions.Status : []}
+                    label="Status"
+                    value={userData.Status}
+                    onChange={(selected) =>
+                      handleSelectChange("Status", selected)
                     }
                   />
 
