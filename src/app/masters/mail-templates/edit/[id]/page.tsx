@@ -152,6 +152,13 @@ export default function MailEdit() {
                   onChange={handleInputChange}
                   error={errors.subject}
                 />
+                {/* Status */}
+                <SingleSelect
+                  options={statusOptions}
+                  label="Status"
+                  value={mailData.status}
+                  onChange={(v) => handleSelectChange("status", v)}
+                />
 
                 {/* Body using JoditEditorClient */}
                   <div className="flex flex-col col-span-2">
@@ -168,13 +175,7 @@ export default function MailEdit() {
                     )}
                   </div>
 
-                {/* Status */}
-                <SingleSelect
-                  options={statusOptions}
-                  label="Status"
-                  value={mailData.status}
-                  onChange={(v) => handleSelectChange("status", v)}
-                />
+                
               </div>
 
               {/* Update Button */}
