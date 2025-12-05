@@ -150,6 +150,7 @@ export default function Customer() {
             AssignTo: item.AssignTo?.name,
             isFavourite: item.isFavourite,
             Date: item.date ?? formattedDate,
+            SitePlan: item.SitePlan || "",
           }
         })
       );
@@ -612,14 +613,44 @@ export default function Customer() {
     key: "Name", label: "Name"
   },
   {
+    key: "Location", label: "Location"
+  },
+  {
     key: "Description", label: "Description"
+  },
+  {
+    key: "ContactNumber", label: "Contact No"
+  }]
+
+  const phoneViewAllHaders= [
+    {
+    key: "Campaign", label: "Campaign"
+  },
+   {
+    key: "Type", label: "Customer Type"
+  },
+   {
+    key: "SubType", label: "Customer Subtype"
+  },
+  {
+    key: "Name", label: "Name"
   },
   {
     key: "Location", label: "Location"
   },
   {
+    key: "Description", label: "Description"
+  },
+  {
     key: "ContactNumber", label: "Contact No"
-  }]
+  },
+  {
+    key: "AssignTo", label: "Assign To"
+  },
+  {
+    key: "Date", label: "Date"
+  }
+  ]
 
   const addFollowup = (id: string) => router.push(`/followups/customer/add/${id}`);
 
@@ -821,6 +852,7 @@ export default function Customer() {
         <CustomerTable
           leads={customerData}
           labelLeads={phonetableheader}
+          allLabelLeads={phoneViewAllHaders}
           onAdd={(id) => addFollowup(id)}
           onEdit={(id) => router.push(`/customer/edit/${id}`)}
           onWhatsappClick={(lead) => {
@@ -1186,6 +1218,8 @@ export default function Customer() {
                         </td>
                         <td className="px-2 py-3 border border-gray-200">{item.Location}</td>
                         <td className="px-4 py-3  flex flex-col justify-center items-center gap-1">{(item.ContactNumber) && <>{item.ContactNumber}<span className=" flex"> <Button
+                         component="a"
+                         href={`tel:${item.ContactNumber}`}
                           sx={{
                             backgroundColor: "#E8F5E9",
                             color: "var(--color-primary)",

@@ -62,6 +62,7 @@ export interface customerGetDataInterface {
   ContactNumber: string;
   AssignTo: string;
   Date: string;
+  SitePlan?: string;
 }
 
 export interface CustomerAdvInterface {

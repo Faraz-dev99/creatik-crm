@@ -7,7 +7,7 @@ import SingleSelect from "@/app/component/SingleSelect";
 import toast, { Toaster } from "react-hot-toast";
 import DateSelector from "@/app/component/DateSelector";
 import { useRouter } from "next/navigation";
-import { addContact } from "@/store/contact";
+import { addContact, getFilteredContact } from "@/store/contact";
 import { contactAllDataInterface } from "@/store/contact.interface";
 import { handleFieldOptions } from "@/app/utils/handleFieldOptions";
 import { getCampaign } from "@/store/masters/campaign/campaign";
@@ -76,12 +76,14 @@ export default function ContactAdd() {
     const newErrors: ErrorInterface = {};
 
     if (!contactData.Name.trim()) newErrors.Name = "Name is required";
-   if (contactData.Email.trim() && !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(contactData.Email)) newErrors.Email = "Invalid email format";
+    if (contactData.Email.trim() && !/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/.test(contactData.Email)) newErrors.Email = "Invalid email format";
 
     return newErrors;
   };
 
   const handleSubmit = async () => {
+    const duplicate = await isContactNoExist(contactData.ContactNo);
+    if (duplicate) return;
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -189,6 +191,33 @@ export default function ContactAdd() {
     }
   };
 
+  const isContactNoExist = async (contactNo: string) => {
+    if (contactNo.trim().length > 0 && contactNo.trim().length < 10) {
+      setErrors((prev) => ({
+        ...prev,
+        ContactNo: "Contact No should at least 10 digits",
+      }));
+      return true;
+    }
+    if(contactNo.trim().length === 0){
+      return false;
+    }
+    
+    const res = await getFilteredContact(`Keyword=${contactNo}`);
+    const isExist = res.length;
+
+    if (isExist && isExist > 0) {
+      setErrors((prev) => ({
+        ...prev,
+        ContactNo: "Contact No already exists",
+      }));
+      return true;
+    }
+
+    return false;
+  };
+
+
   // Dropdown data
   const campaign = ['Buyer', 'Seller', 'Rent Out', 'Rent In', 'Hostel/PG', 'Agents', 'Services', 'Others', 'Guest House', 'Happy Stay'];
   const city = ['Jaipur', 'Ajmer'];
@@ -295,7 +324,7 @@ export default function ContactAdd() {
                   }}
                   error={errors.Location}
                 />
-                <InputField label="Contact No" name="ContactNo" value={contactData.ContactNo} onChange={handleInputChange} />
+                <InputField label="Contact No" name="ContactNo" value={contactData.ContactNo} onChange={handleInputChange} error={errors.ContactNo} />
                 <InputField label="Email" name="Email" value={contactData.Email} onChange={handleInputChange} error={errors.Email} />
                 <InputField className=" max-sm:hidden" label="Company Name" name="CompanyName" value={contactData.CompanyName} onChange={handleInputChange} />
                 <InputField className=" max-sm:hidden" label="Website" name="Website" value={contactData.Website} onChange={handleInputChange} />

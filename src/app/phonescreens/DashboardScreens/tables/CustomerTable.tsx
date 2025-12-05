@@ -10,9 +10,10 @@ import { GrFormNext, GrFormPrevious } from "react-icons/gr";
 import { MdEdit, MdDelete, MdAdd } from "react-icons/md";
 
 import { AiOutlineBackward, AiOutlineForward } from "react-icons/ai"
-import { IoIosHeart } from "react-icons/io";
+import { IoIosHeart, IoMdClose } from "react-icons/io";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import PopupMenu from "@/app/component/popups/PopupMenu";
 export interface LabelConfig {
     key: string;
     label: string;
@@ -21,6 +22,7 @@ export interface LabelConfig {
 interface LeadsSectionProps<T extends Record<string, any>> {
     leads: T[];
     labelLeads: LabelConfig[];
+    allLabelLeads?: LabelConfig[];
     isCustomerPage?: boolean
     onAdd?: (id: string) => void;
     onEdit?: (id: string) => void;
@@ -33,6 +35,7 @@ interface LeadsSectionProps<T extends Record<string, any>> {
 export default function CustomerTable<T extends Record<string, any>>({
     leads,
     labelLeads,
+    allLabelLeads,
     onAdd,
     onEdit,
     onWhatsappClick,
@@ -42,12 +45,14 @@ export default function CustomerTable<T extends Record<string, any>>({
     const [toggleSearchDropdown, setToggleSearchDropdown] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsperpage = 10;
+    const [viewAll, setViewAll] = useState(false);
+    const [viewLeadData,setViewLeadData] = useState<T | null>(null);
 
     const totalPages = Math.ceil(leads.length / itemsperpage);
     const startIndex = (currentPage - 1) * itemsperpage;
     const paginatedLeads = leads.slice(startIndex, startIndex + itemsperpage);
     const [loader, setLoader] = useState(true);
-    const router= useRouter();
+    const router = useRouter();
 
 
     const nextPage = () => {
@@ -76,10 +81,10 @@ export default function CustomerTable<T extends Record<string, any>>({
         }
     }, [leads])
 
-        const followupRedirect= ()=>{
+    const followupRedirect = () => {
         router.push('/followups/customer');
     }
-    
+
 
     if (loader) {
         return <div className=" px-2 pb-4">
@@ -90,6 +95,39 @@ export default function CustomerTable<T extends Record<string, any>>({
     }
     return (
         <>
+            {
+                viewAll && (
+                    <PopupMenu onClose={() => { setViewAll(false) }}>
+                        <div className=" bg-white w-full p-2 rounded-md  flex flex-col gap-1">
+                            <button className=" self-end mb-1 " onClick={()=>{
+                                setViewAll(false)
+                                setViewLeadData(null)
+                            }}><IoMdClose size={25} /></button>
+                            <img className="rounded-md self-end w-full h-[220px]" src={viewLeadData?.SitePlan.length > 0 ? viewLeadData?.SitePlan :"/siteplan.jpg"} />
+                            <div className=" max-h-[80vh] overflow-y-auto mt-3">
+                                {allLabelLeads?.map((item, j) => (
+                                    <div
+                                        key={j}
+                                        className="mb-2 grid grid-cols-[1fr_auto_2fr] items-center gap-2"
+                                    >
+                                        <span className="font-semibold text-black">
+                                            {item.label}
+                                        </span>
+
+                                        <span className="text-gray-500">-</span>
+
+                                        <span className="text-gray-700 ">
+                                            {/*  {String(lead[item.key])} */} 
+                                            {String(viewLeadData && viewLeadData[item.key] ? viewLeadData[item.key] : "")}
+                                        </span>
+                                    </div>
+
+                                ))}
+                            </div>
+                        </div>
+                    </PopupMenu>
+                )
+            }
             {/* LEAD CARDS */}
             <div className="px-0 pb-4">
                 {paginatedLeads.length === 0 && (
@@ -114,7 +152,7 @@ export default function CustomerTable<T extends Record<string, any>>({
 
                                         <span className="text-gray-500">-</span>
 
-                                        <span className="text-gray-700  break-words">
+                                        <span className="text-gray-700 break-words line-clamp-2">
                                             {String(lead[item.key])}
                                         </span>
                                     </div>
@@ -122,25 +160,30 @@ export default function CustomerTable<T extends Record<string, any>>({
                                 ))}
                             </div>
 
-                            <div className=" flex flex-col gap-4">
 
-                                <button
-                                    onClick={() => onEdit?.(lead._id)}
-                                    className="p-2 bg-gray-100 rounded-full shadow text-[var(--color-primary)]"
-                                >
-                                    <MdEdit size={20} />
 
-                                </button>
+                            <div className="flex flex-col min-w-[120px]  items-center gap-4 ">
+                                <button className=" cursor-pointer text-sm self-end text-[var(--color-primary)] hover:text-[var(--color-primary-darker)]" onClick={() =>{
+                                     setViewAll(true)
+                                     setViewLeadData(lead)
+                                    }
+                            } >View All</button>
+                                <img width={120} className="rounded-md self-end w-[120px]" src={lead.SitePlan.length > 0 ? lead.SitePlan : "/siteplan.jpg"} />
                                 <button
                                     onClick={() => onFavourite?.(lead)}
-                                    className="p-2 bg-gray-100 rounded-full shadow"
+                                    className="p-2 bg-gray-100 self-end rounded-full shadow"
                                 >
 
                                     {lead.isFavourite ? <IoIosHeart size={20} className="text-[var(--color-primary)]" /> : <AiOutlineHeart size={20} className="text-[var(--color-primary)]" />}
                                 </button>
+                                <button
+                                    onClick={() => onEdit?.(lead._id)}
+                                    className=" p-2 bg-gray-100 self-end rounded-full shadow"
+                                >
+                                    <MdEdit size={20}className="text-[var(--color-primary)]" />
+
+                                </button>
                             </div>
-
-
 
                         </div>
 
@@ -151,17 +194,19 @@ export default function CustomerTable<T extends Record<string, any>>({
                             </button>
 
 
-                            <div className="flex items-center gap-10">
+                            <div className="flex items-center gap-10 max-[320px]:gap-4">
+                                
                                 <a href={`tel:+91${String(lead["ContactNumber"]) ?? String(lead["ContactNo"]) ?? ""}`} className="" onClick={() => onAdd?.(lead._id)}>
                                     <MdPhone size={25} className="text-white" />
                                 </a>
 
 
                                 {/* <MdEmail size={20} className="text-white" /> */}
-                                
+
                                 {/* <a href={`https://wa.me/+91${String(lead["ContactNumber"]) ?? String(lead["ContactNo"]) ?? ""}`} target="_blank">
                   <FaWhatsapp size={20} className="text-white" />
                 </a> */}
+
                                 <button
                                     onClick={() => onMailClick?.(lead)}
                                     className="text-white"

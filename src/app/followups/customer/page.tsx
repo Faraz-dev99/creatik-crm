@@ -376,7 +376,7 @@ export default function CustomerFollowups() {
     {
         key: "Date", label: "Date"
     },]
-    // 🔹 UI
+
     return (
         <ProtectedRoute>
             <Toaster position="top-right" />
@@ -469,11 +469,111 @@ export default function CustomerFollowups() {
                 <h1 className=" text-[var(--color-primary)] font-bold text-2xl px-0 py-2 mb-4">Followups</h1>
                 <div>
                     <DynamicAdvance>
-                        <SingleSelect options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []} value={filters.Campaign[0]} label="Campaign" onChange={(val) => handleSelectChange("Campaign", val)} />
-                        <SingleSelect options={Array.isArray(fieldOptions?.PropertyTypes) ? fieldOptions.PropertyTypes : []} value={filters.PropertyType[0]} label="Property Type" onChange={(val) => handleSelectChange("PropertyType", val)} />
+                        <ObjectSelect
+                            options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []}
+                            label="Campaign"
+                            value={dependent.Campaign.id}
+                            getLabel={(item) => item?.Name || ""}
+                            getId={(item) => item?._id || ""}
+                            onChange={(selectedId) => {
+                                const selectedObj = fieldOptions.Campaign.find((i) => i._id === selectedId);
+                                if (selectedObj) {
+                                    const updatedFilters = {
+                                        ...filters,
+                                        Campaign: [selectedObj.Name],
+                                        PropertyType: [],   // reset
+
+                                    };
+                                    setFilters(updatedFilters);
+
+                                    setDependent(prev => ({
+                                        ...prev,
+                                        Campaign: { id: selectedObj._id, name: selectedObj.Name },
+                                        PropertyType: { id: "", name: "" },   // reset
+                                    }));
+                                    handleSelectChange("Campaign", selectedObj.Name, updatedFilters)
+                                }
+                            }}
+                        />
+
+                        <ObjectSelect
+                            options={Array.isArray(fieldOptions?.PropertyType) ? fieldOptions.PropertyType : []}
+                            label="Property Type"
+                            value={dependent.PropertyType.name}
+                            getLabel={(item) => item?.Name || ""}
+                            getId={(item) => item?._id || ""}
+                            onChange={(selectedId) => {
+                                const selectedObj = fieldOptions.PropertyType.find((i) => i._id === selectedId);
+                                if (selectedObj) {
+                                    const updatedFilters = {
+                                        ...filters,
+                                        PropertyType: [selectedObj.Name],   // reset
+
+                                    };
+                                    setFilters(updatedFilters);
+
+
+                                    setDependent(prev => ({
+                                        ...prev,
+                                        PropertyType: { id: selectedObj._id, name: selectedObj.Name },   // reset
+
+                                    }));
+                                    handleSelectChange("PropertyType", selectedObj.Name, updatedFilters)
+                                }
+                            }}
+
+                        />
+
+
+                        <ObjectSelect
+                            options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []}
+                            label="City"
+                            value={dependent.City.id}
+                            getLabel={(item) => item?.Name || ""}
+                            getId={(item) => item?._id || ""}
+                            onChange={(selectedId) => {
+                                const selectedObj = fieldOptions.City.find((i) => i._id === selectedId);
+                                if (selectedObj) {
+                                    const updatedFilters = {
+                                        ...filters,
+                                        City: [selectedObj.Name],
+                                        Location: []
+                                    };
+                                    setFilters(updatedFilters);
+
+                                    setDependent(prev => ({
+                                        ...prev,
+                                        City: { id: selectedObj._id, name: selectedObj.Name },
+                                        Location: { id: "", name: "" },
+                                    }));
+                                    handleSelectChange("City", selectedObj.Name, updatedFilters)
+                                }
+                            }}
+                        />
+                        <ObjectSelect
+                            options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []}
+                            label="Location"
+                            value={dependent.Location.id}
+                            getLabel={(item) => item?.Name || ""}
+                            getId={(item) => item?._id || ""}
+                            onChange={(selectedId) => {
+                                const selectedObj = fieldOptions.Location.find((i) => i._id === selectedId);
+                                if (selectedObj) {
+                                    const updatedFilters = {
+                                        ...filters,
+                                        Location: [selectedObj.Name]
+                                    };
+                                    setFilters(updatedFilters);
+
+                                    setDependent(prev => ({
+                                        ...prev,
+                                        Location: { id: selectedObj._id, name: selectedObj.Name },
+                                    }));
+                                    handleSelectChange("Location", selectedObj.Name, updatedFilters)
+                                }
+                            }}
+                        />
                         <SingleSelect options={Array.isArray(fieldOptions?.StatusTypes) ? fieldOptions.StatusTypes : []} value={filters.StatusType[0]} label="Status Type" onChange={(val) => handleSelectChange("StatusType", val)} />
-                        <SingleSelect options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []} value={filters.City[0]} label="City" onChange={(val) => handleSelectChange("City", val)} />
-                        <SingleSelect options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []} value={filters.Location[0]} label="Location" onChange={(val) => handleSelectChange("Location", val)} />
                         <div className=" w-full flex justify-end">
                             <button type="reset" onClick={clearFilter} className="text-red-500 cursor-pointer hover:underline text-sm px-5 py-2 rounded-md">
                                 Clear Search
@@ -570,7 +670,7 @@ export default function CustomerFollowups() {
                                                     const updatedFilters = {
                                                         ...filters,
                                                         PropertyType: [selectedObj.Name],   // reset
-                                                      
+
                                                     };
                                                     setFilters(updatedFilters);
 

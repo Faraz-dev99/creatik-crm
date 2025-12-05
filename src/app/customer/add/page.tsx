@@ -7,7 +7,7 @@ import DateSelector from "@/app/component/DateSelector";
 import toast, { Toaster } from "react-hot-toast";
 import { ArrowLeft, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { addCustomer } from "@/store/customer";
+import { addCustomer, getFilteredCustomer } from "@/store/customer";
 import { customerAllDataInterface } from "@/store/customer.interface";
 import { getCampaign } from "@/store/masters/campaign/campaign";
 import { getTypes, getTypesByCampaign } from "@/store/masters/types/types";
@@ -23,6 +23,7 @@ import ObjectSelect from "@/app/component/ObjectSelect";
 import CustomerSubtypeAdd from "@/app/masters/customer-subtype/add/page";
 import InputField from "@/app/component/datafields/InputField";
 import TextareaField from "@/app/component/datafields/TextareaField";
+import { getFilteredContact } from "@/store/contact";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -127,8 +128,36 @@ export default function CustomerAdd() {
     return newErrors;
   };
 
+    const isContactNoExist = async (contactNo: string) => {
+      if (contactNo.trim().length > 0 && contactNo.trim().length < 10) {
+        setErrors((prev) => ({
+          ...prev,
+          ContactNumber: "Contact No should at least 10 digits",
+        }));
+        return true;
+      }
+      if(contactNo.trim().length === 0){
+        return false;
+      }
+      
+      const res = await getFilteredCustomer(`Keyword=${contactNo}`);
+      const isExist = res.length;
+  
+      if (isExist && isExist > 0) {
+        setErrors((prev) => ({
+          ...prev,
+          ContactNumber: "Contact No already exists",
+        }));
+        return true;
+      }
+  
+      return false;
+    };
+
   // 🟩 Submit Form
   const handleSubmit = async () => {
+     const duplicate = await isContactNoExist(customerData.ContactNumber);
+    if (duplicate) return;
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
