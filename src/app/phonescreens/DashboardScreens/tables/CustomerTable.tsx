@@ -104,7 +104,7 @@ export default function CustomerTable<T extends Record<string, any>>({
                                 setViewLeadData(null)
                             }}><IoMdClose size={25} /></button>
                             <img className="rounded-md self-end w-full h-[220px]" src={viewLeadData?.SitePlan.length > 0 ? viewLeadData?.SitePlan :"/siteplan.jpg"} />
-                            <div className=" max-h-[80vh] overflow-y-auto mt-3">
+                            <div className=" max-h-[calc(80vh-240px)] overflow-y-auto mt-3">
                                 {allLabelLeads?.map((item, j) => (
                                     <div
                                         key={j}

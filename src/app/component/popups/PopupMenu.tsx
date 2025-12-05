@@ -1,5 +1,5 @@
 'use client';
-import React, { ReactNode, MouseEvent } from 'react';
+import React, { ReactNode, MouseEvent, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface PopupMenuProps {
@@ -14,6 +14,18 @@ const PopupMenu: React.FC<PopupMenuProps> = ({ children, onClose, isOpen = true 
       onClose?.();
     }
   };
+
+    useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflowY = 'hidden';
+    } else {
+      document.body.style.overflowY = 'auto';
+    }
+
+    return () => {
+      document.body.style.overflowY = 'auto'; // cleanup
+    };
+  }, [isOpen]);
 
   return (
     <AnimatePresence>
