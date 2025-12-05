@@ -96,7 +96,7 @@ export default function TaskPage() {
 
   // Row selection
   const handleSelectAll = () => {
-    const allIds = filteredTask.map((t) => t._id);
+    const allIds = currentRows.map((t) => t._id);
     setTaskIds((prev) =>
       allIds.every((id) => prev.includes(id))
         ? prev.filter((id) => !allIds.includes(id)) // unselect all
@@ -228,6 +228,8 @@ export default function TaskPage() {
             {/* <button type="button" className="hover:text-gray-950 cursor-pointer" onClick={() => { if(taskIds.length) setIsDeleteAllDialogOpen(true); }}>Delete All</button> */}
             <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
               if (filteredTask.length > 0) {
+                 const firstPageIds = currentRows.map((c) => c._id);
+                    setTaskIds(firstPageIds);
                 setIsDeleteAllDialogOpen(true);
               }
             }}><div className=" absolute top-0 left-0 z-0 h-full bg-[var(--color-primary)] w-0 group-hover:w-full transition-all duration-300 "></div>
@@ -249,9 +251,13 @@ export default function TaskPage() {
                     <input
                       id="selectall"
                       type="checkbox"
-                      checked={currentRows.length > 0 && currentRows.every((r) => taskIds.includes(r._id))}
+                      checked={
+                        currentRows.length > 0 &&
+                        currentRows.every((r) => taskIds.includes(r._id))
+                      }
                       onChange={handleSelectAll}
                     />
+
                   </th>
                   <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">S.No.</th>
                   <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Date</th>
@@ -272,7 +278,7 @@ export default function TaskPage() {
                           onChange={() => handleSelectRow(s._id)}
                         />
                       </td>
-                      <td className="px-4 py-3 border border-gray-200">{i + 1}</td>
+                      <td className="px-4 py-3 border border-gray-200">{(currentTablePage - 1) * rowsPerTablePage + (i + 1)}</td>
                       <td className="px-4 py-3 border border-gray-200">{s.date}</td>
                       <td className="px-4 py-3 border border-gray-200">{s.Time}</td>
                       <td className="px-4 py-3 border border-gray-200">{s.Description}</td>

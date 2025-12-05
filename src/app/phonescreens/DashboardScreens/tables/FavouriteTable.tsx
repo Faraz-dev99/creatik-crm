@@ -62,26 +62,14 @@ export default function FavouriteTable<T extends Record<string, any>>({
         return [currentPage - 1, currentPage, currentPage + 1];
     };
     const pages = getDisplayedPages();
-    useEffect(() => {
-        if (!leads || leads.length === 0) {
-            setLoader(true);
-        } else {
-            setLoader(false);
-        }
-    }, [leads])
+
 
     const followupRedirect = () => {
         router.push('/followups/customer');
     }
 
 
-    if (loader) {
-        return <div className=" px-2 pb-4">
-            <div className="w-full flex justify-center items-center py-10 text-lg text-gray-500">
-                Loading Customers...
-            </div>
-        </div>
-    }
+  
     return (
         <>
             {/* LEAD CARDS */}
@@ -92,7 +80,7 @@ export default function FavouriteTable<T extends Record<string, any>>({
                     </div>
                 )}
                 {paginatedLeads.map((lead, index) => (
-                    <div key={index} className="w-full  bg-white shadow-md rounded-xl overflow-hidden border border-gray-200 mb-5">
+                    <div key={index} className="w-full  bg-white shadow-md rounded-xl overflow-hidden border border-gray-200 mb-0">
                         <div className="bg-[var(--color-primary)] h-2"></div>
 
                         <div className="flex justify-between items-start p-4">

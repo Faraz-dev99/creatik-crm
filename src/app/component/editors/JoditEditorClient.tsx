@@ -19,7 +19,7 @@ export default function JoditEditorClient({ value, onChange }: JoditEditorClient
             placeholder: 'Start typing...',
             height: 'auto',
             minHeight: 300,
-            uploader: { insertImageAsBase64URI: false },
+            uploader: { insertImageAsBase64URI: true },
             addButtons: ["brush"], 
         }),
         []
@@ -27,7 +27,8 @@ export default function JoditEditorClient({ value, onChange }: JoditEditorClient
     // Handle blur safely
     const handleBlur = useCallback(() => {
         if (editor.current) {
-            const html = editor.current.value; // get current HTML
+            const html = editor.current.value;
+             // get current HTML
             setContent(html);                     // update local state
             onChange(html);                       // notify parent
         }

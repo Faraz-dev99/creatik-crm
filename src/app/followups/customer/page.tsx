@@ -33,14 +33,17 @@ import {
 import { handleFieldOptions } from "@/app/utils/handleFieldOptions";
 import { getCampaign } from "@/store/masters/campaign/campaign";
 import { getCity } from "@/store/masters/city/city";
-import { getLocation } from "@/store/masters/location/location";
+import { getLocation, getLocationByCity } from "@/store/masters/location/location";
 import { getAllAdmins } from "@/store/auth";
 import PageHeader from "@/app/component/labels/PageHeader";
-import { getTypes } from "@/store/masters/types/types";
+import { getTypes, getTypesByCampaign } from "@/store/masters/types/types";
 import { getStatusType } from "@/store/masters/statustype/statustype";
 import LeadsSection from "@/app/phonescreens/DashboardScreens/LeadsSection";
 import FollowupTable from "@/app/phonescreens/DashboardScreens/tables/FollowupTable";
 import DynamicAdvance from "@/app/phonescreens/DashboardScreens/DynamicAdvance";
+import { getSubtypeByCampaignAndType } from "@/store/masters/subtype/subtype";
+import { handleFieldOptionsObject } from "@/app/utils/handleFieldOptionsObject";
+import ObjectSelect from "@/app/component/ObjectSelect";
 
 export default function CustomerFollowups() {
     const router = useRouter();
@@ -71,6 +74,13 @@ export default function CustomerFollowups() {
         StartDate: "",
         EndDate: "",
         Limit: ["10"] as string[],
+    });
+
+    const [dependent, setDependent] = useState({
+        Campaign: { id: "", name: "" },
+        PropertyType: { id: "", name: "" },
+        City: { id: "", name: "" },
+        Location: { id: "", name: "" },
     });
 
     // 🔹 Fetch All Followups
@@ -163,8 +173,8 @@ export default function CustomerFollowups() {
     }, [filters.Limit]);
 
     // 🔹 Filters
-    const handleSelectChange = async (field: keyof typeof filters, selected: string | string[]) => {
-        const updatedFilters = {
+    const handleSelectChange = async (field: keyof typeof filters, selected: string | string[], filtersOverride?: typeof filters) => {
+        const updatedFilters = filtersOverride || {
             ...filters,
             [field]: Array.isArray(selected) ? selected : selected ? [selected] : [],
         };
@@ -208,6 +218,12 @@ export default function CustomerFollowups() {
             StartDate: "",
             EndDate: "",
             Limit: ["10"],
+        });
+        setDependent({
+            Campaign: { id: "", name: "" },
+            PropertyType: { id: "", name: "" },
+            City: { id: "", name: "" },
+            Location: { id: "", name: "" },
         });
         await getFollowups();
     };
@@ -258,16 +274,89 @@ export default function CustomerFollowups() {
     const fetchFields = async () => {
         await handleFieldOptions(
             [
-                { key: "StatusTypes", fetchFn: getStatusType },
-                { key: "Campaign", fetchFn: getCampaign },
-                { key: "PropertyTypes", fetchFn: getTypes },
-                { key: "City", fetchFn: getCity },
-                { key: "Location", fetchFn: getLocation },
-                { key: "Users", fetchFn: getAllAdmins },
+                /*  { key: "StatusTypes", fetchFn: getStatusType },
+                 { key: "Campaign", fetchFn: getCampaign },
+                 { key: "PropertyTypes", fetchFn: getTypes },
+                 { key: "City", fetchFn: getCity },
+                 { key: "Location", fetchFn: getLocation },
+                 { key: "Users", fetchFn: getAllAdmins }, */
             ],
             setFieldOptions
         );
     }
+
+    // Object-based fields (for ObjectSelect)
+    const objectFields = [
+
+        { key: "Campaign", fetchFn: getCampaign },
+        { key: "PropertyTypes", fetchFn: getTypes },
+        { key: "City", fetchFn: getCity },
+        { key: "Location", fetchFn: getLocation },// dependent
+
+    ];
+
+    // Simple array fields (for normal Select)
+    const arrayFields = [
+        { key: "StatusTypes", fetchFn: getStatusType },
+        { key: "StatusAssign", staticData: ["Assigned", "Unassigned"] },
+        { key: "User", fetchFn: getAllAdmins },
+    ];
+
+
+    useEffect(() => {
+        const loadFieldOptions = async () => {
+            await handleFieldOptionsObject(objectFields, setFieldOptions);
+            await handleFieldOptions(arrayFields, setFieldOptions);
+        };
+        loadFieldOptions();
+    }, []);
+
+
+    // Run this whenever parent filter changes
+    useEffect(() => {
+        const campaignId = dependent.Campaign.id;
+        const cityId = dependent.City.id;
+
+        if (campaignId) {
+            fetchCustomerType(campaignId);
+        } else {
+            setFieldOptions(prev => ({ ...prev, PropertyType: [] }));
+            setFilters(prev => ({ ...prev, PropertyType: [] }));
+        }
+
+
+
+        if (cityId) {
+            fetchLocation(cityId);
+        } else {
+            setFieldOptions(prev => ({ ...prev, Location: [] }));
+            setFilters(prev => ({ ...prev, Location: [] }));
+        }
+
+    }, [dependent.Campaign.id, dependent.City.id]);
+
+
+    const fetchCustomerType = async (campaignId: string) => {
+        try {
+            const res = await getTypesByCampaign(campaignId);
+            setFieldOptions((prev) => ({ ...prev, PropertyType: res || [] }));
+        } catch (error) {
+            console.error("Error fetching types:", error);
+            setFieldOptions((prev) => ({ ...prev, PropertyType: [] }));
+        }
+    };
+
+    const fetchLocation = async (cityId: string) => {
+        try {
+
+            const res = await getLocationByCity(cityId);
+            setFieldOptions((prev) => ({ ...prev, Location: res || [] }));
+        } catch (error) {
+            console.error("Error fetching location:", error);
+            setFieldOptions((prev) => ({ ...prev, Location: [] }));
+        }
+    };
+
 
     const campaign = ['Buyer', 'Seller', 'Rent Out', 'Rent In', 'Hostel/PG', 'Agents', 'Services', 'Others', 'Guest House', 'Happy Stay'];
     const propertyTypes = ['Flat', 'Villa', 'Plot', 'Commercial'];
@@ -442,11 +531,113 @@ export default function CustomerFollowups() {
                             <div className={`overflow-hidden ${toggleSearchDropdown ? 'max-h-[2000px]' : 'max-h-0'} transition-all duration-500 ease-in-out px-5`}>
                                 <div className="flex flex-col gap-5 my-5">
                                     <div className="grid grid-cols-3 gap-5 max-md:grid-cols-1 max-lg:grid-cols-2">
-                                        <SingleSelect options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []} value={filters.Campaign[0]} label="Campaign" onChange={(val) => handleSelectChange("Campaign", val)} />
-                                        <SingleSelect options={Array.isArray(fieldOptions?.PropertyTypes) ? fieldOptions.PropertyTypes : []} value={filters.PropertyType[0]} label="Property Type" onChange={(val) => handleSelectChange("PropertyType", val)} />
+                                        <ObjectSelect
+                                            options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []}
+                                            label="Campaign"
+                                            value={dependent.Campaign.id}
+                                            getLabel={(item) => item?.Name || ""}
+                                            getId={(item) => item?._id || ""}
+                                            onChange={(selectedId) => {
+                                                const selectedObj = fieldOptions.Campaign.find((i) => i._id === selectedId);
+                                                if (selectedObj) {
+                                                    const updatedFilters = {
+                                                        ...filters,
+                                                        Campaign: [selectedObj.Name],
+                                                        PropertyType: [],   // reset
+
+                                                    };
+                                                    setFilters(updatedFilters);
+
+                                                    setDependent(prev => ({
+                                                        ...prev,
+                                                        Campaign: { id: selectedObj._id, name: selectedObj.Name },
+                                                        PropertyType: { id: "", name: "" },   // reset
+                                                    }));
+                                                    handleSelectChange("Campaign", selectedObj.Name, updatedFilters)
+                                                }
+                                            }}
+                                        />
+
+                                        <ObjectSelect
+                                            options={Array.isArray(fieldOptions?.PropertyType) ? fieldOptions.PropertyType : []}
+                                            label="Property Type"
+                                            value={dependent.PropertyType.name}
+                                            getLabel={(item) => item?.Name || ""}
+                                            getId={(item) => item?._id || ""}
+                                            onChange={(selectedId) => {
+                                                const selectedObj = fieldOptions.PropertyType.find((i) => i._id === selectedId);
+                                                if (selectedObj) {
+                                                    const updatedFilters = {
+                                                        ...filters,
+                                                        PropertyType: [selectedObj.Name],   // reset
+                                                      
+                                                    };
+                                                    setFilters(updatedFilters);
+
+
+                                                    setDependent(prev => ({
+                                                        ...prev,
+                                                        PropertyType: { id: selectedObj._id, name: selectedObj.Name },   // reset
+
+                                                    }));
+                                                    handleSelectChange("PropertyType", selectedObj.Name, updatedFilters)
+                                                }
+                                            }}
+
+                                        />
+
+
+                                        <ObjectSelect
+                                            options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []}
+                                            label="City"
+                                            value={dependent.City.id}
+                                            getLabel={(item) => item?.Name || ""}
+                                            getId={(item) => item?._id || ""}
+                                            onChange={(selectedId) => {
+                                                const selectedObj = fieldOptions.City.find((i) => i._id === selectedId);
+                                                if (selectedObj) {
+                                                    const updatedFilters = {
+                                                        ...filters,
+                                                        City: [selectedObj.Name],
+                                                        Location: []
+                                                    };
+                                                    setFilters(updatedFilters);
+
+                                                    setDependent(prev => ({
+                                                        ...prev,
+                                                        City: { id: selectedObj._id, name: selectedObj.Name },
+                                                        Location: { id: "", name: "" },
+                                                    }));
+                                                    handleSelectChange("City", selectedObj.Name, updatedFilters)
+                                                }
+                                            }}
+                                        />
+                                        <ObjectSelect
+                                            options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []}
+                                            label="Location"
+                                            value={dependent.Location.id}
+                                            getLabel={(item) => item?.Name || ""}
+                                            getId={(item) => item?._id || ""}
+                                            onChange={(selectedId) => {
+                                                const selectedObj = fieldOptions.Location.find((i) => i._id === selectedId);
+                                                if (selectedObj) {
+                                                    const updatedFilters = {
+                                                        ...filters,
+                                                        Location: [selectedObj.Name]
+                                                    };
+                                                    setFilters(updatedFilters);
+
+                                                    setDependent(prev => ({
+                                                        ...prev,
+                                                        Location: { id: selectedObj._id, name: selectedObj.Name },
+                                                    }));
+                                                    handleSelectChange("Location", selectedObj.Name, updatedFilters)
+                                                }
+                                            }}
+                                        />
+
+
                                         <SingleSelect options={Array.isArray(fieldOptions?.StatusTypes) ? fieldOptions.StatusTypes : []} value={filters.StatusType[0]} label="Status Type" onChange={(val) => handleSelectChange("StatusType", val)} />
-                                        <SingleSelect options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []} value={filters.City[0]} label="City" onChange={(val) => handleSelectChange("City", val)} />
-                                        <SingleSelect options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []} value={filters.Location[0]} label="Location" onChange={(val) => handleSelectChange("Location", val)} />
                                         {/* <SingleSelect options={Array.isArray(fieldOptions?.Users) ? fieldOptions.Users : []} value={filters.User[0]} label="User" onChange={(val) => handleSelectChange("User", val)} /> */}
                                         <SingleSelect options={["10", "25", "50", "100"]} value={filters.Limit[0]} label="Limit" onChange={(val) => handleSelectChange("Limit", val)} />
                                     </div>

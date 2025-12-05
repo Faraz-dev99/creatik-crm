@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
-import { MdEdit, MdDelete, MdAdd, MdFavorite, MdFavoriteBorder } from "react-icons/md";
+import { MdEdit, MdDelete, MdAdd, MdFavorite, MdFavoriteBorder, MdEmail } from "react-icons/md";
 import Button from '@mui/material/Button';
 import SingleSelect from "@/app/component/SingleSelect";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -14,14 +14,14 @@ import { getCustomer, deleteCustomer, getFilteredCustomer, updateCustomer, assig
 import { CustomerAdvInterface, customerAssignInterface, customerGetDataInterface, DeleteDialogDataInterface } from "@/store/customer.interface";
 import DeleteDialog from "../component/popups/DeleteDialog";
 import { getCampaign } from "@/store/masters/campaign/campaign";
-import { getTypes } from "@/store/masters/types/types";
+import { getTypes, getTypesByCampaign } from "@/store/masters/types/types";
 import { getCity } from "@/store/masters/city/city";
-import { getLocation } from "@/store/masters/location/location";
+import { getLocation, getLocationByCity } from "@/store/masters/location/location";
 import { handleFieldOptions } from "../utils/handleFieldOptions";
 import PopupMenu from "../component/popups/PopupMenu";
 import { getAllAdmins } from "@/store/auth";
 import { usersGetDataInterface } from "@/store/auth.interface";
-import { getSubtype } from "@/store/masters/subtype/subtype";
+import { getSubtype, getSubtypeByCampaignAndType } from "@/store/masters/subtype/subtype";
 import { mailAllCustomerInterface, mailGetDataInterface } from "@/store/masters/mail/mail.interface";
 import { whatsappAllCustomerInterface, whatsappGetDataInterface } from "@/store/masters/whatsapp/whatsapp.interface";
 import { emailAllCustomer, getMail } from "@/store/masters/mail/mail";
@@ -36,6 +36,9 @@ import { Description } from "@radix-ui/react-dialog";
 import LeadsSection from "../phonescreens/DashboardScreens/LeadsSection";
 import CustomerTable from "../phonescreens/DashboardScreens/tables/CustomerTable";
 import DynamicAdvance from "../phonescreens/DashboardScreens/DynamicAdvance";
+import { handleFieldOptionsObject } from "../utils/handleFieldOptionsObject";
+import ObjectSelect from "../component/ObjectSelect";
+import { FaPhone, FaWhatsapp } from "react-icons/fa";
 
 
 interface DeleteAllDialogDataInterface { }
@@ -85,6 +88,15 @@ export default function Customer() {
     Limit: ["10"] as string[],
   });
 
+  const [dependent, setDependent] = useState({
+    Campaign: { id: "", name: "" },
+    CustomerType: { id: "", name: "" },
+    CustomerSubType: { id: "", name: "" },
+    City: { id: "", name: "" },
+    Location: { id: "", name: "" },
+  });
+
+
   const [customerData, setCustomerData] = useState<customerGetDataInterface[]>([]);
   const [customerAdv, setCustomerAdv] = useState<CustomerAdvInterface[]>([]);
 
@@ -109,10 +121,10 @@ export default function Customer() {
   }, [searchParams, customerData]);
 
   function getPlainTextFromHTML(htmlString: string) {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(htmlString, "text/html");
-  return doc.body.textContent || "";
-}
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlString, "text/html");
+    return doc.body.textContent || "";
+  }
 
   const getCustomers = async () => {
     const data = await getCustomer();
@@ -196,8 +208,8 @@ export default function Customer() {
     setIsFavrouteCustomer(isFavourite);
   };
 
-  const handleSelectChange = async (field: keyof typeof filters, selected: string | string[]) => {
-    const updatedFilters = {
+  const handleSelectChange = async (field: keyof typeof filters, selected: string | string[], filtersOverride?: typeof filters) => {
+    const updatedFilters = filtersOverride || {
       ...filters,
       [field]: Array.isArray(selected)
         ? selected
@@ -261,6 +273,13 @@ export default function Customer() {
       Keyword: "",
       Limit: ["10"],
     });
+    setDependent({
+      Campaign: { id: "", name: "" },
+      CustomerType: { id: "", name: "" },
+      CustomerSubType: { id: "", name: "" },
+      City: { id: "", name: "" },
+      Location: { id: "", name: "" },
+    })
     await getCustomers();
   };
 
@@ -307,7 +326,7 @@ export default function Customer() {
     if (response) {
       console.log("response ", response);
 
-      const admins = response?.admins?.filter((e) => e.role === "user" || e.role==="city_admin") ?? []; //ensure only user and city_admin roles are fetched
+      const admins = response?.admins?.filter((e) => e.role === "user" || e.role === "city_admin") ?? []; //ensure only user and city_admin roles are fetched
 
       setUsers(
         admins.map((item: any): usersGetDataInterface => ({
@@ -379,23 +398,113 @@ export default function Customer() {
 
   //Fetch dropdown data
   const fetchFields = async () => {
-    await handleFieldOptions(
-      [
-        { key: "StatusAssign", staticData: ["Assigned", "Unassigned"] },
-        { key: "Campaign", fetchFn: getCampaign },
-        { key: "CustomerType", fetchFn: getTypes },
-        { key: "CustomerSubtype", fetchFn: getSubtype },
-        { key: "City", fetchFn: getCity },
-        { key: "Location", fetchFn: getLocation },
-        { key: "User", fetchFn: getAllAdmins },
-      ],
-      setFieldOptions
-    );
+    /*     await handleFieldOptions(
+          [
+            { key: "StatusAssign", staticData: ["Assigned", "Unassigned"] },
+            { key: "Campaign", fetchFn: getCampaign },
+            { key: "CustomerType", fetchFn: getTypes },
+            { key: "CustomerSubtype", fetchFn: getSubtype },
+            { key: "City", fetchFn: getCity },
+            { key: "Location", fetchFn: getLocation },
+            { key: "User", fetchFn: getAllAdmins },
+          ],
+          setFieldOptions
+        ); */
   };
+
+  // Object-based fields (for ObjectSelect)
+  const objectFields = [
+    { key: "Campaign", fetchFn: getCampaign },
+    { key: "CustomerType", staticData: [] },
+    { key: "CustomerSubtype", staticData: [] },
+    { key: "City", fetchFn: getCity },
+    { key: "Location", staticData: [] } // dependent
+
+  ];
+
+  // Simple array fields (for normal Select)
+  const arrayFields = [
+    { key: "StatusAssign", staticData: ["Assigned", "Unassigned"] },
+    { key: "User", fetchFn: getAllAdmins },
+  ];
+
+
+  useEffect(() => {
+    const loadFieldOptions = async () => {
+      await handleFieldOptionsObject(objectFields, setFieldOptions);
+      await handleFieldOptions(arrayFields, setFieldOptions);
+    };
+    loadFieldOptions();
+  }, []);
+
+
+  // Run this whenever parent filter changes
+  useEffect(() => {
+    const campaignId = dependent.Campaign.id;
+    const customerTypeId = dependent.CustomerType.id;
+    const cityId = dependent.City.id;
+
+    if (campaignId) {
+      fetchCustomerType(campaignId);
+    } else {
+      setFieldOptions(prev => ({ ...prev, CustomerType: [] }));
+      setFilters(prev => ({ ...prev, CustomerType: [], CustomerSubType: [] }));
+    }
+
+    if (campaignId && customerTypeId) {
+      fetchCustomerSubType(campaignId, customerTypeId);
+    } else {
+      setFieldOptions(prev => ({ ...prev, CustomerSubType: [] }));
+      setFilters(prev => ({ ...prev, CustomerSubType: [] }));
+    }
+
+    if (cityId) {
+      fetchLocation(cityId);
+    } else {
+      setFieldOptions(prev => ({ ...prev, Location: [] }));
+      setFilters(prev => ({ ...prev, Location: [] }));
+    }
+
+  }, [dependent.Campaign.id, dependent.CustomerType.id, dependent.City.id]);
+
+
+  const fetchCustomerType = async (campaignId: string) => {
+    try {
+      const res = await getTypesByCampaign(campaignId);
+      setFieldOptions((prev) => ({ ...prev, CustomerType: res || [] }));
+    } catch (error) {
+      console.error("Error fetching types:", error);
+      setFieldOptions((prev) => ({ ...prev, CustomerType: [] }));
+    }
+  };
+
+  const fetchLocation = async (cityId: string) => {
+    try {
+
+      const res = await getLocationByCity(cityId);
+      setFieldOptions((prev) => ({ ...prev, Location: res || [] }));
+    } catch (error) {
+      console.error("Error fetching location:", error);
+      setFieldOptions((prev) => ({ ...prev, Location: [] }));
+    }
+  };
+
+
+  const fetchCustomerSubType = async (campaignId: string, customertypeId: string) => {
+    try {
+      const res = await getSubtypeByCampaignAndType(campaignId, customertypeId);
+      setFieldOptions((prev) => ({ ...prev, CustomerSubtype: res || [] }));
+    } catch (error) {
+      console.error("Error fetching types:", error);
+      setFieldOptions((prev) => ({ ...prev, CustomerSubtype: [] }));
+    }
+  };
+
+
 
   /* SELECT ALL HANDLER */
   const handleSelectAll = () => {
-    const allIds = customerData.map((c) => c._id);
+    const allIds = currentRows.map((c) => c._id);
     setSelectedCustomers((prev) =>
       allIds.every((id) => prev.includes(id))
         ? prev.filter((id) => !allIds.includes(id)) // unselect all
@@ -526,7 +635,10 @@ export default function Customer() {
           onSelect={handleSelectWhatsapptemplate}
           onSubmit={handleWhatsappAll}
           submitLabel="Whatsapp All"
-          onClose={() => setIsWhatsappAllOpen(false)}
+          onClose={() =>{ 
+            setSelectedCustomers([]);
+            setIsWhatsappAllOpen(false)
+          }}
         />
       )}
       {/* mail all popup */}
@@ -538,7 +650,9 @@ export default function Customer() {
           onSelect={handleSelectMailtemplate}
           onSubmit={handleMailAll}
           submitLabel="Mail All"
-          onClose={() => setIsMailAllOpen(false)}
+          onClose={() =>{ 
+            setSelectedCustomers([]);
+            setIsMailAllOpen(false)}}
         />
       )}
 
@@ -563,15 +677,137 @@ export default function Customer() {
         </div>
         <div className=" w-full">
           <DynamicAdvance>
-            <SingleSelect options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []} value={filters.Campaign[0]} label="Campaign" onChange={(v) => handleSelectChange("Campaign", v)} />
+            <ObjectSelect
+                      options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []}
+                      label="Campaign"
+                      value={dependent.Campaign.id}
+                      getLabel={(item) => item?.Name || ""}
+                      getId={(item) => item?._id || ""}
+                      onChange={(selectedId) => {
+                        const selectedObj = fieldOptions.Campaign.find((i) => i._id === selectedId);
+                        if (selectedObj) {
+                          const updatedFilters = {
+                            ...filters,
+                            Campaign: [selectedObj.Name],
+                            CustomerType: [],   // reset
+                            CustomerSubType: []
+                          };
+                          setFilters(updatedFilters);
 
-            <SingleSelect options={Array.isArray(fieldOptions?.CustomerType) ? fieldOptions.CustomerType : []} value={filters.CustomerType[0]} label="Customer Type" onChange={(v) => handleSelectChange("CustomerType", v)} />
+                          setDependent(prev => ({
+                            ...prev,
+                            Campaign: { id: selectedObj._id, name: selectedObj.Name },
+                            CustomerType: { id: "", name: "" },   // reset
+                            CustomerSubType: { id: "", name: "" }
+                          }));
+                          handleSelectChange("Campaign", selectedObj.Name, updatedFilters)
+                        }
+                      }}
+                    />
 
-            <SingleSelect options={Array.isArray(fieldOptions?.CustomerSubtype) ? fieldOptions.CustomerSubtype : []} value={filters.CustomerSubType[0]} label="Customer SubType" onChange={(v) => handleSelectChange("CustomerSubType", v)} />
+                    <ObjectSelect
+                      options={Array.isArray(fieldOptions?.CustomerType) ? fieldOptions.CustomerType : []}
+                      label="Customer Type"
+                      value={dependent.CustomerType.name}
+                      getLabel={(item) => item?.Name || ""}
+                      getId={(item) => item?._id || ""}
+                      onChange={(selectedId) => {
+                        const selectedObj = fieldOptions.CustomerType.find((i) => i._id === selectedId);
+                        if (selectedObj) {
+                          const updatedFilters = {
+                            ...filters,
+                            CustomerType: [selectedObj.Name],   // reset
+                            CustomerSubType: []
+                          };
+                          setFilters(updatedFilters);
 
-            <SingleSelect options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []} value={filters.City[0]} label="City" onChange={(v) => handleSelectChange("City", v)} />
 
-            <SingleSelect options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []} value={filters.Location[0]} label="Location" onChange={(v) => handleSelectChange("Location", v)} />
+                          setDependent(prev => ({
+                            ...prev,
+                            CustomerType: { id: selectedObj._id, name: selectedObj.Name },   // reset
+                            CustomerSubType: { id: "", name: "" }
+                          }));
+                          handleSelectChange("CustomerType", selectedObj.Name, updatedFilters)
+                        }
+                      }}
+
+                    />
+
+                    <ObjectSelect
+                      options={Array.isArray(fieldOptions?.CustomerSubtype) ? fieldOptions.CustomerSubtype : []}
+                      label="Customer Subtype"
+                      value={dependent.CustomerSubType.name}
+                      getLabel={(item) => item?.Name || ""}
+                      getId={(item) => item?._id || ""}
+                      onChange={(selectedId) => {
+
+                        const selectedObj = fieldOptions.CustomerSubtype.find((i) => i._id === selectedId);
+                        if (selectedObj) {
+                          const updatedFilters = {
+                            ...filters,
+                            CustomerSubType: [selectedObj.Name]
+                          };
+                          setFilters(updatedFilters);
+
+                          setDependent(prev => ({
+                            ...prev,
+                            CustomerSubType: { id: selectedObj._id, name: selectedObj.Name }
+                          }));
+                          handleSelectChange("CustomerSubType", selectedObj.Name, updatedFilters)
+                        }
+                      }}
+                    />
+
+
+                    <ObjectSelect
+                      options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []}
+                      label="City"
+                      value={dependent.City.id}
+                      getLabel={(item) => item?.Name || ""}
+                      getId={(item) => item?._id || ""}
+                      onChange={(selectedId) => {
+                        const selectedObj = fieldOptions.City.find((i) => i._id === selectedId);
+                        if (selectedObj) {
+                          const updatedFilters = {
+                            ...filters,
+                            City: [selectedObj.Name],
+                            Location: []
+                          };
+                          setFilters(updatedFilters);
+
+                          setDependent(prev => ({
+                            ...prev,
+                            City: { id: selectedObj._id, name: selectedObj.Name },
+                            Location: { id: "", name: "" },
+                          }));
+                          handleSelectChange("City", selectedObj.Name,updatedFilters)
+                        }
+                      }}
+                    />
+                    <ObjectSelect
+                      options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []}
+                      label="Location"
+                      value={dependent.Location.id}
+                      getLabel={(item) => item?.Name || ""}
+                      getId={(item) => item?._id || ""}
+                      onChange={(selectedId) => {
+                        const selectedObj = fieldOptions.Location.find((i) => i._id === selectedId);
+                        if (selectedObj) {
+                          const updatedFilters = {
+                            ...filters,
+                            Location: [selectedObj.Name]
+                          };
+                          setFilters(updatedFilters);
+
+                          setDependent(prev => ({
+                            ...prev,
+                            Location: { id: selectedObj._id, name: selectedObj.Name },
+                          }));
+                          handleSelectChange("Location", selectedObj.Name, updatedFilters)
+                        }
+                      }}
+                    />
+
 
             <SingleSelect options={Array.isArray(fieldOptions?.User) ? fieldOptions.User : []} value={filters.User[0]} label="User" onChange={(v) => handleSelectChange("User", v)} />
             <div className=" w-full flex justify-end">
@@ -679,17 +915,136 @@ export default function Customer() {
               <div className={`overflow-hidden ${toggleSearchDropdown ? "max-h-[2000px]" : "max-h-0"} transition-all duration-500 ease-in-out px-5`}>
                 <div className="flex flex-col gap-5 my-5">
                   <div className="grid grid-cols-3 gap-5 max-md:grid-cols-1 max-lg:grid-cols-2">
+                    <ObjectSelect
+                      options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []}
+                      label="Campaign"
+                      value={dependent.Campaign.id}
+                      getLabel={(item) => item?.Name || ""}
+                      getId={(item) => item?._id || ""}
+                      onChange={(selectedId) => {
+                        const selectedObj = fieldOptions.Campaign.find((i) => i._id === selectedId);
+                        if (selectedObj) {
+                          const updatedFilters = {
+                            ...filters,
+                            Campaign: [selectedObj.Name],
+                            CustomerType: [],   // reset
+                            CustomerSubType: []
+                          };
+                          setFilters(updatedFilters);
+
+                          setDependent(prev => ({
+                            ...prev,
+                            Campaign: { id: selectedObj._id, name: selectedObj.Name },
+                            CustomerType: { id: "", name: "" },   // reset
+                            CustomerSubType: { id: "", name: "" }
+                          }));
+                          handleSelectChange("Campaign", selectedObj.Name, updatedFilters)
+                        }
+                      }}
+                    />
+
+                    <ObjectSelect
+                      options={Array.isArray(fieldOptions?.CustomerType) ? fieldOptions.CustomerType : []}
+                      label="Customer Type"
+                      value={dependent.CustomerType.name}
+                      getLabel={(item) => item?.Name || ""}
+                      getId={(item) => item?._id || ""}
+                      onChange={(selectedId) => {
+                        const selectedObj = fieldOptions.CustomerType.find((i) => i._id === selectedId);
+                        if (selectedObj) {
+                          const updatedFilters = {
+                            ...filters,
+                            CustomerType: [selectedObj.Name],   // reset
+                            CustomerSubType: []
+                          };
+                          setFilters(updatedFilters);
 
 
-                    <SingleSelect options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []} value={filters.Campaign[0]} label="Campaign" onChange={(v) => handleSelectChange("Campaign", v)} />
+                          setDependent(prev => ({
+                            ...prev,
+                            CustomerType: { id: selectedObj._id, name: selectedObj.Name },   // reset
+                            CustomerSubType: { id: "", name: "" }
+                          }));
+                          handleSelectChange("CustomerType", selectedObj.Name, updatedFilters)
+                        }
+                      }}
 
-                    <SingleSelect options={Array.isArray(fieldOptions?.CustomerType) ? fieldOptions.CustomerType : []} value={filters.CustomerType[0]} label="Customer Type" onChange={(v) => handleSelectChange("CustomerType", v)} />
+                    />
 
-                    <SingleSelect options={Array.isArray(fieldOptions?.CustomerSubtype) ? fieldOptions.CustomerSubtype : []} value={filters.CustomerSubType[0]} label="Customer SubType" onChange={(v) => handleSelectChange("CustomerSubType", v)} />
+                    <ObjectSelect
+                      options={Array.isArray(fieldOptions?.CustomerSubtype) ? fieldOptions.CustomerSubtype : []}
+                      label="Customer Subtype"
+                      value={dependent.CustomerSubType.name}
+                      getLabel={(item) => item?.Name || ""}
+                      getId={(item) => item?._id || ""}
+                      onChange={(selectedId) => {
 
-                    <SingleSelect options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []} value={filters.City[0]} label="City" onChange={(v) => handleSelectChange("City", v)} />
+                        const selectedObj = fieldOptions.CustomerSubtype.find((i) => i._id === selectedId);
+                        if (selectedObj) {
+                          const updatedFilters = {
+                            ...filters,
+                            CustomerSubType: [selectedObj.Name]
+                          };
+                          setFilters(updatedFilters);
 
-                    <SingleSelect options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []} value={filters.Location[0]} label="Location" onChange={(v) => handleSelectChange("Location", v)} />
+                          setDependent(prev => ({
+                            ...prev,
+                            CustomerSubType: { id: selectedObj._id, name: selectedObj.Name }
+                          }));
+                          handleSelectChange("CustomerSubType", selectedObj.Name, updatedFilters)
+                        }
+                      }}
+                    />
+
+
+                    <ObjectSelect
+                      options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []}
+                      label="City"
+                      value={dependent.City.id}
+                      getLabel={(item) => item?.Name || ""}
+                      getId={(item) => item?._id || ""}
+                      onChange={(selectedId) => {
+                        const selectedObj = fieldOptions.City.find((i) => i._id === selectedId);
+                        if (selectedObj) {
+                          const updatedFilters = {
+                            ...filters,
+                            City: [selectedObj.Name],
+                            Location: []
+                          };
+                          setFilters(updatedFilters);
+
+                          setDependent(prev => ({
+                            ...prev,
+                            City: { id: selectedObj._id, name: selectedObj.Name },
+                            Location: { id: "", name: "" },
+                          }));
+                          handleSelectChange("City", selectedObj.Name,updatedFilters)
+                        }
+                      }}
+                    />
+                    <ObjectSelect
+                      options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []}
+                      label="Location"
+                      value={dependent.Location.id}
+                      getLabel={(item) => item?.Name || ""}
+                      getId={(item) => item?._id || ""}
+                      onChange={(selectedId) => {
+                        const selectedObj = fieldOptions.Location.find((i) => i._id === selectedId);
+                        if (selectedObj) {
+                          const updatedFilters = {
+                            ...filters,
+                            Location: [selectedObj.Name]
+                          };
+                          setFilters(updatedFilters);
+
+                          setDependent(prev => ({
+                            ...prev,
+                            Location: { id: selectedObj._id, name: selectedObj.Name },
+                          }));
+                          handleSelectChange("Location", selectedObj.Name, updatedFilters)
+                        }
+                      }}
+                    />
 
                     <SingleSelect options={Array.isArray(fieldOptions?.User) ? fieldOptions.User : []} value={filters.User[0]} label="User" onChange={(v) => handleSelectChange("User", v)} />
 
@@ -761,6 +1116,8 @@ export default function Customer() {
                 </button> */}
                 <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
                   if (customerData.length > 0) {
+                    const firstPageIds = currentRows.map((c) => c._id);
+                    setSelectedCustomers(firstPageIds);
                     setIsDeleteAllDialogOpen(true);
                     setDeleteAllDialogData({});
                   }
@@ -822,13 +1179,55 @@ export default function Customer() {
                         <td className="px-2 py-3  border-gray-200 break-all whitespace-normal max-w-[120px] inline-block ">{item.SubType}</td>
                         <td className="px-2 py-3 border border-gray-200  ">{item.Name}</td>
                         <td
-                          className={`px-2 py-3 border border-gray-200 max-w-[160px] ${item.Description ? "min-w-[160px]" : ""
+                          className={`px-2 py-3 border border-gray-200 break-all whitespace-normal max-w-[160px] ${item.Description ? "min-w-[160px]" : ""
                             }`}
                         >
                           {item.Description}
                         </td>
                         <td className="px-2 py-3 border border-gray-200">{item.Location}</td>
-                        <td className="px-2 py-3 min-w-[100px]  border-gray-200 break-all whitespace-normal max-w-[150px] block">{item.ContactNumber}</td>
+                        <td className="px-4 py-3  flex flex-col justify-center items-center gap-1">{(item.ContactNumber) && <>{item.ContactNumber}<span className=" flex"> <Button
+                          sx={{
+                            backgroundColor: "#E8F5E9",
+                            color: "var(--color-primary)",
+                            minWidth: "14px",
+                            height: "24px",
+                            borderRadius: "8px",
+                            margin: "4px"
+                          }} ><FaPhone size={12} /></Button>
+                          <Button
+                            sx={{
+                              backgroundColor: "#E8F5E9",
+                              color: "var(--color-primary)",
+                              minWidth: "14px",
+                              height: "24px",
+                              borderRadius: "8px",
+                              margin: "4px"
+                            }}
+                            onClick={() => {
+                              setSelectedCustomers([item._id])
+                              setSelectUser(item._id)
+                              setIsMailAllOpen(true);
+                              fetchEmailTemplates();
+                            }}
+                          ><MdEmail size={14} /></Button>
+                          <Button
+                            onClick={() => {
+                              setSelectedCustomers([item._id]);
+                              setSelectUser(item._id);
+                              setIsWhatsappAllOpen(true);
+                              fetchWhatsappTemplates()
+
+                            }}
+                            sx={{
+                              backgroundColor: "#E8F5E9",
+                              color: "var(--color-primary)",
+                              minWidth: "14px",
+                              height: "24px",
+                              borderRadius: "8px",
+                              margin: "4px"
+                            }} ><FaWhatsapp size={14} /></Button></span></>
+                        }
+                        </td>
                         <td className="px-2 py-3 border border-gray-200">{item.AssignTo}</td>
                         <td className="px-2 py-3 border border-gray-200 min-w-[100px]">{item.Date}</td>
 

@@ -41,7 +41,7 @@ export default function CustomerTable<T extends Record<string, any>>({
 }: LeadsSectionProps<T>) {
     const [toggleSearchDropdown, setToggleSearchDropdown] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsperpage = 5;
+    const itemsperpage = 10;
 
     const totalPages = Math.ceil(leads.length / itemsperpage);
     const startIndex = (currentPage - 1) * itemsperpage;
@@ -98,7 +98,7 @@ export default function CustomerTable<T extends Record<string, any>>({
                     </div>
                 )}
                 {paginatedLeads.map((lead, index) => (
-                    <div key={index} className="w-full  bg-white shadow-md rounded-xl overflow-hidden border border-gray-200 mb-5">
+                    <div key={index} className="w-full  bg-white shadow-md rounded-xl overflow-hidden border border-gray-200 mb-0">
                         <div className="bg-[var(--color-primary)] h-2"></div>
 
                         <div className="flex justify-between items-start p-4">

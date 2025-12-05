@@ -31,9 +31,9 @@ import DeleteDialog from "../component/popups/DeleteDialog";
 import { getAllAdmins } from "@/store/auth";
 import { handleFieldOptions } from "../utils/handleFieldOptions";
 import { getCampaign } from "@/store/masters/campaign/campaign";
-import { getContactType } from "@/store/masters/contacttype/contacttype";
+import { getContactType, getContactTypeByCampaign } from "@/store/masters/contacttype/contacttype";
 import { getCity } from "@/store/masters/city/city";
-import { getLocation } from "@/store/masters/location/location";
+import { getLocation, getLocationByCity } from "@/store/masters/location/location";
 import AddButton from "../component/buttons/AddButton";
 import PageHeader from "../component/labels/PageHeader";
 import { usersGetDataInterface } from "@/store/auth.interface";
@@ -46,6 +46,8 @@ import { getContactCampaign } from "@/store/masters/contactcampaign/contactcampa
 import LeadsSection from "../phonescreens/DashboardScreens/LeadsSection";
 import ContactTable from "../phonescreens/DashboardScreens/tables/ContactTable";
 import DynamicAdvance from "../phonescreens/DashboardScreens/DynamicAdvance";
+import { handleFieldOptionsObject } from "../utils/handleFieldOptionsObject";
+import ObjectSelect from "../component/ObjectSelect";
 
 interface DeleteAllDialogDataInterface { }
 
@@ -57,15 +59,12 @@ export default function Contacts() {
   const [selectedUser, setSelectedUser] = useState<string>();
   const [selectedWhatsapptemplate, setSelectedWhatsapptemplate] = useState<string>();
   const [selectedMailtemplate, setSelectedMailtemplate] = useState<string>();
-
-
   const [users, setUsers] = useState<usersGetDataInterface[]>([])
   const [mailTemplates, setMailtemplates] = useState<mailGetDataInterface[]>([])
   const [whatsappTemplates, setWhatsappTemplates] = useState<whatsappGetDataInterface[]>([])
   const [isAssignOpen, setIsAssignOpen] = useState(false);
   const [isMailAllOpen, setIsMailAllOpen] = useState(false);
   const [isWhatsappAllOpen, setIsWhatsappAllOpen] = useState(false);
-
   /* OTHER STATES */
   const [toggleSearchDropdown, setToggleSearchDropdown] = useState(false);
   const [currentTablePage, setCurrentTablePage] = useState(1);
@@ -87,6 +86,13 @@ export default function Contacts() {
     User: [] as string[],
     Keyword: "" as string,
     Limit: ["10"] as string[],
+  });
+
+  const [dependent, setDependent] = useState({
+    Campaign: { id: "", name: "" },
+    ContactType: { id: "", name: "" },
+    City: { id: "", name: "" },
+    Location: { id: "", name: "" },
   });
 
   const [contactData, setContactData] = useState<contactGetDataInterface[]>([]);
@@ -304,7 +310,7 @@ export default function Contacts() {
 
   /*  SELECT ALL CHECKBOX */
   const handleSelectAll = () => {
-    const allIds = contactData.map((c) => c._id);
+    const allIds = currentRows.map((c) => c._id);
 
     setSelectedContacts((prev) =>
       allIds.every((id) => prev.includes(id))
@@ -404,9 +410,10 @@ export default function Contacts() {
 
   const handleSelectChange = async (
     field: keyof typeof filters,
-    selected: string | string[]
+    selected: string | string[],
+    filtersOverride?: typeof filters
   ) => {
-    const updatedFilters = {
+    const updatedFilters = filtersOverride || {
       ...filters,
       [field]: Array.isArray(selected) ? selected : selected ? [selected] : [],
     };
@@ -445,19 +452,84 @@ export default function Contacts() {
   };
 
   const fetchFields = async () => {
-    await handleFieldOptions(
-      [
-        { key: "StatusAssign", staticData: ["Assigned", "Unassigned"] },
-        { key: "Campaign", fetchFn: getContactCampaign },
-        { key: "ContactType", fetchFn: getContactType },
-        { key: "City", fetchFn: getCity },
-        { key: "Location", fetchFn: getLocation },
-        { key: "User", fetchFn: getAllAdmins },
-        { key: "Verified", staticData: ["yes", "no"] },
-      ],
-      setFieldOptions
-    );
+    /*     await handleFieldOptions(
+          [
+            { key: "StatusAssign", staticData: ["Assigned", "Unassigned"] },
+            { key: "Campaign", fetchFn: getContactCampaign },
+            { key: "ContactType", fetchFn: getContactType },
+            { key: "City", fetchFn: getCity },
+            { key: "Location", fetchFn: getLocation },
+            { key: "User", fetchFn: getAllAdmins },
+            { key: "Verified", staticData: ["yes", "no"] },
+          ],
+          setFieldOptions
+        ); */
   }
+
+  // Object-based fields (for ObjectSelect)
+  const objectFields = [
+    { key: "Campaign", fetchFn: getContactCampaign },
+    { key: "ContactType", staticData: [] },
+    { key: "City", fetchFn: getCity },
+    { key: "Location", staticData: [] }
+  ];
+
+  // Simple array fields (for normal Select)
+  const arrayFields = [
+    { key: "StatusAssign", staticData: ["Assigned", "Unassigned"] },
+    { key: "Status", staticData: ["Active", "Inactive"] },
+    { key: "Verified", staticData: ["yes", "no"] },
+  ];
+
+  useEffect(() => {
+    const loadFieldOptions = async () => {
+      await handleFieldOptionsObject(objectFields, setFieldOptions);
+      await handleFieldOptions(arrayFields, setFieldOptions);
+    };
+    loadFieldOptions();
+  }, []);
+
+  useEffect(() => {
+    const campaignId = dependent.Campaign.id;
+    const cityId = dependent.City.id;
+    if (campaignId) {
+      fetchContactType(campaignId);
+    } else {
+      setFieldOptions((prev) => ({ ...prev, ContactType: [] }));
+      setFilters(prev => ({ ...prev, ContactType: [] }));
+    }
+
+    if (cityId) {
+      fetchLocation(cityId);
+    } else {
+      setFieldOptions((prev) => ({ ...prev, Location: [] }));
+      setFilters(prev => ({ ...prev, Location: [] }));
+    }
+
+
+  }, [dependent.Campaign, dependent.City]);
+
+  const fetchContactType = async (campaignId: string) => {
+    try {
+      const res = await getContactTypeByCampaign(campaignId);
+      setFieldOptions((prev) => ({ ...prev, ContactType: res?.data || [] }));
+
+    } catch (error) {
+      console.error("Error fetching types:", error);
+      setFieldOptions((prev) => ({ ...prev, ContactType: [] }));
+    }
+  };
+
+  const fetchLocation = async (cityId: string) => {
+    try {
+
+      const res = await getLocationByCity(cityId);
+      setFieldOptions((prev) => ({ ...prev, Location: res || [] }));
+    } catch (error) {
+      console.error("Error fetching location:", error);
+      setFieldOptions((prev) => ({ ...prev, Location: [] }));
+    }
+  };
 
   const clearFilter = async () => {
     setFilters({
@@ -470,6 +542,12 @@ export default function Contacts() {
       Keyword: "",
       Limit: ["10"],
     });
+    setDependent({
+      Campaign: { id: "", name: "" },
+      ContactType: { id: "", name: "" },
+      City: { id: "", name: "" },
+      Location: { id: "", name: "" },
+    })
     await getContacts();
   };
 
@@ -498,7 +576,9 @@ export default function Contacts() {
           onSelect={handleSelectMailtemplate}
           onSubmit={handleMailAll}
           submitLabel="Mail All"
-          onClose={() => setIsMailAllOpen(false)}
+          onClose={() => { 
+            setSelectedContacts([]);
+            setIsMailAllOpen(false)}}
         />
       )}
 
@@ -512,7 +592,10 @@ export default function Contacts() {
           onSelect={handleSelectWhatsapptemplate}
           onSubmit={handleWhatsappAll}
           submitLabel="Whatsapp All"
-          onClose={() => setIsWhatsappAllOpen(false)}
+          onClose={() => {
+            setSelectedContacts([]);
+            setIsWhatsappAllOpen(false)
+          }}
         />
       )}
       <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-sm:py-5">
@@ -525,13 +608,103 @@ export default function Contacts() {
           <DynamicAdvance>
             <SingleSelect options={Array.isArray(fieldOptions.StatusAssign) ? fieldOptions.StatusAssign : []} value={filters.StatusAssign[0]} label="Status Assign" onChange={(v) => handleSelectChange("StatusAssign", v)} />
 
-            <SingleSelect options={Array.isArray(fieldOptions.Campaign) ? fieldOptions.Campaign : []} value={filters.Campaign[0]} label="Campaign" onChange={(v) => handleSelectChange("Campaign", v)} />
+            <ObjectSelect
+              options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []}
+              label="Campaign"
+              value={dependent.Campaign.id}
+              getLabel={(item) => item?.Name || ""}
+              getId={(item) => item?._id || ""}
+              onChange={(selectedId) => {
+                const selectedObj = fieldOptions.Campaign.find((i) => i._id === selectedId);
+                if (selectedObj) {
+                  const updatedFilters = {
+                    ...filters,
+                    Campaign: [selectedObj.Name],
+                    ContactType: []
+                  };
+                  setFilters(updatedFilters);
+                  setDependent(prev => ({
+                    ...prev,
+                    Campaign: { id: selectedObj._id, name: selectedObj.Name },
+                    CustomerType: { id: "", name: "" }
+                  }));
+                  handleSelectChange("Campaign", selectedObj.Name, updatedFilters)
+                }
+              }}
+            />
 
-            <SingleSelect options={Array.isArray(fieldOptions.ContactType) ? fieldOptions.ContactType : []} value={filters.ContactType[0]} label="Contact Type" onChange={(v) => handleSelectChange("ContactType", v)} />
+            <ObjectSelect
+              options={Array.isArray(fieldOptions?.ContactType) ? fieldOptions.ContactType : []}
+              label="Contact Type"
+              value={dependent.ContactType.name}
+              getLabel={(item) => item?.Name || ""}
+              getId={(item) => item?._id || ""}
+              onChange={(selectedId) => {
+                const selectedObj = fieldOptions.ContactType.find((i) => i._id === selectedId);
+                if (selectedObj) {
 
-            <SingleSelect options={Array.isArray(fieldOptions.City) ? fieldOptions.City : []} value={filters.City[0]} label="City" onChange={(v) => handleSelectChange("City", v)} />
+                  const updatedFilters = {
+                    ...filters,
+                    ContactType: [selectedObj.Name],
+                  };
+                  setFilters(updatedFilters);
+                  setDependent(prev => ({
+                    ...prev,
+                    ContactType: { id: selectedObj._id, name: selectedObj.Name },
+                  }));
+                  handleSelectChange("ContactType", selectedObj.Name, updatedFilters)
+                }
+              }}
 
-            <SingleSelect options={Array.isArray(fieldOptions.Location) ? fieldOptions.Location : []} value={filters.Location[0]} label="Location" onChange={(v) => handleSelectChange("Location", v)} />
+            />
+
+            <ObjectSelect
+              options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []}
+              label="City"
+              value={dependent.City.id}
+              getLabel={(item) => item?.Name || ""}
+              getId={(item) => item?._id || ""}
+              onChange={(selectedId) => {
+                const selectedObj = fieldOptions.City.find((i) => i._id === selectedId);
+                if (selectedObj) {
+                  const updatedFilters = {
+                    ...filters,
+                    City: [selectedObj.Name],
+                    Location: [] // reset Location
+                  };
+                  setFilters(updatedFilters);
+                  setDependent(prev => ({
+                    ...prev,
+                    City: { id: selectedObj._id, name: selectedObj.Name },
+                    Location: { id: "", name: "" },
+                  }));
+                  handleSelectChange("City", selectedObj.Name, updatedFilters)
+                }
+              }}
+            />
+            <ObjectSelect
+              options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []}
+              label="Location"
+              value={dependent.Location.id}
+              getLabel={(item) => item?.Name || ""}
+              getId={(item) => item?._id || ""}
+              onChange={(selectedId) => {
+                const selectedObj = fieldOptions.Location.find((i) => i._id === selectedId);
+                if (selectedObj) {
+
+                  const updatedFilters = {
+                    ...filters,
+                    Location: [selectedObj.Name]
+                  };
+                  setFilters(updatedFilters);
+                  setDependent(prev => ({
+                    ...prev,
+                    Location: { id: selectedObj._id, name: selectedObj.Name },
+                  }));
+                  handleSelectChange("Location", selectedObj.Name, updatedFilters)
+                }
+              }}
+            />
 
             <SingleSelect options={Array.isArray(fieldOptions.User) ? fieldOptions.User : []} value={filters.User[0]} label="User" onChange={(v) => handleSelectChange("User", v)} />
             <div className=" w-full flex justify-end">
@@ -544,7 +717,7 @@ export default function Contacts() {
         <ContactTable
           leads={contactData}
           labelLeads={phonetableheader}
-          onEdit={(id)=>router.push(`/contact/edit/${id}`)}
+          onEdit={(id) => router.push(`/contact/edit/${id}`)}
           onWhatsappClick={(lead) => {
             setSelectedContacts([lead._id]);
             setIsWhatsappAllOpen(true);
@@ -632,13 +805,102 @@ export default function Contacts() {
 
                     <SingleSelect options={Array.isArray(fieldOptions.StatusAssign) ? fieldOptions.StatusAssign : []} value={filters.StatusAssign[0]} label="Status Assign" onChange={(v) => handleSelectChange("StatusAssign", v)} />
 
-                    <SingleSelect options={Array.isArray(fieldOptions.Campaign) ? fieldOptions.Campaign : []} value={filters.Campaign[0]} label="Campaign" onChange={(v) => handleSelectChange("Campaign", v)} />
+                    <ObjectSelect
+                      options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []}
+                      label="Campaign"
+                      value={dependent.Campaign.id}
+                      getLabel={(item) => item?.Name || ""}
+                      getId={(item) => item?._id || ""}
+                      onChange={(selectedId) => {
+                        const selectedObj = fieldOptions.Campaign.find((i) => i._id === selectedId);
+                        if (selectedObj) {
 
-                    <SingleSelect options={Array.isArray(fieldOptions.ContactType) ? fieldOptions.ContactType : []} value={filters.ContactType[0]} label="Contact Type" onChange={(v) => handleSelectChange("ContactType", v)} />
+                          const updatedFilters = {
+                            ...filters,
+                            Campaign: [selectedObj.Name],
+                            ContactType: []
+                          };
+                          setFilters(updatedFilters);
+                          setDependent(prev => ({
+                            ...prev,
+                            Campaign: { id: selectedObj._id, name: selectedObj.Name },
+                            ContactType: { id: "", name: "" }
+                          }));
+                          handleSelectChange("Campaign", selectedObj.Name, updatedFilters)
+                        }
+                      }}
+                    />
 
-                    <SingleSelect options={Array.isArray(fieldOptions.City) ? fieldOptions.City : []} value={filters.City[0]} label="City" onChange={(v) => handleSelectChange("City", v)} />
+                    <ObjectSelect
+                      options={Array.isArray(fieldOptions?.ContactType) ? fieldOptions.ContactType : []}
+                      label="Contact Type"
+                      value={dependent.ContactType.name}
+                      getLabel={(item) => item?.Name || ""}
+                      getId={(item) => item?._id || ""}
+                      onChange={(selectedId) => {
+                        const selectedObj = fieldOptions.ContactType.find((i) => i._id === selectedId);
+                        if (selectedObj) {
+                          const updatedFilters = {
+                            ...filters,
+                            ContactType: [selectedObj.Name],
+                          };
+                          setFilters(updatedFilters);
+                          setDependent(prev => ({
+                            ...prev,
+                            ContactType: { id: selectedObj._id, name: selectedObj.Name },
+                          }));
+                          handleSelectChange("ContactType", selectedObj.Name, updatedFilters)
+                        }
+                      }}
 
-                    <SingleSelect options={Array.isArray(fieldOptions.Location) ? fieldOptions.Location : []} value={filters.Location[0]} label="Location" onChange={(v) => handleSelectChange("Location", v)} />
+                    />
+
+                    <ObjectSelect
+                      options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []}
+                      label="City"
+                      value={dependent.City.id}
+                      getLabel={(item) => item?.Name || ""}
+                      getId={(item) => item?._id || ""}
+                      onChange={(selectedId) => {
+                        const selectedObj = fieldOptions.City.find((i) => i._id === selectedId);
+                        if (selectedObj) {
+                          const updatedFilters = {
+                            ...filters,
+                            City: [selectedObj.Name],
+                            Location: []
+                          };
+                          setFilters(updatedFilters);
+                          setDependent(prev => ({
+                            ...prev,
+                            City: { id: selectedObj._id, name: selectedObj.Name },
+                            Location: { id: "", name: "" },
+                          }));
+                          handleSelectChange("City", selectedObj.Name, updatedFilters)
+                        }
+                      }}
+                    />
+                    <ObjectSelect
+                      options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []}
+                      label="Location"
+                      value={dependent.Location.id}
+                      getLabel={(item) => item?.Name || ""}
+                      getId={(item) => item?._id || ""}
+                      onChange={(selectedId) => {
+                        const selectedObj = fieldOptions.Location.find((i) => i._id === selectedId);
+                        if (selectedObj) {
+                          const updatedFilters = {
+                            ...filters,
+                            Location: [selectedObj.Name]
+                          };
+                          setFilters(updatedFilters);
+                          setDependent(prev => ({
+                            ...prev,
+                            Location: { id: selectedObj._id, name: selectedObj.Name },
+                          }));
+                          handleSelectChange("Location", selectedObj.Name, updatedFilters)
+                        }
+                      }}
+                    />
 
                     <SingleSelect options={Array.isArray(fieldOptions.User) ? fieldOptions.User : []} value={filters.User[0]} label="User" onChange={(v) => handleSelectChange("User", v)} />
 
@@ -709,6 +971,8 @@ export default function Contacts() {
                 </button> */}
                 <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
                   if (contactData.length > 0) {
+                    const firstPageIds = currentRows.map((c) => c._id);
+                    setSelectedContacts(firstPageIds);
                     setIsDeleteAllDialogOpen(true);
                     setDeleteAllDialogData({});
                   }

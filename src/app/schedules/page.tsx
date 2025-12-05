@@ -113,7 +113,7 @@ export default function SchedulePage() {
   };
 
   const handleSelectAll = () => {
-    const allIds = filteredSchedules.map((s) => s._id);
+    const allIds = currentRows.map((s) => s._id);
 
     setSchedulesIds((prev) =>
       allIds.every((id) => prev.includes(id))
@@ -230,6 +230,8 @@ export default function SchedulePage() {
           <div className="flex gap-10 items-center px-3 py-4 min-w-max text-gray-700">
             <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
               if (filteredSchedules.length > 0) {
+                 const firstPageIds = currentRows.map((c) => c._id);
+                    setSchedulesIds(firstPageIds);
                 setIsDeleteAllDialogOpen(true);
                 setDeleteAllDialogData({});
               }
@@ -278,7 +280,7 @@ export default function SchedulePage() {
                         />
                       </td>
 
-                      <td className="px-4 py-3 border border-gray-200">{i + 1}</td>
+                      <td className="px-4 py-3 border border-gray-200">{(currentTablePage - 1) * rowsPerTablePage + (i + 1)}</td>
                       <td className="px-4 py-3 border border-gray-200">{s.User}</td>
                       <td className="px-4 py-3 border border-gray-200">{s.Description}</td>
                       <td className="px-4 py-3 border border-gray-200">{s.date}</td>

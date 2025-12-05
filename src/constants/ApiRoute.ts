@@ -1,5 +1,6 @@
 export const BASE_URL = "https://live-project-backend-1.onrender.com/api";
 //https://live-project-backend-1.onrender.com
+//https://propertyapi.aileadgenie.cloud/api
 
 export const API_ROUTES = {
   CONTACT: {

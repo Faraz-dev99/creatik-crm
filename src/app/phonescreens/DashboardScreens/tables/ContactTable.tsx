@@ -72,7 +72,7 @@ export default function ContactTable<T extends Record<string, any>>({
                     </div>
                 )}
                 {paginatedLeads.map((lead, index) => (
-                    <div key={index} className="w-full  bg-white shadow-md rounded-xl overflow-hidden border border-gray-200 mb-5">
+                    <div key={index} className="w-full  bg-white shadow-md rounded-xl overflow-hidden border border-gray-200 mb-0">
                         <div className="bg-[var(--color-primary)] h-2"></div>
 
                         <div className="flex justify-between items-start p-4">
