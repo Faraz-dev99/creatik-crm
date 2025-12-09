@@ -59,7 +59,7 @@ export default function Navbar() {
 
   const logoutDashboard = async () => {
     await logout();
-    router.push("/");
+    router.push("/admin");
   };
 
   // Only transition classes for dropdowns
