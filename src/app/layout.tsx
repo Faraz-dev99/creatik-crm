@@ -26,7 +26,7 @@ const poppins = Schibsted_Grotesk({
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const isAdminPage = pathname === "/";
+  const isAdminPage = pathname === "/admin" || pathname === "/register";
 
   return (
     <html lang="en" className={`min-h-screen w-full overflow-x-hidden ${poppins.className}`}>

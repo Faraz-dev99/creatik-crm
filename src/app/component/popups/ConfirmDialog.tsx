@@ -2,32 +2,32 @@
 import React from 'react';
 import PopupMenu from './PopupMenu';
 
-export interface DeleteDialogData {
+export interface ConfirmDialogData {
   [key: string]: any;
 }
 
-interface DeleteDialogProps<T extends DeleteDialogData> {
+interface ConfirmDialogProps<T extends ConfirmDialogData> {
   isOpen: boolean;
   title?: string;
   description?: string;
   data: T | null;
   onClose: () => void;
-  onDelete: (data: T) => void;
+  onConfirm: (data: T) => void;
   /** Optional — allows mapping keys to user-friendly labels */
   fieldLabels?: Record<keyof T, string>;
   confirmLabel?:string;
 }
 
-const DeleteDialog = <T extends DeleteDialogData>({
+const ConfirmDialog = <T extends ConfirmDialogData>({
   isOpen,
-  title = 'Are you sure you want to delete this item?',
+  title = 'Are you sure you want to Accept this request?',
   description,
   data,
   onClose,
-  onDelete,
+  onConfirm,
   fieldLabels,
-  confirmLabel="Yes, delete"
-}: DeleteDialogProps<T>) => {
+  confirmLabel="Yes"
+}: ConfirmDialogProps<T>) => {
   if (!isOpen || !data) return null;
 
   return (
@@ -60,13 +60,13 @@ const DeleteDialog = <T extends DeleteDialogData>({
         {/* Buttons */}
         <div className="flex justify-between items-center pt-4">
           <button
-            className="text-[#C62828] bg-[#FDECEA] hover:bg-[#F9D0C4] cursor-pointer rounded-md px-4 py-2"
-            onClick={() => onDelete(data)}
+            className="text-[var(--color-primary)] bg-[var(--color-primary-lighter)] hover:bg-[var(--color-primary-light)] cursor-pointer rounded-md px-4 py-2"
+            onClick={() => onConfirm(data)}
           >
             {confirmLabel}
           </button>
           <button
-            className="cursor-pointer text-blue-800 hover:bg-gray-200 rounded-md px-4 py-2"
+            className="cursor-pointer text-[#C62828] bg-[#FDECEA] hover:bg-red-200/60 rounded-md px-4 py-2"
             onClick={onClose}
           >
             No
@@ -77,4 +77,4 @@ const DeleteDialog = <T extends DeleteDialogData>({
   );
 };
 
-export default DeleteDialog;
+export default ConfirmDialog;

@@ -8,7 +8,9 @@ import {
 // Get all customer followups
 export const getAllCustomerFollowups = async (): Promise<customerFollowupGetDataInterface[] | null> => {
   try {
-    const response = await fetch(API_ROUTES.FOLLOWUPS.CUSTOMER.GET_ALL);
+    const response = await fetch(API_ROUTES.FOLLOWUPS.CUSTOMER.GET_ALL,{
+      credentials: "include"
+    });
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const data= await response.json();
     //console.log(" follwoups ", data)
@@ -22,7 +24,9 @@ export const getAllCustomerFollowups = async (): Promise<customerFollowupGetData
 // Get all followups of a specific customer
 export const getFollowupByCustomerId = async (id: string): Promise<customerFollowupAllDataInterface[] | null> => {
   try {
-    const response = await fetch(API_ROUTES.FOLLOWUPS.CUSTOMER.GET_CUSTOMER_FOLLOWUP(id));
+    const response = await fetch(API_ROUTES.FOLLOWUPS.CUSTOMER.GET_CUSTOMER_FOLLOWUP(id),{
+      credentials: "include"
+    });
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const data = await response.json();
     //console.log("naruto ",data)

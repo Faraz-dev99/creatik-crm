@@ -570,12 +570,12 @@ export default function Contacts() {
       {/* mail all popup */}
       {isMailAllOpen && selectedContacts.length > 0 && (
         <ListPopup
-          title="Mail to All Contacts"
+          title="Mail Contacts"
           list={mailTemplates}
           selected={selectedMailtemplate}
           onSelect={handleSelectMailtemplate}
           onSubmit={handleMailAll}
-          submitLabel="Mail All"
+          submitLabel="Mail"
           onClose={() => { 
             setSelectedContacts([]);
             setIsMailAllOpen(false)}}
@@ -586,12 +586,12 @@ export default function Contacts() {
       {/* whatsapp all popup */}
       {isWhatsappAllOpen && selectedContacts.length > 0 && (
         <ListPopup
-          title="Whatsapp to All Contacts"
+          title="Whatsapp Contacts"
           list={whatsappTemplates}
           selected={selectedWhatsapptemplate}
           onSelect={handleSelectWhatsapptemplate}
           onSubmit={handleWhatsappAll}
-          submitLabel="Whatsapp All"
+          submitLabel="Whatsapp"
           onClose={() => {
             setSelectedContacts([]);
             setIsWhatsappAllOpen(false)

@@ -9,7 +9,9 @@ import {
 // Get all contact followups
 export const getAllContactFollowups = async (): Promise<contactFollowupGetDataInterface[] | null> => {
   try {
-    const response = await fetch(API_ROUTES.FOLLOWUPS.CONTACT.GET_ALL);
+    const response = await fetch(API_ROUTES.FOLLOWUPS.CONTACT.GET_ALL,{
+      credentials: "include"
+    });
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const data = await response.json();
     console.log(" contact followups ", data);
@@ -23,7 +25,9 @@ export const getAllContactFollowups = async (): Promise<contactFollowupGetDataIn
 // Get all followups of a specific contact
 export const getFollowupByContactId = async (id: string): Promise<contactFollowupAllDataInterface[] | null> => {
   try {
-    const response = await fetch(API_ROUTES.FOLLOWUPS.CONTACT.GET_CONTACT_FOLLOWUP(id));
+    const response = await fetch(API_ROUTES.FOLLOWUPS.CONTACT.GET_CONTACT_FOLLOWUP(id),{
+      credentials: "include"
+    });
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const data = await response.json();
     // console.log("followups for contact", data)

@@ -103,7 +103,7 @@ export default function CustomerTable<T extends Record<string, any>>({
                                 setViewAll(false)
                                 setViewLeadData(null)
                             }}><IoMdClose size={25} /></button>
-                            <img className="rounded-md self-end w-full h-[220px]" src={viewLeadData?.SitePlan.length > 0 ? viewLeadData?.SitePlan :"/siteplan.jpg"} />
+                            <img className="rounded-md self-end w-full h-[220px]" src={viewLeadData?.SitePlan?.length > 0 ? viewLeadData?.SitePlan :"/siteplan.jpg"} />
                             <div className=" max-h-[calc(80vh-240px)] overflow-y-auto mt-3">
                                 {allLabelLeads?.map((item, j) => (
                                     <div
@@ -168,7 +168,7 @@ export default function CustomerTable<T extends Record<string, any>>({
                                      setViewLeadData(lead)
                                     }
                             } >View All</button>
-                                <img width={120} className="rounded-md self-end w-[120px]" src={lead.SitePlan.length > 0 ? lead.SitePlan : "/siteplan.jpg"} />
+                                <img width={120} className="rounded-md self-end w-[120px]" src={lead.SitePlan?.length > 0 ? lead.SitePlan : "/siteplan.jpg"} />
                                 <button
                                     onClick={() => onFavourite?.(lead)}
                                     className="p-2 bg-gray-100 self-end rounded-full shadow"

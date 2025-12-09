@@ -9,9 +9,10 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Link from "next/link";
 
 
-const Login = () => {
+const Register = () => {
   const router = useRouter();
   const { admin, isLoading, login } = useAuth();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,14 +21,9 @@ const Login = () => {
     setShowPassword(!showPassword)
   };
 
+  
 
-  // Redirect if already logged in
-  useEffect(() => {
-    if (admin) {
-      router.push("/dashboard");
-    }
-  }, [admin]);
-
+ 
   if (isLoading || loading) {
     return (
       <div className="grid place-items-center min-h-screen w-full text-lg text-gray-600">
@@ -35,7 +31,6 @@ const Login = () => {
       </div>
     );
   }
-
 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -55,10 +50,10 @@ const Login = () => {
         <div className="relative w-full md:w-1/2 flex items-center justify-center p-10">
           <div className="text-center">
             <h2 className="text-4xl text-blue-200 font-bold mb-4">
-              Welcome Back 👋
+              Hi There 👋
             </h2>
             <p className="text-purple-300 text-lg">
-              Log in to your admin dashboard and manage everything efficiently.
+              Register your user account to manage everything efficiently.
             </p>
           </div>
           <div className="absolute right-[-60px] top-0 bottom-0 w-[120px]  rounded-full  opacity-30"></div>
@@ -66,9 +61,29 @@ const Login = () => {
 
         <div className="w-full md:w-1/2 flex flex-col justify-center p-8 md:p-12">
           <h3 className="text-2xl font-semibold text-blue-200 text-center mb-6">
-            Admin Login
+            Register Account
           </h3>
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+             <div className="relative mt-2">
+              <FaUserAlt className="absolute left-3 top-3 text-gray-300" />
+              <input
+                onChange={(e) => setName(e.target.value)}
+                value={name}
+                type="text"
+                id="name"
+                required
+                className="peer w-full pl-10 pt-4 pb-2 border-b border-gray-300 text-gray-300 focus:border-purple-300 focus:outline-none transition bg-transparent"
+              />
+              <label
+                htmlFor="name"
+                className={`absolute left-10 text-gray-300 text-sm transition-all duration-200 ${name
+                  ? "-top-1.5 text-purple-300 text-sm"
+                  : "top-3 text-gray-300 text-base"
+                  } peer-focus:-top-1.5 peer-focus:text-purple-300 peer-focus:text-sm`}
+              >
+                Fullname
+              </label>
+            </div>
             <div className="relative mt-2">
               <FaUserAlt className="absolute left-3 top-3 text-gray-300" />
               <input
@@ -119,13 +134,13 @@ const Login = () => {
               disabled={loading}
               className="w-full cursor-pointer py-3 mt-2 text-white text-lg font-medium rounded-full bg-gradient-to-r from-cyan-400 to-blue-600 hover:from-cyan-500 hover:to-blue-700  transition disabled:opacity-60"
             >
-              {loading ? "Logging in..." : "Login"}
+              {loading ? " Registering..." : " Register"}
             </button>
           </form>
           <div className="mt-6 flex justify-center gap-1 text-sm text-center text-gray-300">
-            <p>Don't have an Account?</p>
-            <Link href="/register" className=" text-cyan-400 hover:underline">
-              Register
+            <p>Already have an Account?</p>
+            <Link href="/admin" className=" text-cyan-400 hover:underline">
+              Login
             </Link>
           </div>
         </div>
@@ -134,4 +149,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

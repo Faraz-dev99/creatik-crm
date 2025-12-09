@@ -1,26 +1,27 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { admin, isLoading } = useAuth(); // use loading from context
+  const { admin, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!isLoading && !admin) {
-      router.replace("/"); // replace to avoid flicker
+      router.replace("/admin"); // go to admin login, NOT "/"
     }
   }, [admin, isLoading, router]);
 
-  // Show loading only while auth is being verified
-  if (isLoading || !admin) {
+  if (isLoading) {
     return (
-      <div className="grid place-items-center min-h-[calc(100vh)] w-full text-gray-600">
-        Loading page...
+      <div className="grid place-items-center min-h-screen">
+        Loading...
       </div>
     );
   }
+
+  if (!admin) return null; // prevent flash
 
   return <>{children}</>;
 }

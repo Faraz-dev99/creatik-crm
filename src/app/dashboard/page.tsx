@@ -1,5 +1,6 @@
 "use client"
 
+import ProtectedRoute from "../component/ProtectedRoutes";
 import DashboardSectionOne from "./components/DashboardSectionOne";
 import DonutChart from "./components/DonutChart";
 import OwnerFollowups from "./components/OwnerFollowups";
@@ -13,7 +14,7 @@ import VisitorsChart from "./components/VisitorsChart";
 
 export default function Dashboard() {
   return (
-    <>
+    <ProtectedRoute>
       <div className=" max-md:hidden">
         <div className="">
           <DashboardSectionOne />
@@ -47,6 +48,6 @@ export default function Dashboard() {
       </div>
 
 
-    </>
+    </ProtectedRoute>
   );
 }

@@ -55,7 +55,7 @@ export default function CustomerTypePage() {
         (t) =>
           keyword === "" ||
           t.Name.toLowerCase().includes(keyword.toLowerCase()) ||
-          t.Campaign.Name.toLowerCase().includes(keyword.toLowerCase())
+          t.Campaign?.Name?.toLowerCase().includes(keyword.toLowerCase())
       )
   }, [types, keyword]);
 

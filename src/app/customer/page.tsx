@@ -39,6 +39,7 @@ import DynamicAdvance from "../phonescreens/DashboardScreens/DynamicAdvance";
 import { handleFieldOptionsObject } from "../utils/handleFieldOptionsObject";
 import ObjectSelect from "../component/ObjectSelect";
 import { FaPhone, FaWhatsapp } from "react-icons/fa";
+import { useAuth } from "@/context/AuthContext";
 
 
 interface DeleteAllDialogDataInterface { }
@@ -74,6 +75,7 @@ export default function Customer() {
     useState<DeleteAllDialogDataInterface | null>(null);
   const scrollRef = useHorizontalScroll();
   const searchParams = useSearchParams();
+  const { admin} = useAuth();
 
   const [rowsPerTablePage, setRowsPerTablePage] = useState(10);
   const [filters, setFilters] = useState({
@@ -660,12 +662,12 @@ export default function Customer() {
       <Toaster position="top-right" />
       {isWhatsappAllOpen && selectedCustomers.length > 0 && (
         <ListPopup
-          title="Whatsapp to All Customers"
+          title="Whatsapp Customers"
           list={whatsappTemplates}
           selected={selectedWhatsapptemplate}
           onSelect={handleSelectWhatsapptemplate}
           onSubmit={handleWhatsappAll}
-          submitLabel="Whatsapp All"
+          submitLabel="Whatsapp"
           onClose={() =>{ 
             setSelectedCustomers([]);
             setIsWhatsappAllOpen(false)
@@ -675,12 +677,12 @@ export default function Customer() {
       {/* mail all popup */}
       {isMailAllOpen && selectedCustomers.length > 0 && (
         <ListPopup
-          title="Mail to All Customers"
+          title="Mail Customers"
           list={mailTemplates}
           selected={selectedMailtemplate}
           onSelect={handleSelectMailtemplate}
           onSubmit={handleMailAll}
-          submitLabel="Mail All"
+          submitLabel="Mail"
           onClose={() =>{ 
             setSelectedCustomers([]);
             setIsMailAllOpen(false)}}
@@ -1146,7 +1148,8 @@ export default function Customer() {
                   <div className=" absolute top-0 left-0 z-0 h-full bg-[var(--color-primary)] w-0 group-hover:w-full transition-all duration-300 "></div>
                   <span className="relative ">Mass Update</span>
                 </button> */}
-                <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
+                {
+                  admin?.role!=="user" && <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
                   if (customerData.length > 0) {
                     const firstPageIds = currentRows.map((c) => c._id);
                     setSelectedCustomers(firstPageIds);
@@ -1156,6 +1159,8 @@ export default function Customer() {
                 }}><div className=" absolute top-0 left-0 z-0 h-full bg-[var(--color-primary)] w-0 group-hover:w-full transition-all duration-300 "></div>
                   <span className="relative ">Delete All</span>
                 </button>
+                }
+                
               </div>
 
               <table className="table-auto w-full border-collapse text-sm border border-gray-200">

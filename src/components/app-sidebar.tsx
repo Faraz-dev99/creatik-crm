@@ -168,6 +168,10 @@ const data = {
           title: "Whatsapp Templates",
           url: "/masters/whatsapp-templates",
         },
+        {
+          title: "New User Requests",
+          url: "/masters/newuser-requests",
+        },
       ],
     },
     {
