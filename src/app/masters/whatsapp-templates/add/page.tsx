@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import Link from "next/link";
 import SingleSelect from "@/app/component/SingleSelect";
 import toast, { Toaster } from "react-hot-toast";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { whatsappAllDataInterface } from "@/store/masters/whatsapp/whatsapp.interface";
 import { addWhatsapp } from "@/store/masters/whatsapp/whatsapp";
@@ -24,6 +24,9 @@ export default function WhatsappAdd() {
   }));
 
   const [errors, setErrors] = useState<ErrorInterface>({});
+  const [whatsappImagePreview, setWhatsappImagePreview] = useState<string | null>(null);
+  const [whatsappImageFile, setWhatsappImageFile] = useState<File | null>(null);
+
   const router = useRouter();
 
   const handleInputChange = useCallback(
@@ -39,6 +42,20 @@ export default function WhatsappAdd() {
     setWhatsappData((prev) => ({ ...prev, [label]: selected }));
     setErrors((prev) => ({ ...prev, [label]: "" }));
   }, []);
+
+  const handleWhatsappImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setWhatsappImageFile(file);
+    setWhatsappImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveWhatsappImage = () => {
+    setWhatsappImageFile(null);
+    setWhatsappImagePreview(null);
+  };
+
 
   const validateForm = () => {
     const newErrors: ErrorInterface = {};
@@ -56,7 +73,15 @@ export default function WhatsappAdd() {
     }
 
     try {
-      const result = await addWhatsapp(whatsappData);
+      const formData = new FormData();
+      formData.append("name", whatsappData.name)
+      formData.append("status", whatsappData.status)
+      formData.append("body", whatsappData.body)
+      formData.append("type",'whatsapp')
+      if (whatsappImageFile) {
+        formData.append("whatsappImage", whatsappImageFile);
+      }
+      const result = await addWhatsapp(formData);
       if (result) {
         toast.success("WhatsApp Template added successfully!");
         router.push("/masters/whatsapp-templates");
@@ -107,6 +132,8 @@ export default function WhatsappAdd() {
                     value={whatsappData.status}
                     onChange={(v) => handleSelectChange("status", v)}
                   />
+                  
+
                 </div>
 
                 <TextAreaField
@@ -116,6 +143,13 @@ export default function WhatsappAdd() {
                   onChange={handleInputChange}
                   error={errors.body}
                 />
+                <FileUpload
+                    label="WhatsApp Image"
+                    multiple={false}
+                    previews={whatsappImagePreview ? [whatsappImagePreview] : []}
+                    onChange={handleWhatsappImageChange}
+                    onRemove={handleRemoveWhatsappImage}
+                  />
 
                 <div className="flex justify-end mt-4">
 
@@ -190,4 +224,47 @@ const TextAreaField: React.FC<{
     </p>
     {error && <span className="text-red-500 text-sm mt-1 block">{error}</span>}
   </label>
+);
+
+
+
+// File upload with preview and remove
+const FileUpload: React.FC<{
+  label: string;
+  multiple?: boolean;
+  previews?: string[];
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onRemove?: (index: number) => void;
+}> = ({ label, multiple, previews = [], onChange, onRemove }) => (
+  <div className="flex flex-col">
+    <label className="font-semibold text-gray-700 mb-2">{label}</label>
+    <input
+      type="file"
+      multiple={multiple}
+      onChange={onChange}
+      className="border border-gray-300 rounded-md p-2"
+    />
+    {previews.length > 0 && (
+      <div className="flex flex-wrap gap-3 mt-3">
+        {previews.map((src, index) => (
+          <div key={index} className="relative">
+            <img
+              src={src}
+              alt={`preview-${index}`}
+              className="w-24 h-24 object-cover rounded-md border"
+            />
+            {onRemove && (
+              <button
+                type="button"
+                onClick={() => onRemove(index)}
+                className="absolute top-[-8px] right-[-8px] bg-red-600 text-white rounded-full p-1 hover:bg-red-700"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
 );

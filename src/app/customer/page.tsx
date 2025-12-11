@@ -71,11 +71,12 @@ export default function Customer() {
   const [dialogType, setDialogType] = useState<"delete" | "favourite" | null>(null);
   const [fieldOptions, setFieldOptions] = useState<Record<string, any[]>>({});
   const [isFavrouteCustomer, setIsFavrouteCustomer] = useState<boolean>(false);
+  const [customerTableLoader,setCustomerTableLoader]=useState(true);
   const [deleteAllDialogData, setDeleteAllDialogData] =
     useState<DeleteAllDialogDataInterface | null>(null);
   const scrollRef = useHorizontalScroll();
   const searchParams = useSearchParams();
-  const { admin} = useAuth();
+  const { admin } = useAuth();
 
   const [rowsPerTablePage, setRowsPerTablePage] = useState(10);
   const [filters, setFilters] = useState({
@@ -102,25 +103,41 @@ export default function Customer() {
   const [customerData, setCustomerData] = useState<customerGetDataInterface[]>([]);
   const [customerAdv, setCustomerAdv] = useState<CustomerAdvInterface[]>([]);
 
-  useEffect(() => {
-    getCustomers();
-    fetchFields();
-  }, []);
+
 
   useEffect(() => {
     const status = searchParams.get("Campaign");
 
-    if (status) {
+    if (status){
+
+      const campaignObj = fieldOptions?.Campaign?.find(
+        (c) => c.Name === status
+      );
       // Auto set filter
       setFilters((prev) => ({
         ...prev,
         StatusAssign: [status],
       }));
+      setDependent((prev) => ({
+        ...prev,
+        Campaign: { id: campaignObj?._id, name: campaignObj?.Name }
+      }))
+
+      const updatedFilters = {
+        ...filters,
+        Campaign: [status],
+      };
+
+      setCustomerTableLoader(false);
 
       // Fetch filtered data
-      handleSelectChange("Campaign", status);
+      handleSelectChange("Campaign", status,updatedFilters);
     }
-  }, [searchParams, customerData]);
+    else{
+      getCustomers();
+    fetchFields();
+    }
+  }, [searchParams, fieldOptions.Campaign]);
 
   function getPlainTextFromHTML(htmlString: string) {
     const parser = new DOMParser();
@@ -168,6 +185,7 @@ export default function Customer() {
           Limit: item.Limit || [],
         }))
       );
+      setCustomerTableLoader(false);
     }
   };
 
@@ -621,37 +639,37 @@ export default function Customer() {
     key: "Description", label: "Description"
   },
   {
-    key: "ContactNumber", label: "Contact No"
+    key: "ContactNumber", label: "Ph. No."
   }]
 
-  const phoneViewAllHaders= [
+  const phoneViewAllHaders = [
     {
-    key: "Campaign", label: "Campaign"
-  },
-   {
-    key: "Type", label: "Customer Type"
-  },
-   {
-    key: "SubType", label: "Customer Subtype"
-  },
-  {
-    key: "Name", label: "Name"
-  },
-  {
-    key: "Location", label: "Location"
-  },
-  {
-    key: "Description", label: "Description"
-  },
-  {
-    key: "ContactNumber", label: "Contact No"
-  },
-  {
-    key: "AssignTo", label: "Assign To"
-  },
-  {
-    key: "Date", label: "Date"
-  }
+      key: "Campaign", label: "Campaign"
+    },
+    {
+      key: "Type", label: "Customer Type"
+    },
+    {
+      key: "SubType", label: "Customer Subtype"
+    },
+    {
+      key: "Name", label: "Name"
+    },
+    {
+      key: "Location", label: "Location"
+    },
+    {
+      key: "Description", label: "Description"
+    },
+    {
+      key: "ContactNumber", label: "Contact No"
+    },
+    {
+      key: "AssignTo", label: "Assign To"
+    },
+    {
+      key: "Date", label: "Date"
+    }
   ]
 
   const addFollowup = (id: string) => router.push(`/followups/customer/add/${id}`);
@@ -668,7 +686,7 @@ export default function Customer() {
           onSelect={handleSelectWhatsapptemplate}
           onSubmit={handleWhatsappAll}
           submitLabel="Whatsapp"
-          onClose={() =>{ 
+          onClose={() => {
             setSelectedCustomers([]);
             setIsWhatsappAllOpen(false)
           }}
@@ -683,9 +701,10 @@ export default function Customer() {
           onSelect={handleSelectMailtemplate}
           onSubmit={handleMailAll}
           submitLabel="Mail"
-          onClose={() =>{ 
+          onClose={() => {
             setSelectedCustomers([]);
-            setIsMailAllOpen(false)}}
+            setIsMailAllOpen(false)
+          }}
         />
       )}
 
@@ -704,142 +723,142 @@ export default function Customer() {
       {/* Mobile Customer Page */}
       <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-sm:py-5">
 
-        <div className=" flex justify-between items-center px-0 py-2  mb-4">
+        <div className=" flex justify-between items-center px-0 pb-2">
           <h1 className=" text-[var(--color-primary)] font-extrabold text-2xl ">Leads</h1>
-          <AddButton url="/customer/add" text="Add" icon={<PlusSquare size={18} />} />
+
         </div>
         <div className=" w-full">
           <DynamicAdvance>
             <ObjectSelect
-                      options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []}
-                      label="Campaign"
-                      value={dependent.Campaign.id}
-                      getLabel={(item) => item?.Name || ""}
-                      getId={(item) => item?._id || ""}
-                      onChange={(selectedId) => {
-                        const selectedObj = fieldOptions.Campaign.find((i) => i._id === selectedId);
-                        if (selectedObj) {
-                          const updatedFilters = {
-                            ...filters,
-                            Campaign: [selectedObj.Name],
-                            CustomerType: [],   // reset
-                            CustomerSubType: []
-                          };
-                          setFilters(updatedFilters);
+              options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []}
+              label="Campaign"
+              value={dependent.Campaign.id}
+              getLabel={(item) => item?.Name || ""}
+              getId={(item) => item?._id || ""}
+              onChange={(selectedId) => {
+                const selectedObj = fieldOptions.Campaign.find((i) => i._id === selectedId);
+                if (selectedObj) {
+                  const updatedFilters = {
+                    ...filters,
+                    Campaign: [selectedObj.Name],
+                    CustomerType: [],   // reset
+                    CustomerSubType: []
+                  };
+                  setFilters(updatedFilters);
 
-                          setDependent(prev => ({
-                            ...prev,
-                            Campaign: { id: selectedObj._id, name: selectedObj.Name },
-                            CustomerType: { id: "", name: "" },   // reset
-                            CustomerSubType: { id: "", name: "" }
-                          }));
-                          handleSelectChange("Campaign", selectedObj.Name, updatedFilters)
-                        }
-                      }}
-                    />
+                  setDependent(prev => ({
+                    ...prev,
+                    Campaign: { id: selectedObj._id, name: selectedObj.Name },
+                    CustomerType: { id: "", name: "" },   // reset
+                    CustomerSubType: { id: "", name: "" }
+                  }));
+                  handleSelectChange("Campaign", selectedObj.Name, updatedFilters)
+                }
+              }}
+            />
 
-                    <ObjectSelect
-                      options={Array.isArray(fieldOptions?.CustomerType) ? fieldOptions.CustomerType : []}
-                      label="Customer Type"
-                      value={dependent.CustomerType.name}
-                      getLabel={(item) => item?.Name || ""}
-                      getId={(item) => item?._id || ""}
-                      onChange={(selectedId) => {
-                        const selectedObj = fieldOptions.CustomerType.find((i) => i._id === selectedId);
-                        if (selectedObj) {
-                          const updatedFilters = {
-                            ...filters,
-                            CustomerType: [selectedObj.Name],   // reset
-                            CustomerSubType: []
-                          };
-                          setFilters(updatedFilters);
-
-
-                          setDependent(prev => ({
-                            ...prev,
-                            CustomerType: { id: selectedObj._id, name: selectedObj.Name },   // reset
-                            CustomerSubType: { id: "", name: "" }
-                          }));
-                          handleSelectChange("CustomerType", selectedObj.Name, updatedFilters)
-                        }
-                      }}
-
-                    />
-
-                    <ObjectSelect
-                      options={Array.isArray(fieldOptions?.CustomerSubtype) ? fieldOptions.CustomerSubtype : []}
-                      label="Customer Subtype"
-                      value={dependent.CustomerSubType.name}
-                      getLabel={(item) => item?.Name || ""}
-                      getId={(item) => item?._id || ""}
-                      onChange={(selectedId) => {
-
-                        const selectedObj = fieldOptions.CustomerSubtype.find((i) => i._id === selectedId);
-                        if (selectedObj) {
-                          const updatedFilters = {
-                            ...filters,
-                            CustomerSubType: [selectedObj.Name]
-                          };
-                          setFilters(updatedFilters);
-
-                          setDependent(prev => ({
-                            ...prev,
-                            CustomerSubType: { id: selectedObj._id, name: selectedObj.Name }
-                          }));
-                          handleSelectChange("CustomerSubType", selectedObj.Name, updatedFilters)
-                        }
-                      }}
-                    />
+            <ObjectSelect
+              options={Array.isArray(fieldOptions?.CustomerType) ? fieldOptions.CustomerType : []}
+              label="Customer Type"
+              value={dependent.CustomerType.name}
+              getLabel={(item) => item?.Name || ""}
+              getId={(item) => item?._id || ""}
+              onChange={(selectedId) => {
+                const selectedObj = fieldOptions.CustomerType.find((i) => i._id === selectedId);
+                if (selectedObj) {
+                  const updatedFilters = {
+                    ...filters,
+                    CustomerType: [selectedObj.Name],   // reset
+                    CustomerSubType: []
+                  };
+                  setFilters(updatedFilters);
 
 
-                    <ObjectSelect
-                      options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []}
-                      label="City"
-                      value={dependent.City.id}
-                      getLabel={(item) => item?.Name || ""}
-                      getId={(item) => item?._id || ""}
-                      onChange={(selectedId) => {
-                        const selectedObj = fieldOptions.City.find((i) => i._id === selectedId);
-                        if (selectedObj) {
-                          const updatedFilters = {
-                            ...filters,
-                            City: [selectedObj.Name],
-                            Location: []
-                          };
-                          setFilters(updatedFilters);
+                  setDependent(prev => ({
+                    ...prev,
+                    CustomerType: { id: selectedObj._id, name: selectedObj.Name },   // reset
+                    CustomerSubType: { id: "", name: "" }
+                  }));
+                  handleSelectChange("CustomerType", selectedObj.Name, updatedFilters)
+                }
+              }}
 
-                          setDependent(prev => ({
-                            ...prev,
-                            City: { id: selectedObj._id, name: selectedObj.Name },
-                            Location: { id: "", name: "" },
-                          }));
-                          handleSelectChange("City", selectedObj.Name,updatedFilters)
-                        }
-                      }}
-                    />
-                    <ObjectSelect
-                      options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []}
-                      label="Location"
-                      value={dependent.Location.id}
-                      getLabel={(item) => item?.Name || ""}
-                      getId={(item) => item?._id || ""}
-                      onChange={(selectedId) => {
-                        const selectedObj = fieldOptions.Location.find((i) => i._id === selectedId);
-                        if (selectedObj) {
-                          const updatedFilters = {
-                            ...filters,
-                            Location: [selectedObj.Name]
-                          };
-                          setFilters(updatedFilters);
+            />
 
-                          setDependent(prev => ({
-                            ...prev,
-                            Location: { id: selectedObj._id, name: selectedObj.Name },
-                          }));
-                          handleSelectChange("Location", selectedObj.Name, updatedFilters)
-                        }
-                      }}
-                    />
+            <ObjectSelect
+              options={Array.isArray(fieldOptions?.CustomerSubtype) ? fieldOptions.CustomerSubtype : []}
+              label="Customer Subtype"
+              value={dependent.CustomerSubType.name}
+              getLabel={(item) => item?.Name || ""}
+              getId={(item) => item?._id || ""}
+              onChange={(selectedId) => {
+
+                const selectedObj = fieldOptions.CustomerSubtype.find((i) => i._id === selectedId);
+                if (selectedObj) {
+                  const updatedFilters = {
+                    ...filters,
+                    CustomerSubType: [selectedObj.Name]
+                  };
+                  setFilters(updatedFilters);
+
+                  setDependent(prev => ({
+                    ...prev,
+                    CustomerSubType: { id: selectedObj._id, name: selectedObj.Name }
+                  }));
+                  handleSelectChange("CustomerSubType", selectedObj.Name, updatedFilters)
+                }
+              }}
+            />
+
+
+            <ObjectSelect
+              options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []}
+              label="City"
+              value={dependent.City.id}
+              getLabel={(item) => item?.Name || ""}
+              getId={(item) => item?._id || ""}
+              onChange={(selectedId) => {
+                const selectedObj = fieldOptions.City.find((i) => i._id === selectedId);
+                if (selectedObj) {
+                  const updatedFilters = {
+                    ...filters,
+                    City: [selectedObj.Name],
+                    Location: []
+                  };
+                  setFilters(updatedFilters);
+
+                  setDependent(prev => ({
+                    ...prev,
+                    City: { id: selectedObj._id, name: selectedObj.Name },
+                    Location: { id: "", name: "" },
+                  }));
+                  handleSelectChange("City", selectedObj.Name, updatedFilters)
+                }
+              }}
+            />
+            <ObjectSelect
+              options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []}
+              label="Location"
+              value={dependent.Location.id}
+              getLabel={(item) => item?.Name || ""}
+              getId={(item) => item?._id || ""}
+              onChange={(selectedId) => {
+                const selectedObj = fieldOptions.Location.find((i) => i._id === selectedId);
+                if (selectedObj) {
+                  const updatedFilters = {
+                    ...filters,
+                    Location: [selectedObj.Name]
+                  };
+                  setFilters(updatedFilters);
+
+                  setDependent(prev => ({
+                    ...prev,
+                    Location: { id: selectedObj._id, name: selectedObj.Name },
+                  }));
+                  handleSelectChange("Location", selectedObj.Name, updatedFilters)
+                }
+              }}
+            />
 
 
             <SingleSelect options={Array.isArray(fieldOptions?.User) ? fieldOptions.User : []} value={filters.User[0]} label="User" onChange={(v) => handleSelectChange("User", v)} />
@@ -870,6 +889,7 @@ export default function Customer() {
           onFavourite={(lead) => {
             handleFavouriteToggle(lead._id, lead.Name, lead.ContactNumber, lead.isFavourite ?? false)
           }}
+          loader={customerTableLoader}
         />
 
       </div>
@@ -1052,7 +1072,7 @@ export default function Customer() {
                             City: { id: selectedObj._id, name: selectedObj.Name },
                             Location: { id: "", name: "" },
                           }));
-                          handleSelectChange("City", selectedObj.Name,updatedFilters)
+                          handleSelectChange("City", selectedObj.Name, updatedFilters)
                         }
                       }}
                     />
@@ -1149,18 +1169,18 @@ export default function Customer() {
                   <span className="relative ">Mass Update</span>
                 </button> */}
                 {
-                  admin?.role!=="user" && <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
-                  if (customerData.length > 0) {
-                    const firstPageIds = currentRows.map((c) => c._id);
-                    setSelectedCustomers(firstPageIds);
-                    setIsDeleteAllDialogOpen(true);
-                    setDeleteAllDialogData({});
-                  }
-                }}><div className=" absolute top-0 left-0 z-0 h-full bg-[var(--color-primary)] w-0 group-hover:w-full transition-all duration-300 "></div>
-                  <span className="relative ">Delete All</span>
-                </button>
+                  admin?.role !== "user" && <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
+                    if (customerData.length > 0) {
+                      const firstPageIds = currentRows.map((c) => c._id);
+                      setSelectedCustomers(firstPageIds);
+                      setIsDeleteAllDialogOpen(true);
+                      setDeleteAllDialogData({});
+                    }
+                  }}><div className=" absolute top-0 left-0 z-0 h-full bg-[var(--color-primary)] w-0 group-hover:w-full transition-all duration-300 "></div>
+                    <span className="relative ">Delete All</span>
+                  </button>
                 }
-                
+
               </div>
 
               <table className="table-auto w-full border-collapse text-sm border border-gray-200">
@@ -1223,8 +1243,8 @@ export default function Customer() {
                         </td>
                         <td className="px-2 py-3 border border-gray-200">{item.Location}</td>
                         <td className="px-4 py-3  flex flex-col justify-center items-center gap-1">{(item.ContactNumber) && <>{item.ContactNumber}<span className=" flex"> <Button
-                         component="a"
-                         href={`tel:${item.ContactNumber}`}
+                          component="a"
+                          href={`tel:${item.ContactNumber}`}
                           sx={{
                             backgroundColor: "#E8F5E9",
                             color: "var(--color-primary)",

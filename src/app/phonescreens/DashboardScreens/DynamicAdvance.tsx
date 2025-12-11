@@ -1,5 +1,7 @@
 "use client";
 
+import AddButton from "@/app/component/buttons/AddButton";
+import { PlusSquare } from "lucide-react";
 import { useState } from "react";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 
@@ -9,6 +11,8 @@ const DynamicAdvance = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="w-full">
       {/* 🔽 Toggle Button */}
+      <div className=" flex justify-between items-center">
+
       <div
         onClick={() => setOpen(!open)}
         className="bg-[var(--color-primary)] px-3 py-1.5 w-fit rounded-2xl my-4 mb-2 ml-0 flex items-center gap-2 cursor-pointer select-none"
@@ -16,10 +20,12 @@ const DynamicAdvance = ({ children }: { children: React.ReactNode }) => {
         <button className="text-white text-xs font-semibold">
           ADVANCED SEARCH
         </button>
-
+        
         <button type="button" className="p-2 text-white hover:bg-gray-200 rounded-md">
           {open ? <IoIosArrowUp /> : <IoIosArrowDown />}
         </button>
+      </div>
+      <AddButton url="/customer/add" text="Add" icon={<PlusSquare size={18} />} />
       </div>
 
       {/* 🔽 Dropdown Container */}

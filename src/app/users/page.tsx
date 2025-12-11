@@ -131,13 +131,13 @@ export default function UsersPage() {
         }
         console.log("password data and user id : ", userId, "    ", payload, "  ", admin)
         const response = await updateAdminPassword(userId, payload);
-        if (response) {
+        if (response.success) {
             toast.success("password changed successfully");
             setIsChangePasswordOpen(false);
             setUserId("");
             return;
         }
-        toast.error("failed to update password");
+       // toast.error("failed to update password");
 
     }
 

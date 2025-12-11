@@ -1,6 +1,7 @@
 import { API_ROUTES } from "@/constants/ApiRoute";
 import { Admin, LoginCredentials, AuthApiResponse, CreateAdminData } from "./auth.interface";
 import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 
 // 🔓 PUBLIC ROUTES
 export const signupAdmin = async (signupData: Admin): Promise<AuthApiResponse> => {
@@ -178,9 +179,13 @@ export const updateAdminPassword = async (id: string, passwordData: { currentPas
       body: JSON.stringify(passwordData),
     });
 
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-    const data: AuthApiResponse = await res.json();
-    return data;
+   /*  if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`); */
+    const result: AuthApiResponse = await res.json();
+    if (!result.success) {
+      toast.error(result.message ?? "Something went wrong")
+      throw new Error(result.message ?? "Something went wrong")
+    }
+    return result;
   } catch (error) {
     console.error("SERVER ERROR (Update Password): ", error);
     return { success: false, message: "Password update failed" };

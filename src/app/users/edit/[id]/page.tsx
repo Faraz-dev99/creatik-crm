@@ -125,7 +125,7 @@ export default function AdminEditPage() {
       [
 
         { key: "City", fetchFn: getCity },
-         { key:" Status", staticData:["Adctive", "Inactive"] }
+         { key:" Status", staticData:["Active", "Inactive"] }
       ],
       setFieldOptions
     );

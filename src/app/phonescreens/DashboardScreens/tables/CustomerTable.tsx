@@ -29,7 +29,7 @@ interface LeadsSectionProps<T extends Record<string, any>> {
     onWhatsappClick?: (lead: T) => void;
     onMailClick?: (lead: T) => void;
     onFavourite?: (lead: T) => void;
-
+    loader?: boolean;
 }
 
 export default function CustomerTable<T extends Record<string, any>>({
@@ -41,17 +41,18 @@ export default function CustomerTable<T extends Record<string, any>>({
     onWhatsappClick,
     onMailClick,
     onFavourite,
+    loader
 }: LeadsSectionProps<T>) {
     const [toggleSearchDropdown, setToggleSearchDropdown] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const itemsperpage = 10;
     const [viewAll, setViewAll] = useState(false);
-    const [viewLeadData,setViewLeadData] = useState<T | null>(null);
+    const [viewLeadData, setViewLeadData] = useState<T | null>(null);
 
     const totalPages = Math.ceil(leads.length / itemsperpage);
     const startIndex = (currentPage - 1) * itemsperpage;
     const paginatedLeads = leads.slice(startIndex, startIndex + itemsperpage);
-    const [loader, setLoader] = useState(true);
+    /* const [loader, setLoader] = useState(true); */
     const router = useRouter();
 
 
@@ -73,13 +74,13 @@ export default function CustomerTable<T extends Record<string, any>>({
         return [currentPage - 1, currentPage, currentPage + 1];
     };
     const pages = getDisplayedPages();
-    useEffect(() => {
-        if (!leads || leads.length === 0) {
-            setLoader(true);
-        } else {
-            setLoader(false);
-        }
-    }, [leads])
+    /*    useEffect(() => {
+           if (!leads || leads.length === 0) {
+               setLoader(true);
+           } else {
+               setLoader(false);
+           }
+       }, [leads]) */
 
     const followupRedirect = () => {
         router.push('/followups/customer');
@@ -99,11 +100,14 @@ export default function CustomerTable<T extends Record<string, any>>({
                 viewAll && (
                     <PopupMenu onClose={() => { setViewAll(false) }}>
                         <div className=" bg-white w-full p-2 rounded-md  flex flex-col gap-1">
-                            <button className=" self-end mb-1 " onClick={()=>{
+                            <button className=" self-end mb-1 " onClick={() => {
                                 setViewAll(false)
                                 setViewLeadData(null)
                             }}><IoMdClose size={25} /></button>
-                            <img className="rounded-md self-end w-full h-[220px]" src={viewLeadData?.SitePlan?.length > 0 ? viewLeadData?.SitePlan :"/siteplan.jpg"} />
+                            <div className=" rounded-md bg-gray-300 h-[220px]">
+                                <img className=" w-[220px] h-full mx-auto " src={viewLeadData?.SitePlan?.length > 0 ? viewLeadData?.SitePlan : "/siteplan.png"} />
+                            </div>
+
                             <div className=" max-h-[calc(80vh-240px)] overflow-y-auto mt-3">
                                 {allLabelLeads?.map((item, j) => (
                                     <div
@@ -116,10 +120,22 @@ export default function CustomerTable<T extends Record<string, any>>({
 
                                         <span className="text-gray-500">-</span>
 
-                                        <span className="text-gray-700 ">
-                                            {/*  {String(lead[item.key])} */} 
-                                            {String(viewLeadData && viewLeadData[item.key] ? viewLeadData[item.key] : "")}
-                                        </span>
+
+                                        {
+                                            item.label === "Contact No" ? (
+                                                <a
+                                                    href={`tel:+91${viewLeadData?.[item.key] ?? ""}`}
+                                                    className="text-cyan-600 visited:text-purple-600"
+                                                >
+                                                    {viewLeadData?.[item.key] ?? ""}
+                                                </a>
+                                            ) : (
+                                                <span className="text-gray-700">
+                                                    {viewLeadData?.[item.key] ?? ""}
+                                                </span>
+                                            )
+                                        }
+
                                     </div>
 
                                 ))}
@@ -144,7 +160,7 @@ export default function CustomerTable<T extends Record<string, any>>({
                                 {labelLeads.map((item, j) => (
                                     <div
                                         key={j}
-                                        className="mb-2 grid grid-cols-[1fr_auto_2fr] items-center gap-2"
+                                        className="mb-2 grid grid-cols-[max-content_auto_1fr] items-center gap-2"
                                     >
                                         <span className="font-semibold text-black">
                                             {item.label}
@@ -163,12 +179,17 @@ export default function CustomerTable<T extends Record<string, any>>({
 
 
                             <div className="flex flex-col min-w-[120px]  items-center gap-4 ">
-                                <button className=" cursor-pointer text-sm self-end text-[var(--color-primary)] hover:text-[var(--color-primary-darker)]" onClick={() =>{
+                                {/* <button className=" cursor-pointer text-sm self-end text-[var(--color-primary)] hover:text-[var(--color-primary-darker)]" onClick={() =>{
                                      setViewAll(true)
                                      setViewLeadData(lead)
                                     }
-                            } >View All</button>
-                                <img width={120} className="rounded-md self-end w-[120px]" src={lead.SitePlan?.length > 0 ? lead.SitePlan : "/siteplan.jpg"} />
+                            } >View All</button> */}
+                                <div className=" bg-gray-300 w-[120px] h-[80px] grid place-items-center rounded-md  self-end">
+                                    <img width={120} className=" w-[60px] h-[60px] " src={lead.SitePlan?.length > 0 ? lead.SitePlan : "/siteplan.png"} onClick={() => {
+                                        setViewAll(true)
+                                        setViewLeadData(lead)
+                                    }} />
+                                </div>
                                 <button
                                     onClick={() => onFavourite?.(lead)}
                                     className="p-2 bg-gray-100 self-end rounded-full shadow"
@@ -180,7 +201,7 @@ export default function CustomerTable<T extends Record<string, any>>({
                                     onClick={() => onEdit?.(lead._id)}
                                     className=" p-2 bg-gray-100 self-end rounded-full shadow"
                                 >
-                                    <MdEdit size={20}className="text-[var(--color-primary)]" />
+                                    <MdEdit size={20} className="text-[var(--color-primary)]" />
 
                                 </button>
                             </div>
@@ -195,7 +216,7 @@ export default function CustomerTable<T extends Record<string, any>>({
 
 
                             <div className="flex items-center gap-10 max-[320px]:gap-4">
-                                
+
                                 <a href={`tel:+91${String(lead["ContactNumber"]) ?? String(lead["ContactNo"]) ?? ""}`} className="" onClick={() => onAdd?.(lead._id)}>
                                     <MdPhone size={25} className="text-white" />
                                 </a>

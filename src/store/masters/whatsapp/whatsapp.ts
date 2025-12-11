@@ -55,13 +55,12 @@ export const getFilteredWhatsapp = async (params: string) => {
   }
 };
 
-export const addWhatsapp = async (data: whatsappAllDataInterface) => {
+export const addWhatsapp = async (payload:FormData) => {
   try {
-    const payload = { ...data, type: 'whatsapp' }
+   /*  const payload = { ...data, type: 'whatsapp' } */
     let response = await fetch(API_ROUTES.MASTERS.WHATSAPP.ADD, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: payload,
       credentials: "include"
     });
 
@@ -76,19 +75,18 @@ export const addWhatsapp = async (data: whatsappAllDataInterface) => {
       throw new Error(message);
     }
     response = await response.json();
-    return data;
+    return response;
   } catch (error) {
     console.log("SERVER ERROR: ", error);
     return null;
   }
 };
 
-export const updateWhatsapp = async (id: string, data: whatsappAllDataInterface) => {
+export const updateWhatsapp = async (id: string, payload:FormData) => {
   try {
     let response = await fetch(API_ROUTES.MASTERS.WHATSAPP.UPDATE(id), {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: payload,
       credentials: "include"
     });
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
