@@ -22,6 +22,7 @@ import { handleFieldOptionsObject } from "@/app/utils/handleFieldOptionsObject";
 import ObjectSelect from "@/app/component/ObjectSelect";
 import { InputField } from "@/app/component/InputField";
 import TextareaField from "@/app/component/datafields/TextareaField";
+import { trimCountryCodeHelper } from "@/app/utils/trimCountryCodeHelper";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -65,6 +66,12 @@ export default function CustomerEdit() {
   // ✅ Track deleted existing images separately
   const [removedCustomerImages, setRemovedCustomerImages] = useState<string[]>([]);
   const [removedSitePlans, setRemovedSitePlans] = useState<string[]>([]);
+
+  
+  const trimCountryCode = (num: string) => {
+  if (!num) return "";
+  return num.startsWith("+91") ? num.slice(3) : num;
+};
 
   // Fetch existing customer data
   useEffect(() => {
@@ -236,7 +243,7 @@ export default function CustomerEdit() {
       if (customerData.CustomerType) formData.append("CustomerType", customerData.CustomerType?.name);
       if (customerData.customerName) formData.append("customerName", customerData.customerName);
       if (customerData.CustomerSubtype) formData.append("CustomerSubType", customerData.CustomerSubtype?.name);
-      if (customerData.ContactNumber) formData.append("ContactNumber", customerData.ContactNumber);
+      if (customerData.ContactNumber) formData.append("ContactNumber", trimCountryCodeHelper(customerData.ContactNumber));
       if (customerData.City) formData.append("City", customerData.City?.name);
       if (customerData.Location) formData.append("Location", customerData.Location?.name);
       if (customerData.Area) formData.append("Area", customerData.Area);

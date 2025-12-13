@@ -165,7 +165,7 @@ export default function Customer() {
             Email: item.Email,
             City: item.City,
             Location: item.Location,
-            ContactNumber: item.ContactNumber,
+            ContactNumber: item.ContactNumber?.slice(0, 10),
             AssignTo: item.AssignTo?.name,
             isFavourite: item.isFavourite,
             Date: item.date ?? formattedDate,
@@ -272,7 +272,7 @@ export default function Customer() {
           Email: item.Email,
           City: item.City,
           Location: item.Location,
-          ContactNumber: item.ContactNumber,
+          ContactNumber: item.ContactNumber?.slice(0, 10),
           AssignTo: item.AssignTo?.name,
           isFavourite: item.isFavourite,
           Date: item.date ?? formattedDate,
@@ -1233,7 +1233,7 @@ export default function Customer() {
                         <td className="px-2 py-3 border border-gray-200 break-all whitespace-normal max-w-[60px]">{(currentTablePage - 1) * rowsPerTablePage + (index + 1)}</td>
                         <td className="px-2 py-3 border border-gray-200">{item.Campaign}</td>
                         <td className="px-2 py-3 border border-gray-200 break-all whitespace-normal w-[130px]">{item.Type}</td>
-                        <td className="px-2 py-3  border-gray-200 break-all whitespace-normal max-w-[120px] inline-block ">{item.SubType}</td>
+                        <td className="px-2 py-3  border-gray-200 break-all whitespace-normal max-w-[120px] ">{item.SubType}</td>
                         <td className="px-2 py-3 border border-gray-200  ">{item.Name}</td>
                         <td
                           className={`px-2 py-3 border border-gray-200 break-all whitespace-normal max-w-[160px] ${item.Description ? "min-w-[160px]" : ""

@@ -1,4 +1,4 @@
-export const BASE_URL = "http://localhost:5000/api";
+export const BASE_URL = "https://propertyapi.aileadgenie.cloud/api";
 //https://live-project-backend-1.onrender.com
 //https://propertyapi.aileadgenie.cloud/api
 
@@ -305,4 +305,11 @@ export const API_ROUTES = {
     UPDATE_PASSWORD: (id: String) => `${BASE_URL}/admin/${id}/password`,
     DELETE: (id: String) => `${BASE_URL}/admin/${id}`,
   },
+
+  REQUESTUSER:{
+    SIGNUP: `${BASE_URL}/user/newusersignup`,
+    GET_ALL: `${BASE_URL}/user/newusers`,
+    ACCEPTREQUEST:(id: String) => `${BASE_URL}/user/newusers/${id}`,
+    DENYREQUEST: (id: String) => `${BASE_URL}/user/newusers/${id}`
+  }
 };

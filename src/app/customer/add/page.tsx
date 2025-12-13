@@ -24,6 +24,7 @@ import CustomerSubtypeAdd from "@/app/masters/customer-subtype/add/page";
 import InputField from "@/app/component/datafields/InputField";
 import TextareaField from "@/app/component/datafields/TextareaField";
 import { getFilteredContact } from "@/store/contact";
+import { trimCountryCodeHelper } from "@/app/utils/trimCountryCodeHelper";
 
 interface ErrorInterface {
   [key: string]: string;
@@ -128,6 +129,11 @@ export default function CustomerAdd() {
     return newErrors;
   };
 
+  const trimCountryCode = (num: string) => {
+  if (!num) return "";
+  return num.startsWith("+91") ? num.slice(3) : num;
+};
+
     const isContactNoExist = async (contactNo: string) => {
       if (contactNo.trim().length > 0 && contactNo.trim().length < 10) {
         setErrors((prev) => ({
@@ -158,6 +164,9 @@ export default function CustomerAdd() {
   const handleSubmit = async () => {
      const duplicate = await isContactNoExist(customerData.ContactNumber);
     if (duplicate) return;
+
+
+    
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -172,7 +181,7 @@ export default function CustomerAdd() {
       if (customerData.CustomerType) formData.append("CustomerType", customerData.CustomerType.name);
       if (customerData.customerName) formData.append("customerName", customerData.customerName);
       if (customerData.CustomerSubtype) formData.append("CustomerSubType", customerData.CustomerSubtype?.name);
-      if (customerData.ContactNumber) formData.append("ContactNumber", customerData.ContactNumber);
+      if (customerData.ContactNumber) formData.append("ContactNumber", trimCountryCodeHelper(customerData.ContactNumber));
       if (customerData.City) formData.append("City", customerData.City.name);
       if (customerData.Location) formData.append("Location", customerData.Location?.name);
       if (customerData.Area) formData.append("Area", customerData.Area);
