@@ -1,4 +1,4 @@
-export const BASE_URL = "https://live-project-backend-1.onrender.com";
+export const BASE_URL = "https://propertyapi.aileadgenie.cloud/api";
 //https://live-project-backend-1.onrender.com
 //https://propertyapi.aileadgenie.cloud/api
 
