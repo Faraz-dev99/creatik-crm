@@ -19,6 +19,7 @@ import PageHeader from "@/app/component/labels/PageHeader";
 import MasterProtectedRoute from "@/app/component/MasterProtectedRoutes";
 import { userrequestDialogDataInterface, userrequestGetDataInterface } from "@/store/masters/userrequests/userrequests.interface";
 import ConfirmDialog from "@/app/component/popups/ConfirmDialog";
+import { acceptRequest, denyRequest, getRequestUsers } from "@/store/requestusers/requestusers";
 
 export default function NewUserRequests() {
     const [users, setUsers] = useState<userrequestGetDataInterface[]>([]);
@@ -35,7 +36,7 @@ export default function NewUserRequests() {
     const router = useRouter();
 
     const fetchTypes = async () => {
-        const data = await getTypes();
+        const data = await getRequestUsers();
         /* const formatted = data.map((t: userrequestGetDataInterface) => ({
                ...t,
                name: t.name.charAt(0).toUpperCase() + t.name.slice(1),
@@ -53,7 +54,15 @@ export default function NewUserRequests() {
                 email: "amanr@example.com"
             }
         ]
-        setUsers(formatted)
+        console.log(" data is ",data)
+        setUsers(data.map((e:any)=>{
+            return {
+                _id:e?.id,
+                name:e?.name,
+                email:e?.email,
+                phone:e?.phone
+            }
+        }))
     };
 
     useEffect(() => {
@@ -72,14 +81,15 @@ export default function NewUserRequests() {
                 (t) => {
                     return keyword === "" ||
                         t.name.toLowerCase().includes(keyword.toLowerCase()) ||
-                        t.email.toLowerCase().includes(keyword.toLowerCase())
+                        t.email.toLowerCase().includes(keyword.toLowerCase()) ||
+                        t?.phone?.toLowerCase().includes(keyword.toLowerCase())
                 }
             )
     }, [users, keyword]);
 
     const handleDelete = async (data: userrequestDialogDataInterface | null) => {
         if (!data) return;
-        const res = await deleteTypes(data.id);
+        const res = await denyRequest(data.id);
         if (res) {
             toast.success("Request Denied successfully!");
             setIsDeleteDialogOpen(false);
@@ -92,11 +102,11 @@ export default function NewUserRequests() {
 
       const handleAccept = async (data: userrequestDialogDataInterface | null) => {
         if (!data) return;
-        const res = await deleteTypes(data.id);
+        const res = await acceptRequest(data.id);
         if (res) {
             toast.success("Request Accepted successfully!");
-            setIsDeleteDialogOpen(false);
-            setDeleteDialogData(null);
+            setIsAcceptDialogOpen(false);
+            setAcceptDialogData(null);
             fetchTypes();
             return;
         }
@@ -219,6 +229,7 @@ export default function NewUserRequests() {
                                         <p className="w-[60px]">S.No.</p>
                                         <p className="w-[200px]">Fullname</p>
                                         <p className="w-[200px]">Email</p>
+                                        <p className="w-[200px]">Phone</p>
                                     </th>
 
                                     <th className="flex items-center gap-10 px-8 py-3 border border-[var(--color-secondary-dark)] text-left w-1/2 justify-end">
@@ -238,6 +249,7 @@ export default function NewUserRequests() {
                                                 <p className="w-[60px]">{(currentTablePage - 1) * rowsPerTablePage + (i + 1)}</p>
                                                 <p className="w-[200px]">{t.name}</p>
                                                 <p className="w-[200px] font-semibold break-all whitespace-normal max-w-[200px]">{t.email}</p>
+                                                <p className="w-[200px]">{t.phone}</p>
                                             </td>
 
                                             <td className="flex items-center gap-10 px-8 py-3 w-1/2 justify-end">

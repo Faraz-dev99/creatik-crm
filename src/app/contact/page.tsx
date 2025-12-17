@@ -798,7 +798,7 @@ export default function Contacts() {
                 </button>
               </div>
 
-              <div className={`overflow-hidden ${toggleSearchDropdown ? "max-h-[2000px]" : "max-h-0"} transition-all duration-500 ease-in-out px-5`}>
+              <div className={`overflow-hidden ${toggleSearchDropdown ? "overflow-visible max-h-[2000px]" : " overflow-hidden max-h-0"} transition-all duration-500 ease-in-out px-5`}>
 
                 <div className="flex flex-col gap-5 my-5">
                   <div className="grid grid-cols-3 gap-5 max-md:grid-cols-1 max-lg:grid-cols-2">
