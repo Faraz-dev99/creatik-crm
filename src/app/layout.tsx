@@ -1,7 +1,7 @@
 "use client";
 
 import "./globals.css";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Navbar from "./component/Nav";
 import { AppSidebar } from "../components/app-sidebar";
@@ -18,6 +18,7 @@ import { CustomerImportProvider } from "@/context/CustomerImportContext";
 import { ContactImportProvider } from "@/context/ContactImportContext";
 import MobileHamburger from "./component/HamburgerMenu";
 import Link from "next/link";
+import { Router } from "next/router";
 
 const poppins = Schibsted_Grotesk({
   weight: '400',
@@ -27,6 +28,12 @@ const poppins = Schibsted_Grotesk({
 export default function RootLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isAdminPage = pathname === "/admin" || pathname === "/register";
+
+  useEffect(() => {
+    if (Router && "prefetch" in Router) {
+      Router.prefetch = async () => {}; // override prefetch globally
+    }
+  }, []);
 
   return (
     <html lang="en" className={`min-h-screen w-full overflow-x-hidden ${poppins.className}`}>
