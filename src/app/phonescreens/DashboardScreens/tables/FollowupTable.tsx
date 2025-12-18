@@ -36,7 +36,7 @@ export default function FollowupTable<T extends Record<string, any>>({
 }: LeadsSectionProps<T>) {
     const [toggleSearchDropdown, setToggleSearchDropdown] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsperpage = 5;
+    const itemsperpage = 10;
 
     const totalPages = Math.ceil(leads.length / itemsperpage);
     const startIndex = (currentPage - 1) * itemsperpage;
