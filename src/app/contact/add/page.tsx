@@ -241,10 +241,10 @@ export default function ContactAdd() {
           />
         </div>
 
-        <div className="bg-white/90 backdrop-blur-lg w-full p-10 rounded-3xl shadow-2xl h-auto">
+        <div className="bg-white/90 backdrop-blur-lg w-full p-10 max-sm:px-5 rounded-3xl shadow-2xl h-auto">
           <form onSubmit={(e) => e.preventDefault()}>
             <div className="mb-8 text-left border-b pb-4 border-gray-200">
-              <h1 className="text-3xl font-extrabold text-[var(--color-secondary-darker)] leading-tight tracking-tight">
+              <h1 className="text-3xl  max-sm:text-2xl font-extrabold text-[var(--color-secondary-darker)] leading-tight tracking-tight">
                 Add <span className="text-[var(--color-primary)]">Contact</span>
               </h1>
             </div>

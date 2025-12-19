@@ -438,7 +438,7 @@ export default function CustomerAdd() {
 
 
             </div>
-            <div className="flex flex-wrap my-5 gap-5">
+            <div className=" sm:flex flex-wrap my-5 gap-5">
               <FileUpload label="Customer Images" multiple previews={imagePreviews} onChange={(e) => handleFileChange(e, "CustomerImage")} onRemove={handleRemoveImage} />
               <FileUpload label="Site Plan" previews={sitePlanPreview ? [sitePlanPreview] : []} onChange={(e) => handleFileChange(e, "SitePlan")} onRemove={handleRemoveSitePlan} />
             </div>

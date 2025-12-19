@@ -37,6 +37,8 @@ import { getContactCampaign } from "@/store/masters/contactcampaign/contactcampa
 import { getContactStatusType } from "@/store/masters/contactstatustype/contactstatustype";
 import { handleFieldOptionsObject } from "@/app/utils/handleFieldOptionsObject";
 import ObjectSelect from "@/app/component/ObjectSelect";
+import ContactFollowupTable from "@/app/phonescreens/DashboardScreens/tables/ContactFollowupTable";
+import DynamicAdvance from "@/app/phonescreens/DashboardScreens/DynamicAdvance";
 
 export default function ContactFollowups() {
     const router = useRouter();
@@ -314,78 +316,214 @@ export default function ContactFollowups() {
     const locations = ['Andheri', 'Borivali', 'Powai'];
     const users = ['Admin', 'Agent1', 'Agent2'];
 
+    const phonetableheader = [{
+        key: "Name", label: "Name"
+    },
+    {
+        key: "ContactNumber", label: "Contact No"
+    },
+    {
+        key: "User", label: "User"
+    },
+    {
+        key: "Date", label: "Date"
+    },]
+
     // 🔹 UI
     return (
         <ProtectedRoute>
-            <div className=" min-h-[calc(100vh-56px)] overflow-auto max-md:py-10">
-                <Toaster position="top-right" />
+            <Toaster position="top-right" />
+            {/* DELETE POPUP */}
+            <DeleteDialog<DeleteDialogDataInterface>
+                isOpen={isDeleteDialogOpen}
+                title="Are you sure you want to delete this followup?"
+                data={deleteDialogData}
+                onClose={() => {
+                    setIsDeleteDialogOpen(false);
+                    setDeleteDialogData(null);
+                }}
+                onDelete={handleDelete}
+            />
 
-                {/* DELETE POPUP */}
-                <DeleteDialog<DeleteDialogDataInterface>
-                    isOpen={isDeleteDialogOpen}
-                    title="Are you sure you want to delete this followup?"
-                    data={deleteDialogData}
-                    onClose={() => {
-                        setIsDeleteDialogOpen(false);
-                        setDeleteDialogData(null);
-                    }}
-                    onDelete={handleDelete}
-                />
+            <DeleteDialog<FollowupDeleteDialogDataInterface>
+                isOpen={isFollowupDeleteDialogOpen}
+                title={`Are you sure you want delete the followup for contact ${getContactName(followupdeleteDialogData?.id || "")}?`}
+                data={followupdeleteDialogData}
+                onClose={() => {
+                    setFollowupDeleteDialogData(null);
+                    setIsFollowupDeleteDialogOpen(false);
+                }}
+                onDelete={deleteThisFollowup}
+            />
 
-                <DeleteDialog<FollowupDeleteDialogDataInterface>
-                    isOpen={isFollowupDeleteDialogOpen}
-                    title={`Are you sure you want delete the followup for contact ${getContactName(followupdeleteDialogData?.id || "")}?`}
-                    data={followupdeleteDialogData}
-                    onClose={() => {
-                        setFollowupDeleteDialogData(null);
-                        setIsFollowupDeleteDialogOpen(false);
-                    }}
-                    onDelete={deleteThisFollowup}
-                />
-
-                {isfollowupDialogOpen && Array.isArray(followupDialogData) && followupDialogData.length > 0 && (
-                    <PopupMenu onClose={() => { setIsFollowupDialogOpen(false); setFollowupDialogData([]); }}>
-                        <div className="flex flex-col border border-gray-300/30 overflow-y-auto bg-gray-100 text-[var(--color-secondary-darker)] rounded-xl shadow-lg p-6 max-w-[800px] gap-6 m-2 w-full max-h-[80vh]">
-                            <h2 className="text-2xl text-[var(--color-secondary-darker)] font-extrabold flex justify-between items-center"><div>Contact <span className="text-[var(--color-primary)]">Followups</span></div><button className=" cursor-pointer" onClick={() => {
-                                setFollowupDialogData(null)
-                                setIsFollowupDialogOpen(false);
-                            }}><IoMdClose /></button></h2>
-                            <div className="overflow-y-auto max-h-[100vh]">
-                                {followupDialogData.map((item, index) => (
-                                    <div key={item._id ?? +index} className="flex justify-between border border-gray-300 rounded-md p-4">
-                                        <div className=" flex flex-col gap-2">
-                                            <p><span className="font-semibold">Followup Date:</span> {item.StartDate}</p>
-                                            <p><span className="font-semibold">Status Type:</span> {item.StatusType}</p>
-                                            <p><span className="font-semibold">Next Followup Date:</span> {item.FollowupNextDate}</p>
-                                            <p><span className="font-semibold">Description:</span> {item.Description}</p>
-                                        </div>
-                                        <div className="flex flex-wrap gap-2 justify-center items-center">
-                                            <Button
-                                                sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px" }}
-                                                onClick={() => editThisFollowup(item._id ?? "")}
-                                            >
-                                                <MdEdit />
-                                            </Button>
-                                            <Button
-                                                sx={{ backgroundColor: "#FDECEA", color: "#C62828", minWidth: "32px", height: "32px", borderRadius: "8px" }}
-                                                onClick={() => {
-                                                    setIsFollowupDialogOpen(false);
-                                                    setIsFollowupDeleteDialogOpen(true);
-                                                    setFollowupDeleteDialogData({
-                                                        id: item._id ?? "",
-                                                        Name: getContactName(item.contact)
-                                                    });
-                                                }}
-                                            >
-                                                <MdDelete />
-                                            </Button>
-                                        </div>
+            {isfollowupDialogOpen && Array.isArray(followupDialogData) && followupDialogData.length > 0 && (
+                <PopupMenu onClose={() => { setIsFollowupDialogOpen(false); setFollowupDialogData([]); }}>
+                    <div className="flex flex-col border border-gray-300/30 overflow-y-auto bg-gray-100 text-[var(--color-secondary-darker)] rounded-xl shadow-lg p-6 max-w-[800px] gap-6 m-2 w-full max-h-[80vh]">
+                        <h2 className="text-2xl text-[var(--color-secondary-darker)] font-extrabold flex justify-between items-center"><div>Contact <span className="text-[var(--color-primary)]">Followups</span></div><button className=" cursor-pointer" onClick={() => {
+                            setFollowupDialogData(null)
+                            setIsFollowupDialogOpen(false);
+                        }}><IoMdClose /></button></h2>
+                        <div className="overflow-y-auto max-h-[100vh]">
+                            {followupDialogData.map((item, index) => (
+                                <div key={item._id ?? +index} className="flex justify-between border border-gray-300 rounded-md p-4">
+                                    <div className=" flex flex-col gap-2">
+                                        <p><span className="font-semibold">Followup Date:</span> {item.StartDate}</p>
+                                        <p><span className="font-semibold">Status Type:</span> {item.StatusType}</p>
+                                        <p><span className="font-semibold">Next Followup Date:</span> {item.FollowupNextDate}</p>
+                                        <p><span className="font-semibold">Description:</span> {item.Description}</p>
                                     </div>
-                                ))}
-                            </div>
+                                    <div className="flex flex-wrap gap-2 justify-center items-center">
+                                        <Button
+                                            sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px" }}
+                                            onClick={() => editThisFollowup(item._id ?? "")}
+                                        >
+                                            <MdEdit />
+                                        </Button>
+                                        <Button
+                                            sx={{ backgroundColor: "#FDECEA", color: "#C62828", minWidth: "32px", height: "32px", borderRadius: "8px" }}
+                                            onClick={() => {
+                                                setIsFollowupDialogOpen(false);
+                                                setIsFollowupDeleteDialogOpen(true);
+                                                setFollowupDeleteDialogData({
+                                                    id: item._id ?? "",
+                                                    Name: getContactName(item.contact)
+                                                });
+                                            }}
+                                        >
+                                            <MdDelete />
+                                        </Button>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    </PopupMenu>
-                )}
+                    </div>
+                </PopupMenu>
+            )}
+
+            <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-sm:py-2">
+                <h1 className=" text-[var(--color-primary)] font-bold text-2xl px-0 py-0">Contact Followups</h1>
+                <div>
+                    <DynamicAdvance addUrl="/contact/add">
+                        <ObjectSelect
+                            options={Array.isArray(fieldOptions?.Campaign) ? fieldOptions.Campaign : []}
+                            label="Campaign"
+                            value={dependent.Campaign.id}
+                            getLabel={(item) => item?.Name || ""}
+                            getId={(item) => item?._id || ""}
+                            onChange={(selectedId) => {
+                                const selectedObj = fieldOptions.Campaign.find((i) => i._id === selectedId);
+                                if (selectedObj) {
+                                    const updatedFilters = {
+                                        ...filters,
+                                        Campaign: [selectedObj.Name],
+                                        PropertyType: []
+                                    };
+                                    setFilters(updatedFilters);
+                                    setDependent(prev => ({
+                                        ...prev,
+                                        Campaign: { id: selectedObj._id, name: selectedObj.Name },
+                                        PropertyType: { id: "", name: "" }
+                                    }));
+                                    handleSelectChange("Campaign", selectedObj.Name, updatedFilters)
+                                }
+                            }}
+                        />
+
+                        <ObjectSelect
+                            options={Array.isArray(fieldOptions?.PropertyType) ? fieldOptions.PropertyType : []}
+                            label="Property Type"
+                            value={dependent.PropertyType.name}
+                            getLabel={(item) => item?.Name || ""}
+                            getId={(item) => item?._id || ""}
+                            onChange={(selectedId) => {
+                                const selectedObj = fieldOptions.PropertyType.find((i) => i._id === selectedId);
+                                if (selectedObj) {
+
+                                    const updatedFilters = {
+                                        ...filters,
+                                        PropertyType: [selectedObj.Name],
+                                    };
+                                    setFilters(updatedFilters);
+                                    setDependent(prev => ({
+                                        ...prev,
+                                        PropertyType: { id: selectedObj._id, name: selectedObj.Name },
+                                    }));
+                                    handleSelectChange("PropertyType", selectedObj.Name, updatedFilters)
+                                }
+                            }}
+
+                        />
+                        <SingleSelect options={Array.isArray(fieldOptions?.StatusTypes) ? fieldOptions.StatusTypes : []} value={filters.StatusType[0]} label="Status Type" onChange={(val) => handleSelectChange("StatusType", val)} />
+                        <ObjectSelect
+                            options={Array.isArray(fieldOptions?.City) ? fieldOptions.City : []}
+                            label="City"
+                            value={dependent.City.id}
+                            getLabel={(item) => item?.Name || ""}
+                            getId={(item) => item?._id || ""}
+                            onChange={(selectedId) => {
+                                const selectedObj = fieldOptions.City.find((i) => i._id === selectedId);
+                                if (selectedObj) {
+                                    const updatedFilters = {
+                                        ...filters,
+                                        City: [selectedObj.Name],
+                                        Location: [] // reset Location
+                                    };
+                                    setFilters(updatedFilters);
+                                    setDependent(prev => ({
+                                        ...prev,
+                                        City: { id: selectedObj._id, name: selectedObj.Name },
+                                        Location: { id: "", name: "" },
+                                    }));
+                                    handleSelectChange("City", selectedObj.Name, updatedFilters)
+                                }
+                            }}
+                        />
+                        <ObjectSelect
+                            options={Array.isArray(fieldOptions?.Location) ? fieldOptions.Location : []}
+                            label="Location"
+                            value={dependent.Location.id}
+                            getLabel={(item) => item?.Name || ""}
+                            getId={(item) => item?._id || ""}
+                            onChange={(selectedId) => {
+                                const selectedObj = fieldOptions.Location.find((i) => i._id === selectedId);
+                                if (selectedObj) {
+
+                                    const updatedFilters = {
+                                        ...filters,
+                                        Location: [selectedObj.Name]
+                                    };
+                                    setFilters(updatedFilters);
+                                    setDependent(prev => ({
+                                        ...prev,
+                                        Location: { id: selectedObj._id, name: selectedObj.Name },
+                                    }));
+                                    handleSelectChange("Location", selectedObj.Name, updatedFilters)
+                                }
+                            }}
+                        />
+
+                    </DynamicAdvance>
+                </div>
+                <ContactFollowupTable
+                    leads={followupData}
+                    labelLeads={phonetableheader}
+                    onFollowup={(lead) => {
+                        setIsFollowupDialogOpen(true);
+                        handleFollowups(lead.contactid);
+                    }}
+                    onAdd={(id) => addFollowup(id)}
+                    onEdit={(id) => editFollowup(id)}
+                    onDelete={(lead) => {
+                        setIsDeleteDialogOpen(true);
+                        setDeleteDialogData({
+                            id: lead.contactid,
+                            ContactNumber: lead.ContactNumber
+                        });
+                    }}
+                />
+            </div>
+
+            <div className=" min-h-[calc(100vh-56px)] max-sm:hidden overflow-auto max-md:py-10">
 
                 <div className="bg-white rounded-md p-4 max-md:p-3 w-full">
                     <div className="flex justify-between items-center">

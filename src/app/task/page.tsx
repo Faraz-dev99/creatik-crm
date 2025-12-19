@@ -147,8 +147,8 @@ export default function TaskPage() {
         onDelete={deleteTaskFunc}
       />
 
-      <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-sm:py-5">
-        <div className=" flex justify-between items-center px-2 py-2  mb-4">
+      <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-sm:py-2">
+        <div className=" flex justify-between items-center px-2 mb-4">
           <h1 className=" text-[var(--color-primary)] font-extrabold text-2xl ">Tasks</h1>
           <AddButton url="/task/add" text="Add" icon={<PlusSquare size={18} />} />
         </div>

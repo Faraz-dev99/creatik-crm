@@ -509,7 +509,7 @@ export default function CustomerEdit() {
               <InputField className=" max-sm:hidden" label="Video" name="Video" value={customerData.Video} onChange={handleInputChange} />
               <InputField className=" max-sm:hidden" label="Google Map" name="GoogleMap" value={customerData.GoogleMap} onChange={handleInputChange} />
               <SingleSelect className=" max-sm:hidden" options={Array.isArray(fieldOptions?.Verified) ? fieldOptions.Verified : []} label="Verified" value={customerData.Verified} onChange={(v) => handleSelectChange("Verified", v)} />
-              <div className=" max-sm:hidden">
+              <div className=" ">
                 <FileUpload label="Customer Images" multiple onChange={(e) => handleFileChange(e, "CustomerImage")} previews={imagePreviews} onRemove={handleRemoveImage} />
               <FileUpload label="Site Plan" onChange={(e) => handleFileChange(e, "SitePlan")} previews={sitePlanPreview ? [sitePlanPreview] : []} onRemove={() => handleRemoveSitePlan()} />
               </div>

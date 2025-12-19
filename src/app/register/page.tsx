@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, JSX } from "react";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import { FaUserAlt, FaLock, FaPhone } from "react-icons/fa";
@@ -10,7 +10,13 @@ import Link from "next/link";
 import { registerRequestUser } from "@/store/requestusers/requestusers";
 import PopupMenu from "../component/popups/PopupMenu";
 import RegisterPopup from "../component/popups/RegisterPopup";
+import { passwordRules, ValidatePassword } from "../utils/ValidatePassword";
 
+
+type PasswordValidationResult = {
+  messages: JSX.Element[]; // for inline display
+  errorString: string | null; // for toast
+};
 
 const Register = () => {
   const router = useRouter();
@@ -22,6 +28,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [phoneError, setPhoneError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const togglePassword = () => {
     setShowPassword(!showPassword)
@@ -30,24 +37,37 @@ const Register = () => {
 
 
 
-/*   if (isLoading || loading) {
-    return (
-      <div className="grid place-items-center min-h-screen w-full text-lg text-gray-600">
-        Loading...
-      </div>
-    );
-  } */
+  /*   if (isLoading || loading) {
+      return (
+        <div className="grid place-items-center min-h-screen w-full text-lg text-gray-600">
+          Loading...
+        </div>
+      );
+    } */
 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const PhoneValidationError = validatePhone(phone);
+    const PasswordValidationError = ValidatePassword(password);
+    // const PasswordValidationError = validatePassword(password)
+
+    if (PasswordValidationError) {
+      setPasswordError(PasswordValidationError);
+      toast.error(PasswordValidationError);
+      return;
+    }
     if (PhoneValidationError) {
       setPhoneError(PhoneValidationError);
       toast.error(PhoneValidationError);
       return;
     }
+    // if (PasswordValidationError) {
+    //   // setPasswordError(PasswordValidationError)
+    //   toast.error(PasswordValidationError);
+    //   return;
+    // }
     setLoading(true);
 
     const res = await registerRequestUser({ name, email, password, phone });
@@ -70,6 +90,40 @@ const Register = () => {
     }
     return "";
   };
+  // const validatePassword = (password: string) => {
+  //   // Define rules
+  //   const rules = [
+  //     {
+  //       test: /.{6,}/,
+  //       message: "Password must be at least 6 characters long",
+  //     },
+  //     {
+  //       test: /[A-Z]/,
+  //       message: "Password must include at least one uppercase letter",
+  //     },
+  //     {
+  //       test: /\d/,
+  //       message: "Password must include at least one number",
+  //     },
+  //     {
+  //       test: /[!@#$%^&*]/,
+  //       message: "Password must include at least one special character",
+  //     },
+  //   ];
+
+  //   // Map over rules and return <p> with conditional class
+  //   return rules.map((rule, idx) => {
+  //     const passed = rule.test.test(password);
+  //     return (
+  //       <p key={idx} className={passed ? "text-green-600" : "text-red-600"}>
+  //         {rule.message}
+  //       </p>
+  //     );
+  //   });
+  // };
+
+
+
 
 
   return (
@@ -80,6 +134,7 @@ const Register = () => {
         setPassword("")
         setName("")
         setPhone("")
+        setPasswordError("")
       }} />
       }
       <div className="min-h-screen w-full flex items-center justify-center bg-[url('/bgimage.webp')] bg-center bg-cover">
@@ -142,29 +197,46 @@ const Register = () => {
                   Email Address
                 </label>
               </div>
+              <div>
 
-              <div className="relative mt-4">
-                <FaLock className="absolute left-3 top-3 text-gray-300" />
-                <input
-                  onChange={(e) => setPassword(e.target.value)}
-                  value={password}
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  required
-                  className="peer w-full pl-10 pt-4 pb-2 border-b border-gray-300 text-gray-300 focus:border-purple-300 focus:outline-none transition bg-transparent"
-                />
-                <label
-                  htmlFor="password"
-                  className={`absolute left-10 text-gray-300 text-sm transition-all duration-200 ${password
-                    ? "-top-1.5 text-purple-300 text-md"
-                    : "top-3 text-gray-300 text-base"
-                    } peer-focus:-top-1.5 peer-focus:text-purple-300 peer-focus:text-sm`}
-                >
-                  Password
-                </label>
-                <button type="button" onClick={() => togglePassword()} className="text-sm cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
+
+                <div className="relative mt-4">
+                  <FaLock className="absolute left-3 top-3 text-gray-300" />
+                  <input
+                    onChange={(e) => setPassword(e.target.value)}
+                    value={password}
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    required
+                    className="peer w-full pl-10 pt-4 pb-2 border-b border-gray-300 text-gray-300 focus:border-purple-300 focus:outline-none transition bg-transparent"
+                  />
+                  <label
+                    htmlFor="password"
+                    className={`absolute left-10 text-gray-300 text-sm transition-all duration-200 ${password
+                      ? "-top-1.5 text-purple-300 text-md"
+                      : "top-3 text-gray-300 text-base"
+                      } peer-focus:-top-1.5 peer-focus:text-purple-300 peer-focus:text-sm`}
+                  >
+                    Password
+                  </label>
+                  <button type="button" onClick={() => togglePassword()} className="text-sm cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+
+                </div>
+                {/* {passwordError && (
+                  <p className="text-red-500 text-sm mt-1">{passwordError}
+                  </p>
+                )} */}
+                <div className="flex flex-col gap-1  mt-2 text-sm font-extralight">
+                  {passwordRules.map((rule, idx) => {
+                    const passed = rule.test.test(password);
+                    return (passwordError === rule.message) && <p key={idx} className={passed ? "text-green-500" : "text-red-500"}>
+                      {rule.message}
+                    </p>
+
+                  })}
+                </div>
               </div>
 
               <div className="relative mt-2">
@@ -178,7 +250,6 @@ const Register = () => {
                   value={phone}
                   type="text"
                   id="phone"
-                  required
                   className="peer w-full pl-10 pt-4 pb-2 border-b border-gray-300 text-gray-300 focus:border-purple-300 focus:outline-none transition bg-transparent"
                 />
                 <label
@@ -197,7 +268,7 @@ const Register = () => {
               </div>
 
               <button
-                type={loading?"button":"submit"}
+                type={loading ? "button" : "submit"}
                 disabled={loading}
                 className="w-full cursor-pointer py-3 mt-2 text-white text-lg font-medium rounded-full bg-gradient-to-r from-cyan-400 to-blue-600 hover:from-cyan-500 hover:to-blue-700  transition disabled:opacity-60"
               >

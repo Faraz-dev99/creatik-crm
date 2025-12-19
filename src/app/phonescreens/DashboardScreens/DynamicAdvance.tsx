@@ -2,30 +2,43 @@
 
 import AddButton from "@/app/component/buttons/AddButton";
 import { PlusSquare } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 
-const DynamicAdvance = ({ children }: { children: React.ReactNode }) => {
+type DynamicAdvanceProps = {
+  children: React.ReactNode;
+  addUrl?: string; // optional prop
+};
+
+
+const DynamicAdvance = ({ children, addUrl="/customer/add" }: DynamicAdvanceProps) => {
   const [open, setOpen] = useState(false);
+
+
 
   return (
     <div className="w-full">
       {/* 🔽 Toggle Button */}
       <div className=" flex justify-between items-center">
 
-      <div
-        onClick={() => setOpen(!open)}
-        className="bg-[var(--color-primary)] px-3 py-1.5 w-fit rounded-2xl my-4 mb-2 ml-0 flex items-center gap-2 cursor-pointer select-none"
-      >
-        <button className="text-white text-xs font-semibold">
-          ADVANCED SEARCH
-        </button>
-        
-        <button type="button" className="p-2 text-white hover:bg-gray-200 rounded-md">
-          {open ? <IoIosArrowUp /> : <IoIosArrowDown />}
-        </button>
-      </div>
-      <AddButton url="/customer/add" text="Add" icon={<PlusSquare size={18} />} />
+        <div
+          onClick={() => setOpen(!open)}
+          className="bg-[var(--color-primary)] px-3 py-1.5 w-fit rounded-2xl my-4 mb-2 ml-0 flex items-center gap-2 cursor-pointer select-none"
+        >
+          <button className="text-white text-xs font-semibold">
+            ADVANCED SEARCH
+          </button>
+
+          <button type="button" className="p-2 text-white hover:bg-gray-200 rounded-md">
+            {open ? <IoIosArrowUp /> : <IoIosArrowDown />}
+          </button>
+        </div>
+        <AddButton
+          url={addUrl}
+          text="Add"
+          icon={<PlusSquare size={18} />}
+        />
       </div>
 
       {/* 🔽 Dropdown Container */}

@@ -27,6 +27,16 @@ const data = [
     icon: <School size={22} />,
   },
   {
+    title: "Contact",
+    url: "/contact",
+    icon: <Podcast size={22} />,
+  },
+   {
+    title: "Contact FollowUp",
+    url: "/followups/contact",
+    icon: <School size={22} />,
+  },
+  {
     title: "Status Type",
     url: "/masters/status-type",
     icon: <NotebookTabs size={22} />,

@@ -7,11 +7,11 @@ import { MdPhone, MdEmail } from "react-icons/md";
 import { FaWhatsapp } from "react-icons/fa";
 import { AiOutlineHeart } from "react-icons/ai";
 import { GrFormNext, GrFormPrevious } from "react-icons/gr";
-
-import { AiOutlineBackward, AiOutlineForward } from "react-icons/ai"
 import { MdEdit, MdDelete, MdAdd } from "react-icons/md";
+import { AiOutlineBackward, AiOutlineForward } from "react-icons/ai"
 import { IoIosHeart } from "react-icons/io";
 import Link from "next/link";
+import Button from "@mui/material/Button";
 export interface LabelConfig {
     key: string;
     label: string;
@@ -20,19 +20,19 @@ export interface LabelConfig {
 interface LeadsSectionProps<T extends Record<string, any>> {
     leads: T[];
     labelLeads: LabelConfig[];
+    onFollowup?: (lead: T) => void;
+    onAdd?: (id: string) => void;
     onEdit?: (id: string) => void;
-    onWhatsappClick?: (lead: T) => void;
-    onMailClick?: (lead: T) => void;
-    onFavourite?: (lead: T) => void;
+    onDelete?: (lead: T) => void;
 }
 
-export default function ContactTable<T extends Record<string, any>>({
+export default function ContactFollowupTable<T extends Record<string, any>>({
     leads,
     labelLeads,
+    onFollowup,
+    onAdd,
     onEdit,
-    onWhatsappClick,
-    onMailClick,
-    onFavourite,
+    onDelete,
 }: LeadsSectionProps<T>) {
     const [toggleSearchDropdown, setToggleSearchDropdown] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -41,7 +41,6 @@ export default function ContactTable<T extends Record<string, any>>({
     const totalPages = Math.ceil(leads.length / itemsperpage);
     const startIndex = (currentPage - 1) * itemsperpage;
     const paginatedLeads = leads.slice(startIndex, startIndex + itemsperpage);
-     const [loader, setLoader] = useState(true);
 
 
     const nextPage = () => {
@@ -68,22 +67,28 @@ export default function ContactTable<T extends Record<string, any>>({
             <div className="px-0 pb-4">
                 {paginatedLeads.length === 0 && (
                     <div className="w-full flex justify-center items-center py-10 text-lg text-gray-500">
-                        No contact available
+                        No followup available
                     </div>
                 )}
-                {paginatedLeads.map((lead, index) => (
-                    <div key={index} className="w-full  bg-white shadow-md rounded-xl overflow-hidden border border-gray-200 mb-0">
+                {paginatedLeads.filter(
+                    (item, index, arr) =>
+                        arr.findIndex((row) => row.contactid === item.contactid) === index // ✅ keeps only first occurrence
+                ).map((lead, index) => {
+
+                    return <div key={index} className="w-full  bg-white shadow-md rounded-xl overflow-hidden border border-gray-200 mb-0">
                         <div className="bg-[var(--color-primary)] h-2"></div>
 
                         <div className="flex justify-between items-start p-4">
                             <div>
-                                {labelLeads.map((item, j) => (
-                                    <div
+
+                                {labelLeads.map((item, j, arr) => {
+
+                                    return <div
                                         key={j}
-                                        className="mb-2 grid grid-cols-[max-content_auto_1fr] items-center gap-2"
+                                        className="mb-2 grid grid-cols-[1fr_auto_2fr] items-center gap-2"
                                     >
                                         <span className="font-semibold text-black">
-                                            {item.label}
+                                            {item.label}{ }
                                         </span>
 
                                         <span className="text-gray-500">-</span>
@@ -93,56 +98,67 @@ export default function ContactTable<T extends Record<string, any>>({
                                         </span>
                                     </div>
 
-                                ))}
+                                })}
                             </div>
 
                             <button
-                                onClick={() => onEdit?.(lead._id)}
+                                onClick={() => onAdd?.(lead.customerid)}
                                 className="p-2 bg-gray-100 rounded-full shadow text-[var(--color-primary)]"
                             >
-                                <MdEdit size={20} />
+                                <MdAdd size={20} />
 
                             </button>
-
 
                         </div>
 
                         <div className="bg-[var(--color-primary)] p-3 flex justify-between">
-
-                            <div></div>
+                            { }
+                            <button onClick={() => onFollowup?.(lead)} className="text-white border border-white px-3 text-sm rounded-full">
+                                FOLLOW UP
+                            </button>
 
 
                             <div className="flex items-center gap-10">
-                                <a href={`tel:+91${String(lead["ContactNumber"]) ?? String(lead["ContactNo"]) ?? ""}`} className="">
-                                    <MdPhone size={25} className="text-white" />
-                                </a>
 
 
                                 {/* <MdEmail size={20} className="text-white" /> */}
-                                <button
-                                    onClick={() => onMailClick?.(lead)}
-                                    className="text-white"
-                                >
-                                    <MdEmail size={25} />
-                                </button>
 
 
                                 {/* <a href={`https://wa.me/+91${String(lead["ContactNumber"]) ?? String(lead["ContactNo"]) ?? ""}`} target="_blank">
                   <FaWhatsapp size={20} className="text-white" />
                 </a> */}
-                                <button
-                                    onClick={() => onWhatsappClick?.(lead)}
-                                    className="text-white"
+                                <Button
+                                    sx={{
+                                        backgroundColor: "var(--color-primary)",
+                                        color: "white",
+                                        minWidth: "32px",
+                                        height: "32px",
+                                        borderRadius: "8px",
+                                    }}
+                                    onClick={() => onEdit?.(lead.contactid)}   // ⬅ SEND ID HERE
                                 >
-                                    <FaWhatsapp size={25} />
-                                </button>
+                                    <MdEdit size={25} />
+                                </Button>
+
+
+                                <Button
+                                    sx={{
+                                        backgroundColor: "var(--color-primary)",
+                                        color: "white",
+                                        minWidth: "32px",
+                                        height: "32px",
+                                        borderRadius: "8px",
+                                    }}
+                                    onClick={() => onDelete?.(lead)}
+
+                                ><MdDelete size={25} /></Button>
 
 
 
                             </div>
                         </div>
                     </div>
-                ))}
+                })}
                 {/* animated button */}
                 {paginatedLeads.length > 0 && (
                     <div className="flex items-center justify-center w-full">

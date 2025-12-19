@@ -70,7 +70,10 @@ export default function FollowupTable<T extends Record<string, any>>({
                         No followup available
                     </div>
                 )}
-                {paginatedLeads.map((lead, index) => {
+                {paginatedLeads.filter(
+                    (item, index, arr) =>
+                        arr.findIndex((row) => row.customerid === item.customerid) === index //keeps only first occurrence
+                ).map((lead, index) => {
 
                     return <div key={index} className="w-full  bg-white shadow-md rounded-xl overflow-hidden border border-gray-200 mb-0">
                         <div className="bg-[var(--color-primary)] h-2"></div>

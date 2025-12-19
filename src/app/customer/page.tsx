@@ -71,7 +71,7 @@ export default function Customer() {
   const [dialogType, setDialogType] = useState<"delete" | "favourite" | null>(null);
   const [fieldOptions, setFieldOptions] = useState<Record<string, any[]>>({});
   const [isFavrouteCustomer, setIsFavrouteCustomer] = useState<boolean>(false);
-  const [customerTableLoader,setCustomerTableLoader]=useState(true);
+  const [customerTableLoader, setCustomerTableLoader] = useState(true);
   const [deleteAllDialogData, setDeleteAllDialogData] =
     useState<DeleteAllDialogDataInterface | null>(null);
   const scrollRef = useHorizontalScroll();
@@ -108,7 +108,7 @@ export default function Customer() {
   useEffect(() => {
     const status = searchParams.get("Campaign");
 
-    if (status){
+    if (status) {
 
       const campaignObj = fieldOptions?.Campaign?.find(
         (c) => c.Name === status
@@ -131,11 +131,11 @@ export default function Customer() {
       setCustomerTableLoader(false);
 
       // Fetch filtered data
-      handleSelectChange("Campaign", status,updatedFilters);
+      handleSelectChange("Campaign", status, updatedFilters);
     }
-    else{
+    else {
       getCustomers();
-    fetchFields();
+      fetchFields();
     }
   }, [searchParams, fieldOptions.Campaign]);
 
@@ -186,6 +186,7 @@ export default function Customer() {
         }))
       );
       setCustomerTableLoader(false);
+      setCustomerTableLoader(false)
     }
   };
 
@@ -279,6 +280,7 @@ export default function Customer() {
         }
       }))
       setCurrentTablePage(1);
+      setCustomerTableLoader(false)
     }
   };
 
@@ -721,9 +723,9 @@ export default function Customer() {
       />
 
       {/* Mobile Customer Page */}
-      <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-sm:py-5">
+      <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-sm:py-2">
 
-        <div className=" flex justify-between items-center px-0 pb-2">
+        <div className=" flex justify-between items-center px-0">
           <h1 className=" text-[var(--color-primary)] font-extrabold text-2xl ">Leads</h1>
 
         </div>
@@ -1217,43 +1219,39 @@ export default function Customer() {
                 </thead>
 
                 <tbody>
-                  {currentRows.length > 0 ? (
-                    currentRows.map((item, index) => (
-                      <tr key={item._id} className="border-t hover:bg-[#f7f6f3] transition-all duration-200">
+                  {customerTableLoader ?
+                    <tr>
+                      <td colSpan={12} className="text-center py-4 text-gray-500">
+                        Loading customers...
+                      </td>
+                    </tr> : currentRows.length > 0 ? (
+                      currentRows.map((item, index) => (
+                        <tr key={item._id} className="border-t hover:bg-[#f7f6f3] transition-all duration-200">
 
-                        {/* ✅ ROW CHECKBOX */}
-                        <td className="px-2 py-3 border border-gray-200">
-                          <input
-                            type="checkbox"
-                            checked={selectedCustomers.includes(item._id)}
-                            onChange={() => handleSelectRow(item._id)}
-                          />
-                        </td>
+                          {/* ✅ ROW CHECKBOX */}
+                          <td className="px-2 py-3 border border-gray-200">
+                            <input
+                              type="checkbox"
+                              checked={selectedCustomers.includes(item._id)}
+                              onChange={() => handleSelectRow(item._id)}
+                            />
+                          </td>
 
-                        <td className="px-2 py-3 border border-gray-200 break-all whitespace-normal max-w-[60px]">{(currentTablePage - 1) * rowsPerTablePage + (index + 1)}</td>
-                        <td className="px-2 py-3 border border-gray-200">{item.Campaign}</td>
-                        <td className="px-2 py-3 border border-gray-200 break-all whitespace-normal w-[130px]">{item.Type}</td>
-                        <td className="px-2 py-3  border-gray-200 break-all whitespace-normal max-w-[120px] ">{item.SubType}</td>
-                        <td className="px-2 py-3 border border-gray-200  ">{item.Name}</td>
-                        <td
-                          className={`px-2 py-3 border border-gray-200 break-all whitespace-normal max-w-[160px] ${item.Description ? "min-w-[160px]" : ""
-                            }`}
-                        >
-                          {item.Description}
-                        </td>
-                        <td className="px-2 py-3 border border-gray-200">{item.Location}</td>
-                        <td className="px-4 py-3  flex flex-col justify-center items-center gap-1">{(item.ContactNumber) && <>{item.ContactNumber}<span className=" flex"> <Button
-                          component="a"
-                          href={`tel:${item.ContactNumber}`}
-                          sx={{
-                            backgroundColor: "#E8F5E9",
-                            color: "var(--color-primary)",
-                            minWidth: "14px",
-                            height: "24px",
-                            borderRadius: "8px",
-                            margin: "4px"
-                          }} ><FaPhone size={12} /></Button>
-                          <Button
+                          <td className="px-2 py-3 border border-gray-200 break-all whitespace-normal max-w-[60px]">{(currentTablePage - 1) * rowsPerTablePage + (index + 1)}</td>
+                          <td className="px-2 py-3 border border-gray-200">{item.Campaign}</td>
+                          <td className="px-2 py-3 border border-gray-200 break-all whitespace-normal w-[130px]">{item.Type}</td>
+                          <td className="px-2 py-3  border-gray-200 break-all whitespace-normal max-w-[120px] ">{item.SubType}</td>
+                          <td className="px-2 py-3 border border-gray-200  ">{item.Name}</td>
+                          <td
+                            className={`px-2 py-3 border border-gray-200 break-all whitespace-normal max-w-[160px] ${item.Description ? "min-w-[160px]" : ""
+                              }`}
+                          >
+                            {item.Description}
+                          </td>
+                          <td className="px-2 py-3 border border-gray-200">{item.Location}</td>
+                          <td className="px-4 py-3  flex flex-col justify-center items-center gap-1">{(item.ContactNumber) && <>{item.ContactNumber}<span className=" flex"> <Button
+                            component="a"
+                            href={`tel:${item.ContactNumber}`}
                             sx={{
                               backgroundColor: "#E8F5E9",
                               color: "var(--color-primary)",
@@ -1261,90 +1259,99 @@ export default function Customer() {
                               height: "24px",
                               borderRadius: "8px",
                               margin: "4px"
-                            }}
-                            onClick={() => {
-                              setSelectedCustomers([item._id])
-                              setSelectUser(item._id)
-                              setIsMailAllOpen(true);
-                              fetchEmailTemplates();
-                            }}
-                          ><MdEmail size={14} /></Button>
-                          <Button
-                            onClick={() => {
-                              setSelectedCustomers([item._id]);
-                              setSelectUser(item._id);
-                              setIsWhatsappAllOpen(true);
-                              fetchWhatsappTemplates()
+                            }} ><FaPhone size={12} /></Button>
+                            <Button
+                              sx={{
+                                backgroundColor: "#E8F5E9",
+                                color: "var(--color-primary)",
+                                minWidth: "14px",
+                                height: "24px",
+                                borderRadius: "8px",
+                                margin: "4px"
+                              }}
+                              onClick={() => {
+                                setSelectedCustomers([item._id])
+                                setSelectUser(item._id)
+                                setIsMailAllOpen(true);
+                                fetchEmailTemplates();
+                              }}
+                            ><MdEmail size={14} /></Button>
+                            <Button
+                              onClick={() => {
+                                setSelectedCustomers([item._id]);
+                                setSelectUser(item._id);
+                                setIsWhatsappAllOpen(true);
+                                fetchWhatsappTemplates()
 
-                            }}
-                            sx={{
-                              backgroundColor: "#E8F5E9",
-                              color: "var(--color-primary)",
-                              minWidth: "14px",
-                              height: "24px",
-                              borderRadius: "8px",
-                              margin: "4px"
-                            }} ><FaWhatsapp size={14} /></Button></span></>
-                        }
-                        </td>
-                        <td className="px-2 py-3 border border-gray-200">{item.AssignTo}</td>
-                        <td className="px-2 py-3 border border-gray-200 min-w-[100px]">{item.Date}</td>
+                              }}
+                              sx={{
+                                backgroundColor: "#E8F5E9",
+                                color: "var(--color-primary)",
+                                minWidth: "14px",
+                                height: "24px",
+                                borderRadius: "8px",
+                                margin: "4px"
+                              }} ><FaWhatsapp size={14} /></Button></span></>
+                          }
+                          </td>
+                          <td className="px-2 py-3 border border-gray-200">{item.AssignTo}</td>
+                          <td className="px-2 py-3 border border-gray-200 min-w-[100px]">{item.Date}</td>
 
-                        <td className=" py-2 px-[8px] min-w-[90px] grid grid-cols-2 gap-3  items-center">
-                          <Button
-                            sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px", }}
-                            onClick={() => router.push(`/followups/customer/add/${item._id}`)}
-                          >
-                            <MdAdd />
-                          </Button>
+                          <td className=" py-2 px-[8px] min-w-[90px] grid grid-cols-2 gap-3  items-center">
+                            <Button
+                              sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px", }}
+                              onClick={() => router.push(`/followups/customer/add/${item._id}`)}
+                            >
+                              <MdAdd />
+                            </Button>
 
-                          <Button
-                            sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px", }}
-                            onClick={() => router.push(`/customer/edit/${item._id}`)}
-                          >
-                            <MdEdit />
-                          </Button>
+                            <Button
+                              sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px", }}
+                              onClick={() => router.push(`/customer/edit/${item._id}`)}
+                            >
+                              <MdEdit />
+                            </Button>
 
-                          <Button
-                            sx={{ backgroundColor: "#FDECEA", color: "#C62828", minWidth: "32px", height: "32px", borderRadius: "8px", }}
-                            onClick={() => {
-                              setIsDeleteDialogOpen(true);
-                              setDialogType("delete");
-                              setDialogData({
-                                id: item._id,
-                                customerName: item.Name,
-                                ContactNumber: item.ContactNumber,
-                              });
-                            }}
-                          >
-                            <MdDelete />
-                          </Button>
+                            <Button
+                              sx={{ backgroundColor: "#FDECEA", color: "#C62828", minWidth: "32px", height: "32px", borderRadius: "8px", }}
+                              onClick={() => {
+                                setIsDeleteDialogOpen(true);
+                                setDialogType("delete");
+                                setDialogData({
+                                  id: item._id,
+                                  customerName: item.Name,
+                                  ContactNumber: item.ContactNumber,
+                                });
+                              }}
+                            >
+                              <MdDelete />
+                            </Button>
 
-                          <Button
-                            sx={{
-                              backgroundColor: "#FFF0F5",
-                              color: item.isFavourite ? "#E91E63" : "#C62828",
-                              minWidth: "32px",
-                              height: "32px",
-                              borderRadius: "8px",
+                            <Button
+                              sx={{
+                                backgroundColor: "#FFF0F5",
+                                color: item.isFavourite ? "#E91E63" : "#C62828",
+                                minWidth: "32px",
+                                height: "32px",
+                                borderRadius: "8px",
 
-                            }}
-                            onClick={() =>
-                              handleFavouriteToggle(item._id, item.Name, item.ContactNumber, item.isFavourite ?? false)
-                            }
-                          >
-                            {item.isFavourite ? <MdFavorite /> : <MdFavoriteBorder />}
-                          </Button>
+                              }}
+                              onClick={() =>
+                                handleFavouriteToggle(item._id, item.Name, item.ContactNumber, item.isFavourite ?? false)
+                              }
+                            >
+                              {item.isFavourite ? <MdFavorite /> : <MdFavoriteBorder />}
+                            </Button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={10} className="text-center py-4 text-gray-500">
+                          No data available.
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={10} className="text-center py-4 text-gray-500">
-                        No data available.
-                      </td>
-                    </tr>
-                  )}
+                    )}
                 </tbody>
               </table>
 

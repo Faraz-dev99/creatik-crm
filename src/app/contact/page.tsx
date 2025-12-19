@@ -598,14 +598,14 @@ export default function Contacts() {
           }}
         />
       )}
-      <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-sm:py-5">
+      <div className=" sm:hidden min-h-[calc(100vh-56px)] overflow-auto max-sm:py-2">
 
-        <div className=" flex justify-between items-center px-2 py-2  mb-4">
+        <div className=" flex justify-between items-center px-0 pb-0  ">
           <h1 className=" text-[var(--color-primary)] font-extrabold text-2xl ">Contacts</h1>
-          <AddButton url="/contact/add" text="Add" icon={<PlusSquare size={18} />} />
+          
         </div>
         <div className=" w-full">
-          <DynamicAdvance>
+          <DynamicAdvance addUrl="/contact/add">
             <SingleSelect options={Array.isArray(fieldOptions.StatusAssign) ? fieldOptions.StatusAssign : []} value={filters.StatusAssign[0]} label="Status Assign" onChange={(v) => handleSelectChange("StatusAssign", v)} />
 
             <ObjectSelect
