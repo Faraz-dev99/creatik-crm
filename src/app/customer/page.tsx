@@ -231,6 +231,7 @@ export default function Customer() {
   };
 
   const handleSelectChange = async (field: keyof typeof filters, selected: string | string[], filtersOverride?: typeof filters) => {
+    setCustomerTableLoader(true);
     const updatedFilters = filtersOverride || {
       ...filters,
       [field]: Array.isArray(selected)
