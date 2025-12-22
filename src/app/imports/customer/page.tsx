@@ -16,7 +16,7 @@ import SaveButton from "@/app/component/buttons/SaveButton";
 import { handleFieldOptionsObject } from "@/app/utils/handleFieldOptionsObject";
 import ObjectSelect from "@/app/component/ObjectSelect";
 import { useCustomerImport } from "@/context/CustomerImportContext";
-
+import { FaArrowDownLong } from "react-icons/fa6";
 export default function CustomerImport() {
   const [importData, setImportData] = useState({
     Campaign: { id: "", name: "" },
@@ -153,42 +153,95 @@ export default function CustomerImport() {
     }
   };
 
+  // download demo file function
+  const handleDownload = () => {
+    const link = document.createElement("a");
+    link.href = "/files/customer-import-file.xlsx";
+    link.download = "customer-import-template.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
-    <div className=" min-h-screen max-md:p-0 max-w-[700px] mx-auto flex justify-center">
-      <Toaster position="top-right" />
-      <div className="w-full">
-        <div className="flex justify-end mb-4">
-          <BackButton
-            url="/customer"
-            text="Back"
-            icon={<ArrowLeft size={18} />}
-          />
+    <>
+      <div className="flex  mx-auto w-full justify-center">
+        <div className=" min-h-fix max-md:p-0 max-w-[700px] w-[100%] mt-12   flex justify-center">
+          <Toaster position="top-right" />
+          <div className="w-full">
+            <div className="flex justify-end mb-4">
+              <BackButton
+                url="/customer"
+                text="Back"
+                icon={<ArrowLeft size={18} />}
+              />
+            </div>
+
+            <div className="bg-white/90 backdrop-blur-lg p-10 w-full rounded-3xl shadow-2xl h-auto">
+              <h1 className="text-2xl font-extrabold text-[var(--color-secondary-darker)] mb-8 border-b pb-4">
+                Import <span className="text-[var(--color-primary)]
+">Customers</span>
+              </h1>
+
+              <div className=" w-full">
+
+
+                <FileUpload
+                  label="Choose Excel File"
+                  onChange={handleFileChange}
+                  error={errors.file}
+                />
+              </div>
+
+              <div className="flex justify-end mt-8">
+
+                <SaveButton text="Import" onClick={handleSubmit} />
+
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="bg-white/90 backdrop-blur-lg p-10 w-full rounded-3xl shadow-2xl h-auto">
-          <h1 className="text-2xl font-extrabold text-[var(--color-secondary-darker)] mb-8 border-b pb-4">
-            Import <span className="text-[var(--color-primary)]
-">Customers</span>
-          </h1>
+        {/* second */}
+        <div className=" w-[35%]">
+          <div className="bg-white border-neutral-400  p-6 rounded-lg   ml-6  hidden lg:block  relative top-11">
+            <div className="flex items-center space-x-2 mb-4">
+              <span className="text-orange-500">🔥</span>
+              <h2 className="text-xl font-bold text-[var(--color-secondary-darker)]">Product Upload Tips</h2>
+            </div>
+            <ul className="space-y-3 text-sm text-gray-700 font-semibold" >
+              <li className=" flex gap-1">
+                <p>•</p>
+                <div>
+                  Phone numbers must contain digits only. <br />
+                  Do not use special symbols such as -, /, or spaces.
+                </div>
+              </li>
+              <li className=" flex gap-1"><p>•</p>
+                <div>Only 10-digit phone numbers are allowed. <br />
+                  Do not include country codes like +91 or prefixes such as 91.</div>
+              </li>
+              <li className=" flex gap-1"><p>•</p>
+                <div>For multiple phone numbers, separate each number with a comma and a space. <br />
+                  Example: 9876543210, 9123456789</div>
+              </li>
+              <li className=" flex gap-1">
+                <p>•</p> <div> Supported file formats for upload are: <br />
+                  .xlsx, .xlsm, .xlsb, .xls, .ods, .csv</div>
+              </li>
+              <li className=" flex gap-1"><p>•</p>
+                <div>Unsupported file formats will not be accepted, including: <br />
+                  .txt, .json, .pdf, .xml, and similar formats.</div>
+              </li>
 
-          <div className=" w-full">
-
-
-            <FileUpload
-              label="Choose Excel File"
-              onChange={handleFileChange}
-              error={errors.file}
-            />
+            </ul>
+            <p className="text-[var(--color-secondary-darker)] text-sm font-semibold text-center mt-5">Want Demo ?</p>
+            <div onClick={handleDownload} className=" cursor-pointer bg-gradient-to-r mt-1 from-[var(--color-primary-dark)] to-[var(--color-secondary)]  hover:from-[var(--color-primary-darker)] hover:to-[var(--color-secondary-dark)]  w-fit px-3 py-2 flex flex-row gap-x-2 items-center text-white font-medium rounded-md text-xs  mx-auto"><span className=" bg-transparent border-b-2 text-white border-white "><FaArrowDownLong className="animate-bounce" /></span>Download</div>
           </div>
 
-          <div className="flex justify-end mt-8">
-
-            <SaveButton text="Import" onClick={handleSubmit} />
-
-          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

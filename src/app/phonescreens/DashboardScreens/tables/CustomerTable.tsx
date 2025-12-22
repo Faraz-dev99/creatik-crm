@@ -30,6 +30,8 @@ interface LeadsSectionProps<T extends Record<string, any>> {
     onMailClick?: (lead: T) => void;
     onFavourite?: (lead: T) => void;
     loader?: boolean;
+    hasMoreCustomers?: boolean; // like desktop
+    fetchMore?: () => Promise<void>; // async fetch more
 }
 
 export default function CustomerTable<T extends Record<string, any>>({
@@ -41,7 +43,9 @@ export default function CustomerTable<T extends Record<string, any>>({
     onWhatsappClick,
     onMailClick,
     onFavourite,
-    loader
+    loader,
+    hasMoreCustomers,
+    fetchMore
 }: LeadsSectionProps<T>) {
     const [toggleSearchDropdown, setToggleSearchDropdown] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -55,11 +59,24 @@ export default function CustomerTable<T extends Record<string, any>>({
     /* const [loader, setLoader] = useState(true); */
     const router = useRouter();
 
+const nextPage = async () => {
+    // Normal client-side pagination
+    if (currentPage < totalPages) {
+        setCurrentPage(prev => prev + 1);
+        return;
+    }
 
-    const nextPage = () => {
-        if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    // Last page → fetch more from server (if available)
+    if (hasMoreCustomers && fetchMore) {
+        await fetchMore(); // fetchMore should update leads
+        // After leads update, recompute totalPages
+        const newTotalPages = Math.ceil((leads.length + itemsperpage) / itemsperpage);
+        if (currentPage < newTotalPages) {
+            setCurrentPage(prev => prev + 1);
+        }
+    }
+};
 
-    };
 
     const prevPage = () => {
         if (currentPage > 1) setCurrentPage(currentPage - 1);
@@ -271,8 +288,13 @@ export default function CustomerTable<T extends Record<string, any>>({
 
                             <button
                                 onClick={nextPage}
-                                disabled={currentPage === totalPages}
-                                className={`h-[30px] w-[30px] bg-white rounded-full text-sm grid place-items-center ${currentPage === totalPages ? "bg-gray-200 opacity-50 cursor-not-allowed" : "bg-white "}`}><GrFormNext /> </button>
+                                disabled={!hasMoreCustomers && currentPage === totalPages}
+                                className={`h-[30px] w-[30px] bg-white rounded-full text-sm grid place-items-center ${currentPage === totalPages && !hasMoreCustomers ? "bg-gray-200 opacity-50 cursor-not-allowed" : "bg-white"
+                                    }`}
+                            >
+                                <GrFormNext />
+                            </button>
+
                             <button onClick={() => setCurrentPage(totalPages)} className=" h-[30px] w-[30px] bg-white rounded-full text-sm grid place-items-center"><AiOutlineForward /> </button>
                         </div>
                     </div>)}

@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { MdEdit, MdDelete, MdAdd, MdFavorite, MdFavoriteBorder, MdEmail } from "react-icons/md";
@@ -46,6 +46,16 @@ interface DeleteAllDialogDataInterface { }
 
 export default function Customer() {
   const router = useRouter();
+const hasInitialFetched = useRef(false);
+  /* fetch */
+  const FETCH_CHUNK = 100;
+
+  const [fetchedCount, setFetchedCount] = useState(0);
+  const [hasMoreCustomers, setHasMoreCustomers] = useState(true);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [totalCustomers,setTotalCustomers] = useState(0);
+  const [totalCustomerPage,setTotalCustomerPage]=useState(0)
+
 
   /*NEW STATE FOR SELECTED CUSTOMERS */
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
@@ -107,6 +117,7 @@ export default function Customer() {
 
   useEffect(() => {
     const status = searchParams.get("Campaign");
+    if(!fieldOptions?.Campaign?.length) return;
 
     if (status) {
 
@@ -139,6 +150,13 @@ export default function Customer() {
     }
   }, [searchParams, fieldOptions.Campaign]);
 
+  const getTotalCustomerPage = async ()=>{
+    const data= await getCustomer();
+    const total=  Math.ceil(data.length / Number(filters.Limit[0])) || 0
+    setTotalCustomerPage(total);
+  }
+  
+
   function getPlainTextFromHTML(htmlString: string) {
     const parser = new DOMParser();
     const doc = parser.parseFromString(htmlString, "text/html");
@@ -146,49 +164,82 @@ export default function Customer() {
   }
 
   const getCustomers = async () => {
-    const data = await getCustomer();
+    setCustomerTableLoader(true);
+    setFetchedCount(0);
+    setHasMoreCustomers(true);
+
+    const queryParams = new URLSearchParams();
+    queryParams.append("Limit", FETCH_CHUNK.toString());
+    queryParams.append("Skip", "0");
+
+    const data = await getFilteredCustomer(queryParams.toString());
+
     if (data) {
-      setCustomerData(
-        data.map((item: any) => {
-          const date = new Date(item.createdAt);
-          const formattedDate =
-            date.getDate().toString().padStart(2, "0") + "-" +
-            (date.getMonth() + 1).toString().padStart(2, "0") + "-" +
-            date.getFullYear();
-          return {
-            _id: item._id,
-            Campaign: item.Campaign,
-            Type: item.CustomerType,
-            SubType: item.CustomerSubType,
-            Name: item.customerName,
-            Description: item.Description,
-            Email: item.Email,
-            City: item.City,
-            Location: item.Location,
-            ContactNumber: item.ContactNumber?.slice(0, 10),
-            AssignTo: item.AssignTo?.name,
-            isFavourite: item.isFavourite,
-            Date: item.date ?? formattedDate,
-            SitePlan: item.SitePlan || "",
-          }
-        })
-      );
-      setCustomerAdv(
-        data.map((item: any) => ({
-          _id: item._id,
-          Campaign: item.Campaign || [],
-          CustomerType: item.CustomerType || [],
-          CustomerSubtype: item.CustomerSubtype || [],
-          City: item.City || [],
-          Location: item.Location || [],
-          User: item.User || [],
-          Limit: item.Limit || [],
-        }))
-      );
-      setCustomerTableLoader(false);
-      setCustomerTableLoader(false)
+      const mapped = data.map(mapCustomer);
+      setCustomerData(mapped);
+      setFetchedCount(mapped.length);
+      setHasMoreCustomers(mapped.length === FETCH_CHUNK);
     }
+
+    setCustomerTableLoader(false);
   };
+
+
+  const mapCustomer = (item: any) => {
+    const date = new Date(item.createdAt);
+    const formattedDate =
+      date.getDate().toString().padStart(2, "0") + "-" +
+      (date.getMonth() + 1).toString().padStart(2, "0") + "-" +
+      date.getFullYear();
+
+    return {
+      _id: item._id,
+      Campaign: item.Campaign,
+      Type: item.CustomerType,
+      SubType: item.CustomerSubType,
+      Name: item.customerName,
+      Description: item.Description,
+      Email: item.Email,
+      City: item.City,
+      Location: item.Location,
+      ContactNumber: item.ContactNumber?.slice(0, 10),
+      AssignTo: item.AssignTo?.name,
+      isFavourite: item.isFavourite,
+      Date: item.date ?? formattedDate,
+      SitePlan: item.SitePlan || "",
+    };
+  };
+
+
+  const fetchMore = async () => {
+    if (isFetchingMore || !hasMoreCustomers) return;
+
+    setIsFetchingMore(true);
+    setCustomerTableLoader(true);
+
+    const queryParams = new URLSearchParams();
+    queryParams.append("Limit", FETCH_CHUNK.toString());
+    queryParams.append("Skip", customerData.length.toString());
+
+    Object.entries(filters).forEach(([key, value]) => {
+      if (key === "Limit") return;
+      if (Array.isArray(value)) value.forEach(v => queryParams.append(key, v));
+      if (typeof value === "string" && value) queryParams.append(key, value);
+    });
+
+    const data = await getFilteredCustomer(queryParams.toString());
+
+    if (data) {
+      const mapped = data.map(mapCustomer);
+      setCustomerData(prev => [...prev, ...mapped]);
+      setFetchedCount(prev => prev + mapped.length);
+      setHasMoreCustomers(mapped.length === FETCH_CHUNK);
+    }
+
+    setCustomerTableLoader(false);
+    setIsFetchingMore(false);
+  };
+
 
   const handleDelete = async (data: DeleteDialogDataInterface | null) => {
     if (!data) return;
@@ -256,33 +307,21 @@ export default function Customer() {
 
 
 
+    queryParams.append("Limit", FETCH_CHUNK.toString());
+    queryParams.append("Skip", "0");
+
     const data = await getFilteredCustomer(queryParams.toString());
+
     if (data) {
-      setCustomerData(data.map((item: any) => {
-        const date = new Date(item.createdAt);
-        const formattedDate =
-          date.getDate().toString().padStart(2, "0") + "-" +
-          (date.getMonth() + 1).toString().padStart(2, "0") + "-" +
-          date.getFullYear();
-        return {
-          _id: item._id,
-          Campaign: item.Campaign,
-          Type: item.CustomerType,
-          SubType: item.CustomerSubType,
-          Name: item.customerName,
-          Description: item.Description,
-          Email: item.Email,
-          City: item.City,
-          Location: item.Location,
-          ContactNumber: item.ContactNumber?.slice(0, 10),
-          AssignTo: item.AssignTo?.name,
-          isFavourite: item.isFavourite,
-          Date: item.date ?? formattedDate,
-        }
-      }))
+      const mapped = data.map(mapCustomer);
+      setCustomerData(mapped);
+      setFetchedCount(mapped.length);
+      setHasMoreCustomers(mapped.length === FETCH_CHUNK);
       setCurrentTablePage(1);
-      setCustomerTableLoader(false)
     }
+
+    setCustomerTableLoader(false);
+
   };
 
   const clearFilter = async () => {
@@ -320,6 +359,7 @@ export default function Customer() {
     setRowsPerTablePage(safeLimit);
     setCurrentTablePage(1);
   }, [filters.Limit]);
+
 
 
 
@@ -893,6 +933,8 @@ export default function Customer() {
             handleFavouriteToggle(lead._id, lead.Name, lead.ContactNumber, lead.isFavourite ?? false)
           }}
           loader={customerTableLoader}
+          hasMoreCustomers={hasMoreCustomers}
+          fetchMore={fetchMore}
         />
 
       </div>
@@ -1105,7 +1147,9 @@ export default function Customer() {
 
                     <SingleSelect options={Array.isArray(fieldOptions?.User) ? fieldOptions.User : []} value={filters.User[0]} label="User" onChange={(v) => handleSelectChange("User", v)} />
 
-                    <SingleSelect options={["10", "25", "50", "100"]} value={filters.Limit[0]} label="Limit" onChange={(v) => handleSelectChange("Limit", v)} />
+                    <SingleSelect options={["10", "25", "50", "100"]} value={filters.Limit[0]} label="Limit" onChange={(v) =>{
+                      
+                       handleSelectChange("Limit", v)}} />
 
                   </div>
 
@@ -1360,7 +1404,7 @@ export default function Customer() {
             {/* Pagination */}
             <div className="flex justify-between items-center mt-3 py-3 px-5">
               <p className="text-sm">
-                Page {currentTablePage} of {totalTablePages}
+                Page {currentTablePage} of {hasMoreCustomers? totalTablePages+1 : totalCustomerPage}
               </p>
               <div className="flex gap-3">
                 <button
@@ -1373,16 +1417,25 @@ export default function Customer() {
                   Prev
                 </button>
                 <button
-                  onClick={() =>
-                    setCurrentTablePage((prev) =>
-                      prev < totalTablePages ? prev + 1 : prev
-                    )
-                  }
-                  disabled={currentTablePage === totalTablePages}
+                  onClick={async () => {
+                    // normal pagination
+                    if (currentTablePage < totalTablePages) {
+                      setCurrentTablePage(prev => prev + 1);
+                      return;
+                    }
+
+                    // last page → fetch more → then move
+                    if (hasMoreCustomers) {
+                      await fetchMore();
+                      setCurrentTablePage(prev => prev + 1);
+                    }
+                  }}
+                  disabled={!hasMoreCustomers && currentTablePage === totalTablePages}
                   className="px-3 py-1 bg-gray-200 border border-gray-300 rounded disabled:opacity-50"
                 >
                   Next
                 </button>
+
               </div>
             </div>
           </section>
