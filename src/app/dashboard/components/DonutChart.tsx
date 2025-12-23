@@ -139,13 +139,10 @@ const DonutChart = () => {
               ))}
             </Pie>
 
-            <Tooltip
-              formatter={(
-                value: string | number,
-                name: string,
-                entry: any
-              ) => {
-                const numericValue = typeof value === "number" ? value : 0;
+            <Tooltip<number, string>
+              formatter={(value, name, item, index, payload) => {
+                // value is guaranteed to be number
+                const numericValue = value ?? 0; // just in case
                 return `${numericValue} (${((numericValue / total) * 100).toFixed(1)}%)`;
               }}
               contentStyle={{ fontSize: "0.8rem", borderRadius: "8px" }}
