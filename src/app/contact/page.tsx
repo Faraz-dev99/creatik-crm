@@ -971,8 +971,10 @@ export default function Contacts() {
                 </button> */}
                 <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
                   if (contactData.length > 0) {
+                    if(selectedContacts.length<1){
                     const firstPageIds = currentRows.map((c) => c._id);
                     setSelectedContacts(firstPageIds);
+                    }
                     setIsDeleteAllDialogOpen(true);
                     setDeleteAllDialogData({});
                   }

@@ -65,6 +65,7 @@ export interface customerGetDataInterface {
   SitePlan?: string;
 }
 
+
 export interface CustomerAdvInterface {
   _id: string[];
   StatusAssign: string[];

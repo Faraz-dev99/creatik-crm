@@ -230,8 +230,10 @@ export default function SchedulePage() {
           <div className="flex gap-10 items-center px-3 py-4 min-w-max text-gray-700">
             <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
               if (filteredSchedules.length > 0) {
+                if(scheduleIds.length<1){
                  const firstPageIds = currentRows.map((c) => c._id);
                     setSchedulesIds(firstPageIds);
+                }
                 setIsDeleteAllDialogOpen(true);
                 setDeleteAllDialogData({});
               }

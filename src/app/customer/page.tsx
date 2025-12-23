@@ -46,15 +46,17 @@ interface DeleteAllDialogDataInterface { }
 
 export default function Customer() {
   const router = useRouter();
-const hasInitialFetched = useRef(false);
+  const hasInitialFetched = useRef(false);
   /* fetch */
   const FETCH_CHUNK = 100;
 
   const [fetchedCount, setFetchedCount] = useState(0);
   const [hasMoreCustomers, setHasMoreCustomers] = useState(true);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
-  const [totalCustomers,setTotalCustomers] = useState(0);
-  const [totalCustomerPage,setTotalCustomerPage]=useState(0)
+  const [totalCustomers, setTotalCustomers] = useState(0);
+  const [totalCustomerPage, setTotalCustomerPage] = useState(1)
+  const [isFilteredTrigger, setIsFilteredTrigger] = useState(false);
+  const lastAppliedFiltersRef = useRef<typeof filters | null>(null);
 
 
   /*NEW STATE FOR SELECTED CUSTOMERS */
@@ -117,7 +119,7 @@ const hasInitialFetched = useRef(false);
 
   useEffect(() => {
     const status = searchParams.get("Campaign");
-    if(!fieldOptions?.Campaign?.length) return;
+    if (!fieldOptions?.Campaign?.length) return;
 
     if (status) {
 
@@ -150,12 +152,12 @@ const hasInitialFetched = useRef(false);
     }
   }, [searchParams, fieldOptions.Campaign]);
 
-  const getTotalCustomerPage = async ()=>{
-    const data= await getCustomer();
-    const total=  Math.ceil(data.length / Number(filters.Limit[0])) || 0
+  const getTotalCustomerPage = async () => {
+    const data = await getCustomer();
+    const total = Math.ceil(data.length / Number(filters.Limit[0])) || 0
     setTotalCustomerPage(total);
   }
-  
+
 
   function getPlainTextFromHTML(htmlString: string) {
     const parser = new DOMParser();
@@ -248,6 +250,10 @@ const hasInitialFetched = useRef(false);
       toast.success(`Customer deleted successfully`);
       setIsDeleteDialogOpen(false);
       setDialogData(null);
+       if (isFilteredTrigger) {
+        await refreshCustomersWithLastFilters();
+        return;
+      }
       await getCustomers();
     }
   };
@@ -292,8 +298,8 @@ const hasInitialFetched = useRef(false);
           : [],
     };
     setFilters(updatedFilters);
-
-
+    lastAppliedFiltersRef.current = updatedFilters;
+    setIsFilteredTrigger(true);
 
     const queryParams = new URLSearchParams();
     Object.entries(updatedFilters).forEach(([key, value]) => {
@@ -343,8 +349,43 @@ const hasInitialFetched = useRef(false);
       City: { id: "", name: "" },
       Location: { id: "", name: "" },
     })
+    setIsFilteredTrigger(false);
     await getCustomers();
   };
+
+  const refreshCustomersWithLastFilters = async () => {
+    const appliedFilters = lastAppliedFiltersRef.current;
+
+    if (!appliedFilters) return;
+
+    setCustomerTableLoader(true);
+
+    const queryParams = new URLSearchParams();
+    Object.entries(appliedFilters).forEach(([key, value]) => {
+      if (key === "Limit") return;
+      if (Array.isArray(value) && value.length > 0) {
+        value.forEach((v) => queryParams.append(key, v));
+      } else if (typeof value === "string" && value) {
+        queryParams.append(key, value);
+      }
+    });
+
+    queryParams.append("Limit", FETCH_CHUNK.toString());
+    queryParams.append("Skip", "0");
+
+    const data = await getFilteredCustomer(queryParams.toString());
+
+    if (data) {
+      const mapped = data.map(mapCustomer);
+      setCustomerData(mapped);
+      setFetchedCount(mapped.length);
+      setHasMoreCustomers(mapped.length === FETCH_CHUNK);
+      setCurrentTablePage(1);
+    }
+
+    setCustomerTableLoader(false);
+  };
+
 
   const totalTablePages = useMemo(() => {
     return Math.ceil(customerData.length / rowsPerTablePage) || 1;
@@ -359,11 +400,6 @@ const hasInitialFetched = useRef(false);
     setRowsPerTablePage(safeLimit);
     setCurrentTablePage(1);
   }, [filters.Limit]);
-
-
-
-
-
 
 
   const nexttablePage = () => {
@@ -455,7 +491,13 @@ const hasInitialFetched = useRef(false);
       setIsDeleteAllDialogOpen(false);
       setDeleteAllDialogData(null);
       setSelectedCustomers([]);
+      if (isFilteredTrigger) {
+        await refreshCustomersWithLastFilters();
+        return;
+      }
       getCustomers();
+
+
     }
   };
 
@@ -904,7 +946,7 @@ const hasInitialFetched = useRef(false);
             />
 
 
-            <SingleSelect options={Array.isArray(fieldOptions?.User) ? fieldOptions.User : []} value={filters.User[0]} label="User" onChange={(v) => handleSelectChange("User", v)} />
+            <SingleSelect options={Array.isArray(fieldOptions?.User) ? fieldOptions.User : []} value={filters.User[0]} label="User" onChange={(v) => handleSelectChange("User", v)} isSearchable />
             <div className=" w-full flex justify-end">
               <button type="reset" onClick={clearFilter} className="text-red-500 cursor-pointer hover:underline text-sm px-5 py-2 rounded-md">
                 Clear Search
@@ -1143,13 +1185,15 @@ const hasInitialFetched = useRef(false);
                           handleSelectChange("Location", selectedObj.Name, updatedFilters)
                         }
                       }}
+                      isSearchable
                     />
 
-                    <SingleSelect options={Array.isArray(fieldOptions?.User) ? fieldOptions.User : []} value={filters.User[0]} label="User" onChange={(v) => handleSelectChange("User", v)} />
+                    <SingleSelect options={Array.isArray(fieldOptions?.User) ? fieldOptions.User : []} value={filters.User[0]} label="User" onChange={(v) => handleSelectChange("User", v)} isSearchable />
 
-                    <SingleSelect options={["10", "25", "50", "100"]} value={filters.Limit[0]} label="Limit" onChange={(v) =>{
-                      
-                       handleSelectChange("Limit", v)}} />
+                    <SingleSelect options={["10", "25", "50", "100"]} value={filters.Limit[0]} label="Limit" onChange={(v) => {
+
+                      handleSelectChange("Limit", v)
+                    }} />
 
                   </div>
 
@@ -1180,7 +1224,8 @@ const hasInitialFetched = useRef(false);
                 </form>
               </div>
             </div>
-            <div className=" overflow-auto" ref={scrollRef}>
+            <div className=" overflow-auto relative" ref={scrollRef}>
+              <div className=" flex justify-between items-center sticky top-0 left-0 w-full">
               <div className="flex gap-10 items-center px-3 py-4 min-w-max text-gray-700">
 
                 <label htmlFor="selectall" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer">
@@ -1218,8 +1263,12 @@ const hasInitialFetched = useRef(false);
                 {
                   admin?.role !== "user" && <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
                     if (customerData.length > 0) {
-                      const firstPageIds = currentRows.map((c) => c._id);
-                      setSelectedCustomers(firstPageIds);
+                      if (selectedCustomers.length < 1) {
+                        const firstPageIds = currentRows.map((c) => c._id);
+                        setSelectedCustomers(firstPageIds);
+                        return;
+                      }
+
                       setIsDeleteAllDialogOpen(true);
                       setDeleteAllDialogData({});
                     }
@@ -1228,6 +1277,8 @@ const hasInitialFetched = useRef(false);
                   </button>
                 }
 
+              </div>
+              {selectedCustomers.length>0 && <p className=" text-gray-400 font-extralight text-sm">selected {selectedCustomers.length}</p>}
               </div>
 
               <table className="table-auto w-full border-collapse text-sm border border-gray-200">
@@ -1404,7 +1455,7 @@ const hasInitialFetched = useRef(false);
             {/* Pagination */}
             <div className="flex justify-between items-center mt-3 py-3 px-5">
               <p className="text-sm">
-                Page {currentTablePage} of {hasMoreCustomers? totalTablePages+1 : totalCustomerPage}
+                Page {currentTablePage} of {hasMoreCustomers ? totalTablePages + 1 : totalTablePages}
               </p>
               <div className="flex gap-3">
                 <button

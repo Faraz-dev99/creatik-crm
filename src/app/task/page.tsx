@@ -228,8 +228,10 @@ export default function TaskPage() {
             {/* <button type="button" className="hover:text-gray-950 cursor-pointer" onClick={() => { if(taskIds.length) setIsDeleteAllDialogOpen(true); }}>Delete All</button> */}
             <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
               if (filteredTask.length > 0) {
+                if(taskIds.length<1){
                  const firstPageIds = currentRows.map((c) => c._id);
                     setTaskIds(firstPageIds);
+                }
                 setIsDeleteAllDialogOpen(true);
               }
             }}><div className=" absolute top-0 left-0 z-0 h-full bg-[var(--color-primary)] w-0 group-hover:w-full transition-all duration-300 "></div>
