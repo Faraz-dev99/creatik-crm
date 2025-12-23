@@ -141,8 +141,8 @@ const DonutChart = () => {
 
             <Tooltip
               formatter={(
-                value: ValueType,
-                name: NameType,
+                value: string | number,
+                name: string,
                 entry: any
               ) => {
                 const numericValue = typeof value === "number" ? value : 0;
