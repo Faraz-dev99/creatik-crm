@@ -9,6 +9,8 @@ import {
 } from "recharts";
 import { useDashboardData } from "../data/useDashboardSectionOne";
 import { getAllCustomerFollowups } from "@/store/customerFollowups";
+import type { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
+
 
 const COLORS = ["#F87171", "#0EA5E9", "#10B981", "#FBBF24", "#A855F7", "#3B82F6"];
 
@@ -65,52 +67,52 @@ const DonutChart = () => {
   const total = feedbackStats.reduce((sum, item) => sum + item.value, 0);
 
   // Custom label inside slice
-const renderLabel = ({
-  cx,
-  cy,
-  midAngle,
-  innerRadius,
-  outerRadius,
-  percent,
-}: any) => {
-  const RADIAN = Math.PI / 180;
-  const radius = innerRadius + (outerRadius - innerRadius) * 0.55;
+  const renderLabel = ({
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    percent,
+  }: any) => {
+    const RADIAN = Math.PI / 180;
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.55;
 
-  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
-  return (
-    <foreignObject
-      x={x - 18}
-      y={y - 12}
-      width={36}
-      height={24}
-      style={{ pointerEvents: "none" }}
-    >
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          fontSize: "10px",
-          fontWeight: "bold",
-          color: "white",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "2px",
-        }}
+    return (
+      <foreignObject
+        x={x - 18}
+        y={y - 12}
+        width={36}
+        height={24}
+        style={{ pointerEvents: "none" }}
       >
-        {`${(percent * 100).toFixed(0)}%`}
-      </div>
-    </foreignObject>
-  );
-};
+        <div
+          style={{
+            width: "100%",
+            height: "100%",
+            fontSize: "10px",
+            fontWeight: "bold",
+            color: "white",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "2px",
+          }}
+        >
+          {`${(percent * 100).toFixed(0)}%`}
+        </div>
+      </foreignObject>
+    );
+  };
 
 
   return (
     <div className="w-full max-w-md mx-auto p-4 bg-white shadow-md">
       <h2 className="text-base sm:text-lg font-bold text-blue-600 text-center">
-         Followup Status
+        Followup Status
       </h2>
 
       <ResponsiveContainer width="100%" height={250} className="sm:h-[260px] md:h-[300px]">
@@ -138,11 +140,17 @@ const renderLabel = ({
             </Pie>
 
             <Tooltip
-              formatter={(value: number) =>
-                `${value} (${((value / total) * 100).toFixed(1)}%)`
-              }
+              formatter={(
+                value: ValueType,
+                name: NameType,
+                entry: any
+              ) => {
+                const numericValue = typeof value === "number" ? value : 0;
+                return `${numericValue} (${((numericValue / total) * 100).toFixed(1)}%)`;
+              }}
               contentStyle={{ fontSize: "0.8rem", borderRadius: "8px" }}
             />
+
 
             <Legend
               layout="horizontal"
