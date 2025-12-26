@@ -1266,7 +1266,6 @@ export default function Customer() {
                       if (selectedCustomers.length < 1) {
                         const firstPageIds = currentRows.map((c) => c._id);
                         setSelectedCustomers(firstPageIds);
-                        return;
                       }
 
                       setIsDeleteAllDialogOpen(true);
