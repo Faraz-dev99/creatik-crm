@@ -121,8 +121,8 @@ const nextPage = async () => {
                                 setViewAll(false)
                                 setViewLeadData(null)
                             }}><IoMdClose size={25} /></button>
-                            <div className=" rounded-md mb-5 h-[220px]">
-                                <img className=" w-[280px] h-full mx-auto " src={viewLeadData?.SitePlan?.length > 0 ? viewLeadData?.SitePlan : "/siteplan.png"} />
+                            <div className=" rounded-md bg-gray-300 h-[220px]">
+                                <img className=" w-[220px] h-full mx-auto " src={viewLeadData?.SitePlan?.length > 0 ? viewLeadData?.SitePlan : "/siteplan2.png"} />
                             </div>
 
                             <div className=" max-h-[calc(80vh-240px)] overflow-y-auto mt-3">
@@ -201,8 +201,8 @@ const nextPage = async () => {
                                      setViewLeadData(lead)
                                     }
                             } >View All</button> */}
-                                <div className=" w-[120px] h-[80px] grid place-items-center rounded-md  self-end">
-                                    <img width={120} className=" w-[80px] h-[60px] " src={lead.SitePlan?.length > 0 ? lead.SitePlan : "/siteplan.png"} onClick={() => {
+                                <div className=" bg-gray-300 w-[120px] h-[80px] grid place-items-center rounded-md  self-end">
+                                    <img width={120} className=" w-[60px] h-[60px] " src={lead.SitePlan?.length > 0 ? lead.SitePlan : "/siteplan2.png"} onClick={() => {
                                         setViewAll(true)
                                         setViewLeadData(lead)
                                     }} />
