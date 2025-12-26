@@ -202,7 +202,7 @@ const nextPage = async () => {
                                     }
                             } >View All</button> */}
                                 <div className=" w-[120px] h-[80px] grid place-items-center rounded-md  self-end">
-                                    <img width={120} className=" w-[90px] h-[60px] " src={lead.SitePlan?.length > 0 ? lead.SitePlan : "/siteplan.png"} onClick={() => {
+                                    <img width={120} className=" w-[80px] h-[60px] " src={lead.SitePlan?.length > 0 ? lead.SitePlan : "/siteplan.png"} onClick={() => {
                                         setViewAll(true)
                                         setViewLeadData(lead)
                                     }} />
