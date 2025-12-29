@@ -1,7 +1,8 @@
-export const BASE_URL = "https://propertyapi.aileadgenie.cloud/api";
+export const BASE_URL = "https://apiedu.ibigdata.in/api";
 //https://live-project-backend-1.onrender.com
 //https://propertyapi.aileadgenie.cloud/api
 //https://apiconsult.ibigdata.in
+//https://apiedu.ibigdata.in
 
 export const API_ROUTES = {
   CONTACT: {
