@@ -26,6 +26,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.18",
+    "file-saver": "^2.0.5",
     "framer-motion": "^12.23.24",
     "jodit-react": "^5.2.38",
     "js-cookie": "^3.0.5",
@@ -39,7 +40,8 @@
     "rechart": "^0.0.1",
     "recharts": "^3.4.1",
     "tailwind-merge": "^3.3.1",
-    "tinymce": "^8.2.2"
+    "tinymce": "^8.2.2",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

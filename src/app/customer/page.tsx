@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useMemo, useRef, useState } from "react";
-import { CiSearch } from "react-icons/ci";
+import { CiExport, CiSearch } from "react-icons/ci";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { MdEdit, MdDelete, MdAdd, MdFavorite, MdFavoriteBorder, MdEmail } from "react-icons/md";
 import Button from '@mui/material/Button';
@@ -40,6 +40,7 @@ import { handleFieldOptionsObject } from "../utils/handleFieldOptionsObject";
 import ObjectSelect from "../component/ObjectSelect";
 import { FaPhone, FaWhatsapp } from "react-icons/fa";
 import { useAuth } from "@/context/AuthContext";
+import { exportToExcel } from "../utils/exportToExcel";
 
 
 interface DeleteAllDialogDataInterface { }
@@ -114,6 +115,7 @@ export default function Customer() {
 
   const [customerData, setCustomerData] = useState<customerGetDataInterface[]>([]);
   const [customerAdv, setCustomerAdv] = useState<CustomerAdvInterface[]>([]);
+  const [exportingCustomerData, setExportingCustomerData] = useState<customerGetDataInterface[]>([]);
 
 
 
@@ -151,6 +153,12 @@ export default function Customer() {
       fetchFields();
     }
   }, [searchParams, fieldOptions.Campaign]);
+
+
+  useEffect(() => {
+    const datatoExport = customerData.filter((customer) => selectedCustomers.includes(customer._id));
+    setExportingCustomerData(datatoExport);
+  }, [selectedCustomers]);
 
   const getTotalCustomerPage = async () => {
     const data = await getCustomer();
@@ -250,7 +258,7 @@ export default function Customer() {
       toast.success(`Customer deleted successfully`);
       setIsDeleteDialogOpen(false);
       setDialogData(null);
-       if (isFilteredTrigger) {
+      if (isFilteredTrigger) {
         await refreshCustomersWithLastFilters();
         return;
       }
@@ -1029,14 +1037,27 @@ export default function Customer() {
         <div className="p-4 max-md:p-3 w-full rounded-md bg-white max-[450px]:hidden">
           <div className="flex justify-between items-center p-2">
             <PageHeader title="Dashboard" subtitles={["Customer"]} />
-
-            <AddButton
+            <div className=" flex items-center gap-4">
+              {
+            admin?.role === "administrator" && <button className=" flex justify-center items-center gap-1 hover:bg-[var(--color-primary-light)] cursor-pointer text-[var(--color-primary)] text-sm bg-[var(--color-primary-lighter)] px-2 py-1 rounded-sm " onClick={() =>{
+              if(selectedCustomers.length === 0){
+                toast.error("Please select at least one customer to export")
+                return
+              }
+               exportToExcel(exportingCustomerData, "customer_list")}}>
+             <CiExport/> Export
+            </button>
+          }
+          <AddButton
               url="/customer/add"
               text="Add"
               icon={<PlusSquare size={18} />}
             />
+            </div>
+            
 
           </div>
+          
 
           {/* TABLE */}
           <section className="flex flex-col mt-6 p-2 rounded-md">
@@ -1226,58 +1247,58 @@ export default function Customer() {
             </div>
             <div className=" overflow-auto relative" ref={scrollRef}>
               <div className=" flex justify-between items-center sticky top-0 left-0 w-full">
-              <div className="flex gap-10 items-center px-3 py-4 min-w-max text-gray-700">
+                <div className="flex gap-10 items-center px-3 py-4 min-w-max text-gray-700">
 
-                <label htmlFor="selectall" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer">
-                  <div className=" absolute top-0 left-0 z-0 h-full bg-[var(--color-primary)] w-0 group-hover:w-full transition-all duration-300 "></div>
-                  <span className="relative">Select All</span>
-                </label>
-                <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
-                  if (selectedCustomers.length <= 0) toast.error("please select atleast 1 customer")
-                  else {
-                    setIsAssignOpen(true);
-                    fetchUsers()
-                  } 0
-                }}><div className=" absolute top-0 left-0 z-0 h-full bg-[var(--color-primary)] w-0 group-hover:w-full transition-all duration-300 "></div>
-                  <span className="relative">Asign To</span></button>
-                <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
-                  if (selectedCustomers.length <= 0) toast.error("please select atleast 1 customer")
-                  else {
-                    setIsMailAllOpen(true);
-                    fetchEmailTemplates()
-                  }
-                }}><div className=" absolute top-0 left-0 z-0 h-full bg-[var(--color-primary)] w-0 group-hover:w-full transition-all duration-300 "></div>
-                  <span className="relative">Email All</span></button>
-                <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
-                  if (selectedCustomers.length <= 0) toast.error("please select atleast 1 customer")
-                  else {
-                    setIsWhatsappAllOpen(true);
-                    fetchWhatsappTemplates()
-                  }
-                }}><div className=" absolute top-0 left-0 z-0 h-full bg-[var(--color-primary)] w-0 group-hover:w-full transition-all duration-300 "></div>
-                  <span className="relative">SMS All</span></button>
-                {/*                 <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer">
+                  <label htmlFor="selectall" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer">
+                    <div className=" absolute top-0 left-0 z-0 h-full bg-[var(--color-primary)] w-0 group-hover:w-full transition-all duration-300 "></div>
+                    <span className="relative">Select All</span>
+                  </label>
+                  <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
+                    if (selectedCustomers.length <= 0) toast.error("please select atleast 1 customer")
+                    else {
+                      setIsAssignOpen(true);
+                      fetchUsers()
+                    } 0
+                  }}><div className=" absolute top-0 left-0 z-0 h-full bg-[var(--color-primary)] w-0 group-hover:w-full transition-all duration-300 "></div>
+                    <span className="relative">Asign To</span></button>
+                  <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
+                    if (selectedCustomers.length <= 0) toast.error("please select atleast 1 customer")
+                    else {
+                      setIsMailAllOpen(true);
+                      fetchEmailTemplates()
+                    }
+                  }}><div className=" absolute top-0 left-0 z-0 h-full bg-[var(--color-primary)] w-0 group-hover:w-full transition-all duration-300 "></div>
+                    <span className="relative">Email All</span></button>
+                  <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
+                    if (selectedCustomers.length <= 0) toast.error("please select atleast 1 customer")
+                    else {
+                      setIsWhatsappAllOpen(true);
+                      fetchWhatsappTemplates()
+                    }
+                  }}><div className=" absolute top-0 left-0 z-0 h-full bg-[var(--color-primary)] w-0 group-hover:w-full transition-all duration-300 "></div>
+                    <span className="relative">SMS All</span></button>
+                  {/*                 <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer">
                   <div className=" absolute top-0 left-0 z-0 h-full bg-[var(--color-primary)] w-0 group-hover:w-full transition-all duration-300 "></div>
                   <span className="relative ">Mass Update</span>
                 </button> */}
-                {
-                  admin?.role !== "user" && <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
-                    if (customerData.length > 0) {
-                      if (selectedCustomers.length < 1) {
-                        const firstPageIds = currentRows.map((c) => c._id);
-                        setSelectedCustomers(firstPageIds);
+                  {
+                    admin?.role !== "user" && <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
+                      if (customerData.length > 0) {
+                        if (selectedCustomers.length < 1) {
+                          const firstPageIds = currentRows.map((c) => c._id);
+                          setSelectedCustomers(firstPageIds);
+                        }
+
+                        setIsDeleteAllDialogOpen(true);
+                        setDeleteAllDialogData({});
                       }
+                    }}><div className=" absolute top-0 left-0 z-0 h-full bg-[var(--color-primary)] w-0 group-hover:w-full transition-all duration-300 "></div>
+                      <span className="relative ">Delete All</span>
+                    </button>
+                  }
 
-                      setIsDeleteAllDialogOpen(true);
-                      setDeleteAllDialogData({});
-                    }
-                  }}><div className=" absolute top-0 left-0 z-0 h-full bg-[var(--color-primary)] w-0 group-hover:w-full transition-all duration-300 "></div>
-                    <span className="relative ">Delete All</span>
-                  </button>
-                }
-
-              </div>
-              {selectedCustomers.length>0 && <p className=" text-gray-400 font-extralight text-sm">selected {selectedCustomers.length}</p>}
+                </div>
+                {selectedCustomers.length > 0 && <p className=" text-gray-400 font-extralight text-sm">selected {selectedCustomers.length}</p>}
               </div>
 
               <table className="table-auto w-full border-collapse text-sm border border-gray-200">

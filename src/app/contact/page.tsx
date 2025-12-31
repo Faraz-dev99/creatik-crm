@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from "react";
-import { CiSearch } from "react-icons/ci";
+import { CiExport, CiSearch } from "react-icons/ci";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { MdEdit, MdDelete, MdAdd } from "react-icons/md";
 import Button from "@mui/material/Button";
@@ -48,6 +48,8 @@ import ContactTable from "../phonescreens/DashboardScreens/tables/ContactTable";
 import DynamicAdvance from "../phonescreens/DashboardScreens/DynamicAdvance";
 import { handleFieldOptionsObject } from "../utils/handleFieldOptionsObject";
 import ObjectSelect from "../component/ObjectSelect";
+import { exportToExcel } from "../utils/exportToExcel";
+import { useAuth } from "@/context/AuthContext";
 
 interface DeleteAllDialogDataInterface { }
 
@@ -74,6 +76,7 @@ export default function Contacts() {
     useState<DeleteDialogDataInterface | null>(null);
   const [deleteAllDialogData, setDeleteAllDialogData] =
     useState<DeleteAllDialogDataInterface | null>(null);
+  const { admin } = useAuth();
 
   const [rowsPerTablePage, setRowsPerTablePage] = useState(10);
 
@@ -96,6 +99,7 @@ export default function Contacts() {
   });
 
   const [contactData, setContactData] = useState<contactGetDataInterface[]>([]);
+  const [exportingContactData, setExportingContactData] = useState<contactGetDataInterface[]>([]);
   const [contactAdv, setContactAdv] = useState<ContactAdvInterface[]>([]);
   const [fieldOptions, setFieldOptions] = useState<Record<string, any[]>>({});
 
@@ -104,6 +108,11 @@ export default function Contacts() {
     getContacts();
     fetchFields();
   }, []);
+
+  useEffect(() => {
+    const datatoExport = contactData.filter((customer) => selectedContacts.includes(customer._id));
+    setExportingContactData(datatoExport);
+  }, [selectedContacts, contactData]);
 
   const getContacts = async () => {
     const data = await getContact();
@@ -576,9 +585,10 @@ export default function Contacts() {
           onSelect={handleSelectMailtemplate}
           onSubmit={handleMailAll}
           submitLabel="Mail"
-          onClose={() => { 
+          onClose={() => {
             setSelectedContacts([]);
-            setIsMailAllOpen(false)}}
+            setIsMailAllOpen(false)
+          }}
         />
       )}
 
@@ -602,7 +612,7 @@ export default function Contacts() {
 
         <div className=" flex justify-between items-center px-0 pb-0  ">
           <h1 className=" text-[var(--color-primary)] font-extrabold text-2xl ">Contacts</h1>
-          
+
         </div>
         <div className=" w-full">
           <DynamicAdvance addUrl="/contact/add">
@@ -776,12 +786,24 @@ export default function Contacts() {
         <div className="p-4 max-md:p-3 bg-white rounded-md w-full">
           <div className="flex justify-between items-center">
             <PageHeader title="Dashboard" subtitles={["Contact"]} />
-
-            <AddButton
-              url="/contact/add"
-              text="Add"
-              icon={<PlusSquare size={18} />}
-            />
+            <div className=" flex items-center gap-4">
+              {
+                admin?.role === "administrator" && <button className=" flex justify-center items-center gap-1 hover:bg-[var(--color-primary-light)] cursor-pointer text-[var(--color-primary)] text-sm bg-[var(--color-primary-lighter)] px-2 py-1 rounded-sm " onClick={() => {
+                  if (selectedContacts.length === 0) {
+                    toast.error("Please select at least one contact to export")
+                    return
+                  }
+                  exportToExcel(exportingContactData, "contact_list")
+                }}>
+                  <CiExport /> Export
+                </button>
+              }
+              <AddButton
+                url="/contact/add"
+                text="Add"
+                icon={<PlusSquare size={18} />}
+              />
+            </div>
           </div>
 
           {/* TABLE SECTION */}
@@ -971,9 +993,9 @@ export default function Contacts() {
                 </button> */}
                 <button type="button" className=" relative overflow-hidden py-[2px] group hover:bg-[var(--color-primary-lighter)] hover:text-white text-[var(--color-primary)] bg-[var(--color-primary-lighter)]  rounded-tr-sm rounded-br-sm  border-l-[3px] px-2 border-l-[var(--color-primary)] cursor-pointer" onClick={() => {
                   if (contactData.length > 0) {
-                    if(selectedContacts.length<1){
-                    const firstPageIds = currentRows.map((c) => c._id);
-                    setSelectedContacts(firstPageIds);
+                    if (selectedContacts.length < 1) {
+                      const firstPageIds = currentRows.map((c) => c._id);
+                      setSelectedContacts(firstPageIds);
                     }
                     setIsDeleteAllDialogOpen(true);
                     setDeleteAllDialogData({});
