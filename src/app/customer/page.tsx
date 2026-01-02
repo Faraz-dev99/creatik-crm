@@ -1300,12 +1300,12 @@ export default function Customer() {
                 </div>
                 {selectedCustomers.length > 0 && <p className=" text-gray-400 font-extralight text-sm">selected {selectedCustomers.length}</p>}
               </div>
-
-              <table className="table-auto w-full border-collapse text-sm border border-gray-200">
-                <thead className="bg-[var(--color-primary)] text-white">
+              <div className=" max-h-[600px] overflow-y-auto">
+              <table className="table-auto relative w-full border-separate border-spacing-0 text-sm border border-gray-200">
+                <thead className="bg-[var(--color-primary)] text-white sticky top-0 left-0 z-[5]">
                   <tr>
 
-                    {/* ✅ SELECT ALL CHECKBOX COLUMN */}
+                    {/* ✅ SELECT ALL CHECKBOX COLUMN */}           
                     <th className="px-2 py-3 border border-[var(--color-secondary-dark)] text-left">
 
                       <input
@@ -1365,7 +1365,7 @@ export default function Customer() {
                             {item.Description}
                           </td>
                           <td className="px-2 py-3 border border-gray-200">{item.Location}</td>
-                          <td className="px-4 py-3  flex flex-col justify-center items-center gap-1">{(item.ContactNumber) && <>{item.ContactNumber}<span className=" flex"> <Button
+                          <td className="px-2 py-3 border border-gray-200 break-all text-center whitespace-normal max-w-[140px]">{(item.ContactNumber) && <>{item.ContactNumber}<span className=" flex"> <Button
                             component="a"
                             href={`tel:${item.ContactNumber}`}
                             sx={{
@@ -1470,7 +1470,7 @@ export default function Customer() {
                     )}
                 </tbody>
               </table>
-
+              </div>
             </div>
             {/* Pagination */}
             <div className="flex justify-between items-center mt-3 py-3 px-5">
