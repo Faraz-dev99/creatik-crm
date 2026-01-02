@@ -62,11 +62,18 @@ export default function CustomerAdd() {
   const router = useRouter();
 
 
+const handleContactExist = async (contactNo: string) => { 
+  const duplicate = await isContactNoExist(contactNo);
+    if (duplicate) return;
+}
 
   // 🟩 Handle Input
   const handleInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       const { name, value } = e.target;
+      if(name==="ContactNumber"){
+        handleContactExist(value);
+      }
       setCustomerData((prev) => ({ ...prev, [name]: value }));
       setErrors((prev) => ({ ...prev, [name]: "" }));
     },
