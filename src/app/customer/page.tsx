@@ -7,7 +7,7 @@ import Button from '@mui/material/Button';
 import SingleSelect from "@/app/component/SingleSelect";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { PlusSquare } from "lucide-react";
+import { ChevronsLeft, ChevronsRight, PlusSquare } from "lucide-react";
 import ProtectedRoute from "../component/ProtectedRoutes";
 import toast, { Toaster } from "react-hot-toast";
 import { getCustomer, deleteCustomer, getFilteredCustomer, updateCustomer, assignCustomer, deleteAllCustomer } from "@/store/customer";
@@ -101,7 +101,7 @@ export default function Customer() {
     Location: [] as string[],
     User: [] as string[],
     Keyword: "" as string,
-    Limit: ["10"] as string[],
+    Limit: ["100"] as string[],
   });
 
   const [dependent, setDependent] = useState({
@@ -152,6 +152,7 @@ export default function Customer() {
       getCustomers();
       fetchFields();
     }
+    getTotalCustomerPage();
   }, [searchParams, fieldOptions.Campaign]);
 
 
@@ -162,9 +163,16 @@ export default function Customer() {
 
   const getTotalCustomerPage = async () => {
     const data = await getCustomer();
-    const total = Math.ceil(data.length / Number(filters.Limit[0])) || 0
+    const total = Math.ceil(data.length / Number(filters.Limit[0])) || 1
     setTotalCustomerPage(total);
+    setTotalCustomers(data.length);
   }
+
+
+  useEffect(() => {
+    const total = Math.ceil(totalCustomers / Number(filters.Limit[0])) || 1
+    setTotalCustomerPage(total);
+  }, [filters,totalCustomers]);
 
 
   function getPlainTextFromHTML(htmlString: string) {
@@ -251,6 +259,39 @@ export default function Customer() {
   };
 
 
+const handleLastPage = async () => {
+  setCustomerTableLoader(true);
+
+  const queryParams = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (key === "Limit") return;
+    if (Array.isArray(value)) value.forEach(v => queryParams.append(key, v));
+    if (typeof value === "string" && value) queryParams.append(key, value);
+  });
+
+  // Fetch all rows at once by not limiting
+  queryParams.delete("Limit");
+  queryParams.delete("Skip");
+
+  const data = await getFilteredCustomer(queryParams.toString());
+  if (data) {
+    const mapped = data.map(mapCustomer);
+    setCustomerData(mapped);
+    setFetchedCount(mapped.length);
+    setHasMoreCustomers(false); // all loaded
+setTotalCustomers(mapped.length);
+    // calculate last page using the freshly fetched data
+    const finalTotalPages = Math.ceil(mapped.length / rowsPerTablePage) || 1;
+    setCurrentTablePage(finalTotalPages); // jump to last page
+  }
+
+  setCustomerTableLoader(false);
+};
+
+
+
+
+
   const handleDelete = async (data: DeleteDialogDataInterface | null) => {
     if (!data) return;
     const response = await deleteCustomer(data.id);
@@ -325,6 +366,11 @@ export default function Customer() {
     queryParams.append("Skip", "0");
 
     const data = await getFilteredCustomer(queryParams.toString());
+    const totalQueryParams = new URLSearchParams(queryParams);
+    totalQueryParams.delete("Limit");
+    totalQueryParams.delete("Skip");
+
+
 
     if (data) {
       const mapped = data.map(mapCustomer);
@@ -332,6 +378,14 @@ export default function Customer() {
       setFetchedCount(mapped.length);
       setHasMoreCustomers(mapped.length === FETCH_CHUNK);
       setCurrentTablePage(1);
+    }
+
+    const totalfilteredData = await getFilteredCustomer(
+      totalQueryParams.toString()
+    );
+
+    if (totalfilteredData) {
+      setTotalCustomers(totalfilteredData.length);
     }
 
     setCustomerTableLoader(false);
@@ -1039,25 +1093,26 @@ export default function Customer() {
             <PageHeader title="Dashboard" subtitles={["Customer"]} />
             <div className=" flex items-center gap-4">
               {
-            admin?.role === "administrator" && <button className=" flex justify-center items-center gap-1 hover:bg-[var(--color-primary-light)] cursor-pointer text-[var(--color-primary)] text-sm bg-[var(--color-primary-lighter)] px-2 py-1 rounded-sm " onClick={() =>{
-              if(selectedCustomers.length === 0){
-                toast.error("Please select at least one customer to export")
-                return
+                admin?.role === "administrator" && <button className=" flex justify-center items-center gap-1 hover:bg-[var(--color-primary-light)] cursor-pointer text-[var(--color-primary)] text-sm bg-[var(--color-primary-lighter)] px-2 py-1 rounded-sm " onClick={() => {
+                  if (selectedCustomers.length === 0) {
+                    toast.error("Please select at least one customer to export")
+                    return
+                  }
+                  exportToExcel(exportingCustomerData, "customer_list")
+                }}>
+                  <CiExport /> Export
+                </button>
               }
-               exportToExcel(exportingCustomerData, "customer_list")}}>
-             <CiExport/> Export
-            </button>
-          }
-          <AddButton
-              url="/customer/add"
-              text="Add"
-              icon={<PlusSquare size={18} />}
-            />
+              <AddButton
+                url="/customer/add"
+                text="Add"
+                icon={<PlusSquare size={18} />}
+              />
             </div>
-            
+
 
           </div>
-          
+
 
           {/* TABLE */}
           <section className="flex flex-col mt-6 p-2 rounded-md">
@@ -1301,183 +1356,193 @@ export default function Customer() {
                 {selectedCustomers.length > 0 && <p className=" text-gray-400 font-extralight text-sm">selected {selectedCustomers.length}</p>}
               </div>
               <div className=" max-h-[600px] overflow-y-auto">
-              <table className="table-auto relative w-full border-separate border-spacing-0 text-sm border border-gray-200">
-                <thead className="bg-[var(--color-primary)] text-white sticky top-0 left-0 z-[5]">
-                  <tr>
-
-                    {/* ✅ SELECT ALL CHECKBOX COLUMN */}           
-                    <th className="px-2 py-3 border border-[var(--color-secondary-dark)] text-left">
-
-                      <input
-                        id="selectall"
-                        type="checkbox"
-                        className=" hidden"
-                        checked={
-                          currentRows.length > 0 &&
-                          currentRows.every((r) => selectedCustomers.includes(r._id))
-                        }
-                        onChange={handleSelectAll}
-                      />
-                    </th>
-
-                    <th className="px-2 py-3 border border-[var(--color-secondary-dark)] text-left  max-w-[60px]">S.No.</th>
-                    <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Campaign</th>
-                    <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Customer Type</th>
-                    <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Customer Subtype</th>
-                    <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Name</th>
-                    <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Description</th>
-                    <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Location</th>
-                    <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Contact No</th>
-                    <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Assign To</th>
-                    <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Date</th>
-                    <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Actions</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {customerTableLoader ?
+                <table className="table-auto relative w-full border-separate border-spacing-0 text-sm border border-gray-200">
+                  <thead className="bg-[var(--color-primary)] text-white sticky top-0 left-0 z-[5]">
                     <tr>
-                      <td colSpan={12} className="text-center py-4 text-gray-500">
-                        Loading customers...
-                      </td>
-                    </tr> : currentRows.length > 0 ? (
-                      currentRows.map((item, index) => (
-                        <tr key={item._id} className="border-t hover:bg-[#f7f6f3] transition-all duration-200">
 
-                          {/* ✅ ROW CHECKBOX */}
-                          <td className="px-2 py-3 border border-gray-200">
-                            <input
-                              type="checkbox"
-                              checked={selectedCustomers.includes(item._id)}
-                              onChange={() => handleSelectRow(item._id)}
-                            />
-                          </td>
+                      {/* ✅ SELECT ALL CHECKBOX COLUMN */}
+                      <th className="px-2 py-3 border border-[var(--color-secondary-dark)] text-left">
 
-                          <td className="px-2 py-3 border border-gray-200 break-all whitespace-normal max-w-[60px]">{(currentTablePage - 1) * rowsPerTablePage + (index + 1)}</td>
-                          <td className="px-2 py-3 border border-gray-200">{item.Campaign}</td>
-                          <td className="px-2 py-3 border border-gray-200 break-all whitespace-normal w-[130px]">{item.Type}</td>
-                          <td className="px-2 py-3  border-gray-200 break-all whitespace-normal max-w-[120px] ">{item.SubType}</td>
-                          <td className="px-2 py-3 border border-gray-200  ">{item.Name}</td>
-                          <td
-                            className={`px-2 py-3 border border-gray-200 break-all whitespace-normal max-w-[160px] ${item.Description ? "min-w-[160px]" : ""
-                              }`}
-                          >
-                            {item.Description}
-                          </td>
-                          <td className="px-2 py-3 border border-gray-200">{item.Location}</td>
-                          <td className="px-2 py-3 border border-gray-200 break-all text-center whitespace-normal max-w-[140px]">{(item.ContactNumber) && <>{item.ContactNumber}<span className=" flex"> <Button
-                            component="a"
-                            href={`tel:${item.ContactNumber}`}
-                            sx={{
-                              backgroundColor: "#E8F5E9",
-                              color: "var(--color-primary)",
-                              minWidth: "14px",
-                              height: "24px",
-                              borderRadius: "8px",
-                              margin: "4px"
-                            }} ><FaPhone size={12} /></Button>
-                            <Button
-                              sx={{
-                                backgroundColor: "#E8F5E9",
-                                color: "var(--color-primary)",
-                                minWidth: "14px",
-                                height: "24px",
-                                borderRadius: "8px",
-                                margin: "4px"
-                              }}
-                              onClick={() => {
-                                setSelectedCustomers([item._id])
-                                setSelectUser(item._id)
-                                setIsMailAllOpen(true);
-                                fetchEmailTemplates();
-                              }}
-                            ><MdEmail size={14} /></Button>
-                            <Button
-                              onClick={() => {
-                                setSelectedCustomers([item._id]);
-                                setSelectUser(item._id);
-                                setIsWhatsappAllOpen(true);
-                                fetchWhatsappTemplates()
-
-                              }}
-                              sx={{
-                                backgroundColor: "#E8F5E9",
-                                color: "var(--color-primary)",
-                                minWidth: "14px",
-                                height: "24px",
-                                borderRadius: "8px",
-                                margin: "4px"
-                              }} ><FaWhatsapp size={14} /></Button></span></>
+                        <input
+                          id="selectall"
+                          type="checkbox"
+                          className=" hidden"
+                          checked={
+                            currentRows.length > 0 &&
+                            currentRows.every((r) => selectedCustomers.includes(r._id))
                           }
-                          </td>
-                          <td className="px-2 py-3 border border-gray-200">{item.AssignTo}</td>
-                          <td className="px-2 py-3 border border-gray-200 min-w-[100px]">{item.Date}</td>
+                          onChange={handleSelectAll}
+                        />
+                      </th>
 
-                          <td className=" py-2 px-[8px] min-w-[90px] grid grid-cols-2 gap-3  items-center">
-                            <Button
-                              sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px", }}
-                              onClick={() => router.push(`/followups/customer/add/${item._id}`)}
+                      <th className="px-2 py-3 border border-[var(--color-secondary-dark)] text-left  max-w-[60px]">S.No.</th>
+                      <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Campaign</th>
+                      <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Customer Type</th>
+                      <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Customer Subtype</th>
+                      <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Name</th>
+                      <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Description</th>
+                      <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Location</th>
+                      <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Contact No</th>
+                      <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Assign To</th>
+                      <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Date</th>
+                      <th className="px-4 py-3 border border-[var(--color-secondary-dark)] text-left">Actions</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {customerTableLoader ?
+                      <tr>
+                        <td colSpan={12} className="text-center py-4 text-gray-500">
+                          Loading customers...
+                        </td>
+                      </tr> : currentRows.length > 0 ? (
+                        currentRows.map((item, index) => (
+                          <tr key={item._id} className="border-t hover:bg-[#f7f6f3] transition-all duration-200">
+
+                            {/* ✅ ROW CHECKBOX */}
+                            <td className="px-2 py-3 border border-gray-200">
+                              <input
+                                type="checkbox"
+                                checked={selectedCustomers.includes(item._id)}
+                                onChange={() => handleSelectRow(item._id)}
+                              />
+                            </td>
+
+                            <td className="px-2 py-3 border border-gray-200 break-all whitespace-normal max-w-[60px]">{(currentTablePage - 1) * rowsPerTablePage + (index + 1)}</td>
+                            <td className="px-2 py-3 border border-gray-200">{item.Campaign}</td>
+                            <td className="px-2 py-3 border border-gray-200 break-all whitespace-normal w-[130px]">{item.Type}</td>
+                            <td className="px-2 py-3 border  border-gray-200 break-all whitespace-normal max-w-[120px] ">{item.SubType}</td>
+                            <td className="px-2 py-3 border border-gray-200  ">{item.Name}</td>
+                            <td
+                              className={`px-2 py-3 border border-gray-200 break-all whitespace-normal max-w-[160px] ${item.Description ? "min-w-[160px]" : ""
+                                }`}
                             >
-                              <MdAdd />
-                            </Button>
-
-                            <Button
-                              sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px", }}
-                              onClick={() => router.push(`/customer/edit/${item._id}`)}
-                            >
-                              <MdEdit />
-                            </Button>
-
-                            <Button
-                              sx={{ backgroundColor: "#FDECEA", color: "#C62828", minWidth: "32px", height: "32px", borderRadius: "8px", }}
-                              onClick={() => {
-                                setIsDeleteDialogOpen(true);
-                                setDialogType("delete");
-                                setDialogData({
-                                  id: item._id,
-                                  customerName: item.Name,
-                                  ContactNumber: item.ContactNumber,
-                                });
-                              }}
-                            >
-                              <MdDelete />
-                            </Button>
-
-                            <Button
+                              {item.Description}
+                            </td>
+                            <td className="px-2 py-3 border border-gray-200">{item.Location}</td>
+                            <td className="px-2 py-3 border border-gray-200 break-all text-center whitespace-normal max-w-[140px]">{(item.ContactNumber) && <>{item.ContactNumber}<span className=" flex"> <Button
+                              component="a"
+                              href={`tel:${item.ContactNumber}`}
                               sx={{
-                                backgroundColor: "#FFF0F5",
-                                color: item.isFavourite ? "#E91E63" : "#C62828",
-                                minWidth: "32px",
-                                height: "32px",
+                                backgroundColor: "#E8F5E9",
+                                color: "var(--color-primary)",
+                                minWidth: "14px",
+                                height: "24px",
                                 borderRadius: "8px",
+                                margin: "4px"
+                              }} ><FaPhone size={12} /></Button>
+                              <Button
+                                sx={{
+                                  backgroundColor: "#E8F5E9",
+                                  color: "var(--color-primary)",
+                                  minWidth: "14px",
+                                  height: "24px",
+                                  borderRadius: "8px",
+                                  margin: "4px"
+                                }}
+                                onClick={() => {
+                                  setSelectedCustomers([item._id])
+                                  setSelectUser(item._id)
+                                  setIsMailAllOpen(true);
+                                  fetchEmailTemplates();
+                                }}
+                              ><MdEmail size={14} /></Button>
+                              <Button
+                                onClick={() => {
+                                  setSelectedCustomers([item._id]);
+                                  setSelectUser(item._id);
+                                  setIsWhatsappAllOpen(true);
+                                  fetchWhatsappTemplates()
 
-                              }}
-                              onClick={() =>
-                                handleFavouriteToggle(item._id, item.Name, item.ContactNumber, item.isFavourite ?? false)
-                              }
-                            >
-                              {item.isFavourite ? <MdFavorite /> : <MdFavoriteBorder />}
-                            </Button>
+                                }}
+                                sx={{
+                                  backgroundColor: "#E8F5E9",
+                                  color: "var(--color-primary)",
+                                  minWidth: "14px",
+                                  height: "24px",
+                                  borderRadius: "8px",
+                                  margin: "4px"
+                                }} ><FaWhatsapp size={14} /></Button></span></>
+                            }
+                            </td>
+                            <td className="px-2 py-3 border border-gray-200">{item.AssignTo}</td>
+                            <td className="px-2 py-3 border border-gray-200 min-w-[100px]">{item.Date}</td>
+
+                           <td className="px-2 py-3 border border-gray-200 min-w-[90px] align-middle">
+<div className="grid grid-cols-2 gap-3 items-center h-full">
+                              <Button
+                                sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px", }}
+                                onClick={() => router.push(`/followups/customer/add/${item._id}`)}
+                              >
+                                <MdAdd />
+                              </Button>
+
+                              <Button
+                                sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px", }}
+                                onClick={() => router.push(`/customer/edit/${item._id}`)}
+                              >
+                                <MdEdit />
+                              </Button>
+
+                              <Button
+                                sx={{ backgroundColor: "#FDECEA", color: "#C62828", minWidth: "32px", height: "32px", borderRadius: "8px", }}
+                                onClick={() => {
+                                  setIsDeleteDialogOpen(true);
+                                  setDialogType("delete");
+                                  setDialogData({
+                                    id: item._id,
+                                    customerName: item.Name,
+                                    ContactNumber: item.ContactNumber,
+                                  });
+                                }}
+                              >
+                                <MdDelete />
+                              </Button>
+
+                              <Button
+                                sx={{
+                                  backgroundColor: "#FFF0F5",
+                                  color: item.isFavourite ? "#E91E63" : "#C62828",
+                                  minWidth: "32px",
+                                  height: "32px",
+                                  borderRadius: "8px",
+
+                                }}
+                                onClick={() =>
+                                  handleFavouriteToggle(item._id, item.Name, item.ContactNumber, item.isFavourite ?? false)
+                                }
+                              >
+                                {item.isFavourite ? <MdFavorite /> : <MdFavoriteBorder />}
+                              </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={10} className="text-center py-4 text-gray-500">
+                            No data available.
                           </td>
                         </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={10} className="text-center py-4 text-gray-500">
-                          No data available.
-                        </td>
-                      </tr>
-                    )}
-                </tbody>
-              </table>
+                      )}
+                  </tbody>
+                </table>
               </div>
             </div>
             {/* Pagination */}
             <div className="flex justify-between items-center mt-3 py-3 px-5">
               <p className="text-sm">
-                Page {currentTablePage} of {hasMoreCustomers ? totalTablePages + 1 : totalTablePages}
+                Page {currentTablePage} of {totalCustomerPage}
               </p>
               <div className="flex gap-3">
+                <button
+                  onClick={() => setCurrentTablePage(1)}
+                  disabled={currentTablePage === 1}
+                  className="p-2 bg-gray-200 border border-gray-300 rounded disabled:opacity-50"
+                  title="First page"
+                >
+                  <ChevronsLeft size={16} />
+                </button>
                 <button
                   onClick={() =>
                     setCurrentTablePage((prev) => Math.max(prev - 1, 1))
@@ -1506,7 +1571,16 @@ export default function Customer() {
                 >
                   Next
                 </button>
+                <button
+  onClick={handleLastPage}
+  disabled={currentTablePage === totalTablePages && !hasMoreCustomers}
+  className="p-2 bg-gray-200 border border-gray-300 rounded disabled:opacity-50"
+  title="Last page"
+>
+  <ChevronsRight size={16} />
+</button>
 
+                
               </div>
             </div>
           </section>
