@@ -14,7 +14,7 @@ export interface customerAllDataInterface {
   CustomerId: string;
   CustomerDate: string;
   CustomerYear: string;
-  Others: string;
+  Other: string;
   Description: string;
   Video: string;
   GoogleMap: string;
@@ -40,7 +40,7 @@ export interface customerImportDataInterface {
   CustomerId: string;
   CustomerDate: string;
   CustomerYear: string;
-  Others: string;
+  Other: string;
   Description: string;
   Video: string;
   GoogleMap: string;

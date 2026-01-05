@@ -48,7 +48,7 @@ export default function CustomerEdit() {
     CustomerId: "",
     CustomerDate: "",
     CustomerYear: "",
-    Others: "",
+    Other: "",
     Description: "",
     Video: "",
     GoogleMap: "",
@@ -254,7 +254,7 @@ export default function CustomerEdit() {
       if (customerData.CustomerId) formData.append("CustomerId", customerData.CustomerId);
       if (customerData.CustomerDate) formData.append("CustomerDate", customerData.CustomerDate);
       if (customerData.CustomerYear) formData.append("CustomerYear", customerData.CustomerYear);
-      if (customerData.Others) formData.append("Other", customerData.Others);
+      if (customerData.Other) formData.append("Other", customerData.Other);
       if (customerData.Description) formData.append("Description", customerData.Description);
       if (customerData.Video) formData.append("Video", customerData.Video);
       if (customerData.GoogleMap) formData.append("GoogleMap", customerData.GoogleMap);
@@ -504,7 +504,7 @@ export default function CustomerEdit() {
                 <DateSelector label="Customer Date" value={customerData.CustomerDate} onChange={(val) => handleSelectChange("CustomerDate", val)} />
               </div>
               <InputField className=" max-sm:hidden" label="Customer Year" name="CustomerYear" value={customerData.CustomerYear} onChange={handleInputChange} />
-              <InputField className=" max-sm:hidden" label="Others" name="Others" value={customerData.Others} onChange={handleInputChange} />
+              <InputField className=" max-sm:hidden" label="Others" name="Others" value={customerData.Other} onChange={handleInputChange} />
               <TextareaField label="Description" name="Description" value={customerData.Description} onChange={handleInputChange} />
               <InputField className=" max-sm:hidden" label="Video" name="Video" value={customerData.Video} onChange={handleInputChange} />
               <InputField className=" max-sm:hidden" label="Google Map" name="GoogleMap" value={customerData.GoogleMap} onChange={handleInputChange} />

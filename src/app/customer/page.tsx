@@ -172,7 +172,7 @@ export default function Customer() {
   useEffect(() => {
     const total = Math.ceil(totalCustomers / Number(filters.Limit[0])) || 1
     setTotalCustomerPage(total);
-  }, [filters,totalCustomers]);
+  }, [filters, totalCustomers]);
 
 
   function getPlainTextFromHTML(htmlString: string) {
@@ -259,34 +259,34 @@ export default function Customer() {
   };
 
 
-const handleLastPage = async () => {
-  setCustomerTableLoader(true);
+  const handleLastPage = async () => {
+    setCustomerTableLoader(true);
 
-  const queryParams = new URLSearchParams();
-  Object.entries(filters).forEach(([key, value]) => {
-    if (key === "Limit") return;
-    if (Array.isArray(value)) value.forEach(v => queryParams.append(key, v));
-    if (typeof value === "string" && value) queryParams.append(key, value);
-  });
+    const queryParams = new URLSearchParams();
+    Object.entries(filters).forEach(([key, value]) => {
+      if (key === "Limit") return;
+      if (Array.isArray(value)) value.forEach(v => queryParams.append(key, v));
+      if (typeof value === "string" && value) queryParams.append(key, value);
+    });
 
-  // Fetch all rows at once by not limiting
-  queryParams.delete("Limit");
-  queryParams.delete("Skip");
+    // Fetch all rows at once by not limiting
+    queryParams.delete("Limit");
+    queryParams.delete("Skip");
 
-  const data = await getFilteredCustomer(queryParams.toString());
-  if (data) {
-    const mapped = data.map(mapCustomer);
-    setCustomerData(mapped);
-    setFetchedCount(mapped.length);
-    setHasMoreCustomers(false); // all loaded
-setTotalCustomers(mapped.length);
-    // calculate last page using the freshly fetched data
-    const finalTotalPages = Math.ceil(mapped.length / rowsPerTablePage) || 1;
-    setCurrentTablePage(finalTotalPages); // jump to last page
-  }
+    const data = await getFilteredCustomer(queryParams.toString());
+    if (data) {
+      const mapped = data.map(mapCustomer);
+      setCustomerData(mapped);
+      setFetchedCount(mapped.length);
+      setHasMoreCustomers(false); // all loaded
+      setTotalCustomers(mapped.length);
+      // calculate last page using the freshly fetched data
+      const finalTotalPages = Math.ceil(mapped.length / rowsPerTablePage) || 1;
+      setCurrentTablePage(finalTotalPages); // jump to last page
+    }
 
-  setCustomerTableLoader(false);
-};
+    setCustomerTableLoader(false);
+  };
 
 
 
@@ -1468,52 +1468,52 @@ setTotalCustomers(mapped.length);
                             <td className="px-2 py-3 border border-gray-200">{item.AssignTo}</td>
                             <td className="px-2 py-3 border border-gray-200 min-w-[100px]">{item.Date}</td>
 
-                           <td className="px-2 py-3 border border-gray-200 min-w-[90px] align-middle">
-<div className="grid grid-cols-2 gap-3 items-center h-full">
-                              <Button
-                                sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px", }}
-                                onClick={() => router.push(`/followups/customer/add/${item._id}`)}
-                              >
-                                <MdAdd />
-                              </Button>
+                            <td className="px-2 py-3 border border-gray-200 min-w-[90px] align-middle">
+                              <div className="grid grid-cols-2 gap-3 items-center h-full">
+                                <Button
+                                  sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px", }}
+                                  onClick={() => router.push(`/followups/customer/add/${item._id}`)}
+                                >
+                                  <MdAdd />
+                                </Button>
 
-                              <Button
-                                sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px", }}
-                                onClick={() => router.push(`/customer/edit/${item._id}`)}
-                              >
-                                <MdEdit />
-                              </Button>
+                                <Button
+                                  sx={{ backgroundColor: "#E8F5E9", color: "var(--color-primary)", minWidth: "32px", height: "32px", borderRadius: "8px", }}
+                                  onClick={() => router.push(`/customer/edit/${item._id}`)}
+                                >
+                                  <MdEdit />
+                                </Button>
 
-                              <Button
-                                sx={{ backgroundColor: "#FDECEA", color: "#C62828", minWidth: "32px", height: "32px", borderRadius: "8px", }}
-                                onClick={() => {
-                                  setIsDeleteDialogOpen(true);
-                                  setDialogType("delete");
-                                  setDialogData({
-                                    id: item._id,
-                                    customerName: item.Name,
-                                    ContactNumber: item.ContactNumber,
-                                  });
-                                }}
-                              >
-                                <MdDelete />
-                              </Button>
+                                <Button
+                                  sx={{ backgroundColor: "#FDECEA", color: "#C62828", minWidth: "32px", height: "32px", borderRadius: "8px", }}
+                                  onClick={() => {
+                                    setIsDeleteDialogOpen(true);
+                                    setDialogType("delete");
+                                    setDialogData({
+                                      id: item._id,
+                                      customerName: item.Name,
+                                      ContactNumber: item.ContactNumber,
+                                    });
+                                  }}
+                                >
+                                  <MdDelete />
+                                </Button>
 
-                              <Button
-                                sx={{
-                                  backgroundColor: "#FFF0F5",
-                                  color: item.isFavourite ? "#E91E63" : "#C62828",
-                                  minWidth: "32px",
-                                  height: "32px",
-                                  borderRadius: "8px",
+                                <Button
+                                  sx={{
+                                    backgroundColor: "#FFF0F5",
+                                    color: item.isFavourite ? "#E91E63" : "#C62828",
+                                    minWidth: "32px",
+                                    height: "32px",
+                                    borderRadius: "8px",
 
-                                }}
-                                onClick={() =>
-                                  handleFavouriteToggle(item._id, item.Name, item.ContactNumber, item.isFavourite ?? false)
-                                }
-                              >
-                                {item.isFavourite ? <MdFavorite /> : <MdFavoriteBorder />}
-                              </Button>
+                                  }}
+                                  onClick={() =>
+                                    handleFavouriteToggle(item._id, item.Name, item.ContactNumber, item.isFavourite ?? false)
+                                  }
+                                >
+                                  {item.isFavourite ? <MdFavorite /> : <MdFavoriteBorder />}
+                                </Button>
                               </div>
                             </td>
                           </tr>
@@ -1572,15 +1572,15 @@ setTotalCustomers(mapped.length);
                   Next
                 </button>
                 <button
-  onClick={handleLastPage}
-  disabled={currentTablePage === totalTablePages && !hasMoreCustomers}
-  className="p-2 bg-gray-200 border border-gray-300 rounded disabled:opacity-50"
-  title="Last page"
->
-  <ChevronsRight size={16} />
-</button>
+                  onClick={handleLastPage}
+                  disabled={currentTablePage === totalTablePages && !hasMoreCustomers}
+                  className="p-2 bg-gray-200 border border-gray-300 rounded disabled:opacity-50"
+                  title="Last page"
+                >
+                  <ChevronsRight size={16} />
+                </button>
 
-                
+
               </div>
             </div>
           </section>
