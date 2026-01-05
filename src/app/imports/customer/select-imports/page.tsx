@@ -216,7 +216,7 @@ export default function SelectImports() {
         "CustomerId",
         "CustomerDate",
         "CustomerYear",
-        "Others",
+        "Other",
         "Description",
         "Video",
         "GoogleMap",
